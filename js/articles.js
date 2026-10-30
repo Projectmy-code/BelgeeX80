@@ -1,14 +1,11 @@
 import { supabase } from './config.js';
 
-// Переменная для нашего редактора
 let quill = null;
-let loadedArticles = []; // Храним загруженные статьи для поиска
+let loadedArticles = [];
 
-// 1. Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     loadArticlesFromDB();
 
-    // Настраиваем Quill (Визуальный редактор)
     const editorContainer = document.getElementById('editor-container');
     if (editorContainer) {
         quill = new Quill('#editor-container', {
@@ -26,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 2. Загрузка статей из базы на главную
 export async function loadArticlesFromDB() {
     const grid = document.getElementById('articles-grid');
     if(!grid) return;
@@ -41,7 +37,7 @@ export async function loadArticlesFromDB() {
 
         if (error) throw error;
 
-        loadedArticles = articles || []; // Сохраняем для поиска
+        loadedArticles = articles || [];
         renderArticles(loadedArticles);
 
     } catch (e) {
@@ -50,7 +46,6 @@ export async function loadArticlesFromDB() {
     }
 }
 
-// 3. Отрисовка карточек статей
 function renderArticles(articles) {
     const grid = document.getElementById('articles-grid');
     if (!grid) return;
@@ -80,7 +75,6 @@ function renderArticles(articles) {
     });
 }
 
-// 4. Поиск по статьям (подключен к input на главной)
 window.handleArticlesSearch = function() {
     const query = document.getElementById('articles-search-input').value.toLowerCase();
     const filtered = loadedArticles.filter(a => 
@@ -91,24 +85,27 @@ window.handleArticlesSearch = function() {
     renderArticles(filtered);
 }
 
-// 5. Открытие модального окна статьи
 export function openArticleModal(article) {
     document.getElementById('info-modal-category').textContent = article.category;
     document.getElementById('info-modal-title').textContent = article.title;
     document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
     document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readtime}`;
-    
-    // Выводим красивый HTML из базы
     document.getElementById('info-modal-content').innerHTML = article.content;
-    
     document.getElementById('info-modal').classList.remove('hidden');
 }
 
-// 6. Проверка прав и открытие формы
+// ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОВЕРКИ НАСТРОЕК
 export async function openSubmission() {
     const { data: { session } } = await supabase.auth.getSession();
-    const { data: settings } = await supabase.from('site_settings').select('publish_mode').eq('id', 1).single();
-    const mode = settings ? settings.publish_mode : 'all';
+    
+    // Запрашиваем значение по ключу submission_mode
+    const { data: settings } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'submission_mode')
+        .single();
+        
+    const mode = settings ? settings.value : 'everyone';
 
     if (mode === 'registered' && !session) {
         alert("Публиковать статьи могут только зарегистрированные пользователи. Пожалуйста, войдите в аккаунт.");
@@ -116,22 +113,18 @@ export async function openSubmission() {
         return;
     }
 
-    // Очищаем редактор перед открытием
     if (quill) quill.root.innerHTML = '';
     
     document.getElementById('add-article-modal').classList.remove('hidden');
 }
 
-// 7. Отправка статьи в базу
 export async function handleAddArticleSubmit(e) {
     e.preventDefault();
     
     if (!quill) return;
     
-    // Получаем текст из визуального редактора
     const contentHTML = quill.root.innerHTML;
     
-    // Проверка на пустой текст
     if (quill.getText().trim().length === 0) {
         alert('Пожалуйста, напишите текст статьи.');
         return;
@@ -146,7 +139,7 @@ export async function handleAddArticleSubmit(e) {
         category: document.getElementById('new-category').value,
         readtime: document.getElementById('new-readtime').value,
         summary: document.getElementById('new-summary').value,
-        content: contentHTML, // <-- Сохраняем отформатированный HTML
+        content: contentHTML,
         author: document.getElementById('new-author').value,
         status: 'pending'
     };
@@ -168,6 +161,5 @@ export async function handleAddArticleSubmit(e) {
     }
 }
 
-// Глобальные привязки для HTML
 window.openSubmission = openSubmission;
 window.handleAddArticleSubmit = handleAddArticleSubmit;
