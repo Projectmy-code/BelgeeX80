@@ -1,0 +1,17 @@
+{
+  "name": "BELGEE X80 Club",
+  "short_name": "X80 Club",
+  "description": "Клуб владельцев, база знаний и запчасти BELGEE X80",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0c1017",
+  "theme_color": "#00f0ff",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
