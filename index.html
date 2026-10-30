@@ -78,6 +78,7 @@
             background: #00f0ff;
         }
     </style>
+    <link rel="stylesheet" href="./css/shared.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
@@ -97,12 +98,14 @@
                 </div>
             </a>
 
-            <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-300">
+            <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-300">
                 <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
                 <a href="#catalog" class="hover:text-brand-teal transition-colors">Каталог запчастей</a>
                 <a href="#articles" class="hover:text-brand-teal transition-colors">Статьи & Гайды</a>
                 <a href="#videos" class="hover:text-brand-teal transition-colors">Видео</a>
                 <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
+                <a href="login.html" class="hover:text-brand-teal transition-colors">Войти</a>
+                <a href="admin.html" class="hover:text-brand-teal transition-colors">Админ</a>
             </nav>
 
             <div class="hidden sm:flex items-center gap-3">
@@ -129,6 +132,8 @@
             <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
+                <a href="login.html" class="block py-2 text-brand-teal">Войти / Регистрация</a>
+                <a href="admin.html" class="block py-2 text-brand-teal">Админ-панель</a>
                 <a href="login.html" class="text-cyan-400">Вход / Регистрация</a>
                 <a href="https://t.me" target="_blank" class="w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
@@ -475,9 +480,9 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="text-xl font-bold font-display text-white mb-2">Написать статью или гайд</h3>
-            <p class="text-xs text-gray-400 mb-6">Поделитесь вашим опытом обслуживания или тюнинга BELGEE X80 с другими владельцами.</p>
+            <p class="text-xs text-gray-400 mb-6">Поделитесь опытом обслуживания или тюнинга. Материал появится на сайте только после проверки администратором.</p>
 
-            <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="space-y-4">
+            <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="space-y-4"><div class="hp-field" aria-hidden="true"><label>Оставьте поле пустым<input type="text" id="article-website" tabindex="-1" autocomplete="off"></label></div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Заголовок статьи</label>
                     <input type="text" id="new-title" required placeholder="Например: Установка омывателя камеры заднего вида" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
@@ -527,14 +532,14 @@
             <h3 class="text-xl font-bold font-display text-white mb-2">Обратная связь</h3>
             <p class="text-xs text-gray-400 mb-6">Предложите новый каталожный номер, статью или задайте вопрос администрации клуба.</p>
 
-            <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)" class="space-y-4">
+            <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)" class="space-y-4"><div class="hp-field" aria-hidden="true"><input id="feedback-website" tabindex="-1" autocomplete="off"></div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Ваше имя или Telegram Nick</label>
-                    <input type="text" required placeholder="@username" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                    <input id="feedback-name" type="text" maxlength="80" required placeholder="@username" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Сообщение</label>
-                    <textarea rows="4" required placeholder="Опишите предложение..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
+                    <textarea id="feedback-message" rows="4" maxlength="4000" required placeholder="Опишите предложение..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
                 </div>
                 <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
                     Отправить сообщение
@@ -628,90 +633,6 @@
             { name: "Игорь Г.", role: "Участник", handle: "@igor_x80", avatar: "I" }
         ];
 
-        function renderArticles(filterQuery = '') {
-            const grid = document.getElementById('articles-grid');
-            const customArticles = JSON.parse(localStorage.getItem('belgee_articles') || '[]');
-            const allArticles = [...defaultArticles, ...customArticles];
-
-            const q = filterQuery.toLowerCase();
-            const filtered = allArticles.filter(art => 
-                art.title.toLowerCase().includes(q) || 
-                art.summary.toLowerCase().includes(q) || 
-                art.category.toLowerCase().includes(q) ||
-                art.author.toLowerCase().includes(q)
-            );
-
-            if(filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">По вашему запросу статьи не найдены</div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(art => `
-                <article class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow flex flex-col justify-between">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between text-xs text-gray-400 mb-3">
-                            <span class="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 font-medium">${art.category}</span>
-                            <span>${art.readTime}</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white hover:text-brand-teal transition-colors cursor-pointer" onclick="openArticleFull('${art.id}')">${art.title}</h3>
-                        <p class="text-xs text-gray-400 mt-2 line-clamp-3">${art.summary}</p>
-                    </div>
-                    <div class="px-6 pb-6 pt-2 border-t border-brand-border/40 flex items-center justify-between text-xs">
-                        <span class="text-gray-400"><i class="fa-solid fa-user text-gray-500 mr-1"></i> ${art.author}</span>
-                        <button onclick="openArticleFull('${art.id}')" class="text-brand-teal font-semibold hover:underline flex items-center gap-1">
-                            Читать <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </button>
-                    </div>
-                </article>
-            `).join('');
-        }
-
-        function handleArticlesSearch() {
-            const query = document.getElementById('articles-search-input').value;
-            renderArticles(query);
-        }
-
-        function openArticleFull(id) {
-            const customArticles = JSON.parse(localStorage.getItem('belgee_articles') || '[]');
-            const allArticles = [...defaultArticles, ...customArticles];
-            const article = allArticles.find(a => a.id === id);
-
-            if(!article) return;
-
-            document.getElementById('info-modal-category').innerText = article.category;
-            document.getElementById('info-modal-title').innerText = article.title;
-            document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
-            document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readTime}`;
-            document.getElementById('info-modal-content').innerHTML = article.content;
-
-            toggleModal('info-modal');
-        }
-
-        function handleAddArticleSubmit(e) {
-            e.preventDefault();
-            const title = document.getElementById('new-title').value;
-            const category = document.getElementById('new-category').value;
-            const readTime = document.getElementById('new-readtime').value;
-            const summary = document.getElementById('new-summary').value;
-            const content = document.getElementById('new-content').value;
-            const author = document.getElementById('new-author').value;
-
-            const newArt = {
-                id: 'custom-' + Date.now(),
-                title, category, readTime, summary,
-                content: `<p>${content.replace(/\n/g, '<br>')}</p>`,
-                author
-            };
-
-            const customArticles = JSON.parse(localStorage.getItem('belgee_articles') || '[]');
-            customArticles.unshift(newArt);
-            localStorage.setItem('belgee_articles', JSON.stringify(customArticles));
-
-            renderArticles();
-            toggleModal('add-article-modal');
-            showToast('Статья успешно опубликована!');
-            e.target.reset();
-        }
 
         function renderPartsTable(items) {
             const tbody = document.getElementById('parts-table-body');
@@ -774,25 +695,10 @@
         }
 
         function openVideoModal(title) {
-            document.getElementById('info-modal-category').innerText = "Видеообзор";
-            document.getElementById('info-modal-title').innerText = title;
-            document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-video text-brand-teal mr-1"></i> YouTube`;
-            document.getElementById('info-modal-time').innerText = "Обзор";
-            
-            document.getElementById('info-modal-content').innerHTML = `
-                <div class="aspect-video bg-black rounded-xl overflow-hidden border border-brand-border">
-                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-            `;
-            toggleModal('info-modal');
+            const query = encodeURIComponent(title);
+            window.open('https://www.youtube.com/results?search_query=' + query, '_blank', 'noopener,noreferrer');
         }
 
-        function handleFeedbackSubmit(e) {
-            e.preventDefault();
-            toggleModal('feedback-modal');
-            showToast('Спасибо! Ваше сообщение отправлено модераторам.');
-            e.target.reset();
-        }
 
         function showToast(message) {
             const toast = document.createElement('div');
@@ -808,5 +714,6 @@
         };
     </script>
     <script type="module" src="./js/articles.js"></script>
+    <script type="module" src="./js/feedback.js"></script>
 </body>
 </html>

@@ -16,8 +16,10 @@ $('articles-grid').addEventListener('click',e=>{const btn=e.target.closest('[dat
 window.handleArticlesSearch=search;
 window.openSubmission=async()=>{if(!configured){message('Сначала настройте подключение Supabase в js/config.js');return;}try{const mode=await submissionMode(),user=await currentUser();if(mode==='admin'){message('Приём статей временно закрыт.');return;}if(mode==='registered'&&!user){message('Для отправки статьи необходимо войти.');location.href='login.html';return;}window.toggleModal('add-article-modal');}catch(e){message(e.message);}};
 window.handleAddArticleSubmit=async e=>{e.preventDefault();if(!db)return message('Сначала подключите Supabase.');const button=e.target.querySelector('[type=submit]');button.disabled=true;try{
+ if($('article-website')?.value)throw Error('Не удалось отправить форму.');
  const user=await currentUser(),mode=await submissionMode();if(mode==='admin'||(mode==='registered'&&!user))throw Error('Отправка статей сейчас недоступна.');
  const title=$('new-title').value.trim(),category=$('new-category').value,summary=$('new-summary').value.trim(),content=$('new-content').value.trim(),guest_name=$('new-author').value.trim();
+ if(title.length<5||title.length>180||summary.length<10||summary.length>800||content.length<30||content.length>30000||guest_name.length<2||guest_name.length>80)throw Error('Проверьте длину заголовка, описания, текста и имени.');
  const {error}=await db.from('articles').insert({title,category,summary,content,guest_name,author_id:user?.id||null,status:'pending'});
  if(error)throw error;window.toggleModal('add-article-modal');e.target.reset();message('Статья отправлена на модерацию!');
  }catch(err){message('Ошибка: '+err.message);}finally{button.disabled=false;}};
