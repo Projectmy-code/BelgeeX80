@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель управления — BELGEE X80</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -84,28 +81,24 @@
     <main class="flex-1 py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <!-- LOADING -->
             <div id="loading" class="flex flex-col items-center justify-center py-32">
                 <div class="w-10 h-10 border-4 border-brand-border border-t-brand-teal rounded-full animate-spin mb-4"></div>
                 <p class="text-gray-400 text-sm">Проверка прав доступа...</p>
             </div>
 
-            <!-- ACCESS DENIED -->
             <div id="access-denied" class="hidden text-center py-32 bg-brand-card rounded-3xl border border-red-500/30">
                 <div class="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h2 class="text-3xl font-display font-bold text-white mb-2">Доступ запрещен</h2>
-                <p class="text-gray-400 mb-6">Вы вошли как <span class="text-white font-semibold"></span>, но у вас нет прав администратора.</p>
+                <p class="text-gray-400 mb-6">Вы вошли как <span id="denied-email" class="text-white font-semibold"></span>, но у вас нет прав администратора.</p>
                 <a href="index.html" class="inline-block px-6 py-3 bg-brand-border hover:bg-gray-700 text-white font-semibold rounded-xl transition-colors">
                     Вернуться на главную
                 </a>
             </div>
 
-            <!-- ADMIN DASHBOARD -->
             <div id="admin-content" class="hidden space-y-8">
                 
-                <!-- Заголовок и статистика -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <h1 class="text-3xl font-display font-bold text-white">Управление порталом</h1>
@@ -134,8 +127,8 @@
 
                     <div class="flex flex-col sm:flex-row gap-4 max-w-2xl">
                         <label class="flex-1 relative cursor-pointer">
-                            <input type="radio" name="publish_mode" value="all" class="peer sr-only">
-                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all">
+                            <input type="radio" name="publish_mode" value="everyone" class="peer sr-only">
+                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all h-full">
                                 <div class="flex items-center gap-3 mb-1">
                                     <i class="fa-solid fa-globe text-gray-400 peer-checked:text-brand-teal"></i>
                                     <span class="font-bold text-white text-sm">Разрешить всем</span>
@@ -146,7 +139,7 @@
 
                         <label class="flex-1 relative cursor-pointer">
                             <input type="radio" name="publish_mode" value="registered" class="peer sr-only">
-                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all">
+                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all h-full">
                                 <div class="flex items-center gap-3 mb-1">
                                     <i class="fa-solid fa-user-lock text-gray-400"></i>
                                     <span class="font-bold text-white text-sm">Только для своих</span>
@@ -196,10 +189,9 @@
                 return;
             }
 
-            // Показываем почту в шапке
             document.getElementById('user-email').textContent = session.user.email;
+            document.getElementById('denied-email').textContent = session.user.email;
 
-            // Проверка прав по UID
             const { data: adminData } = await supabase
                 .from('admins')
                 .select('user_id')
@@ -211,23 +203,24 @@
                 return;
             }
 
-            // Успех — открываем панель
             document.getElementById('admin-content').classList.remove('hidden');
             await loadSettings();
             await loadPendingArticles();
         }
 
-        // Загрузка настроек
         async function loadSettings() {
-            const { data } = await supabase.from('site_settings').select('publish_mode').eq('id', 1).single();
+            const { data } = await supabase
+                .from('site_settings')
+                .select('value')
+                .eq('key', 'submission_mode')
+                .single();
+                
             if (data) {
-                const mode = data.publish_mode;
-                const radio = document.querySelector(`input[name="publish_mode"][value="${mode}"]`);
+                const radio = document.querySelector(`input[name="publish_mode"][value="${data.value}"]`);
                 if (radio) radio.checked = true;
             }
         }
 
-        // Сохранение настроек
         window.saveSettings = async function() {
             const selectedMode = document.querySelector('input[name="publish_mode"]:checked');
             if (!selectedMode) return;
@@ -239,7 +232,10 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Сохранение...';
             btn.disabled = true;
 
-            const { error } = await supabase.from('site_settings').update({ publish_mode: mode }).eq('id', 1);
+            const { error } = await supabase
+                .from('site_settings')
+                .update({ value: mode })
+                .eq('key', 'submission_mode');
             
             btn.innerHTML = originalText;
             btn.disabled = false;
@@ -247,7 +243,6 @@
             if (error) {
                 alert('Ошибка при сохранении: ' + error.message);
             } else {
-                // Красивое уведомление вместо alert
                 const toast = document.createElement('div');
                 toast.className = 'fixed bottom-5 right-5 z-50 bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold shadow-2xl flex items-center gap-2 animate-bounce';
                 toast.innerHTML = '<i class="fa-solid fa-check-circle"></i> Настройки успешно сохранены!';
@@ -256,11 +251,9 @@
             }
         }
 
-        // Загрузка статей на модерации
         async function loadPendingArticles() {
             const container = document.getElementById('pending-articles');
             
-            // Получаем все статьи, чтобы посчитать статистику
             const { data: allArticles } = await supabase.from('articles').select('id, status');
             
             if (allArticles) {
@@ -269,7 +262,6 @@
                 document.getElementById('total-count').textContent = allArticles.length;
             }
 
-            // Получаем только pending
             const { data: articles, error } = await supabase
                 .from('articles')
                 .select('*')
@@ -320,7 +312,6 @@
             });
         }
 
-        // Одобрить статью
         window.approveArticle = async function(id) {
             const btn = event.currentTarget;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -336,7 +327,6 @@
             }
         }
 
-        // Удалить статью
         window.deleteArticle = async function(id) {
             if(confirm('Вы уверены, что хотите навсегда удалить эту статью?')) {
                 const btn = event.currentTarget;
@@ -354,7 +344,6 @@
             }
         }
 
-        // Выход
         window.logout = async function() {
             await supabase.auth.signOut();
             window.location.href = 'index.html';
