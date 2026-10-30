@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BELGEE X80 — Клуб владельцев, Запчасти, Артикулы, Отзывы</title>
     
+    <!-- PWA Манифест и Мета-теги -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00f0ff">
+    <link rel="apple-touch-icon" href="favicon.svg">
+    
     <!-- Иконка сайта (Колесо) -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
@@ -666,5 +671,20 @@
         updateAuthUI();
     </script>
     <script type="module" src="./js/articles.js"></script>
+
+    <!-- Регистрация Service Worker для PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('PWA Service Worker зарегистрирован!', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('Ошибка регистрации Service Worker:', err);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
