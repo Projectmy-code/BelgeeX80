@@ -78,15 +78,14 @@
             background: #00f0ff;
         }
     </style>
-    <link rel="stylesheet" href="./css/shared.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
     <!-- HEADER / NAVIGATION -->
     <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             
-            <a href="#" class="flex items-center gap-3 group shrink-0">
+            <a href="#" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
                     <span class="font-display font-black text-black text-xl">X</span>
                 </div>
@@ -98,7 +97,7 @@
                 </div>
             </a>
 
-            <nav class="hidden xl:flex items-center gap-4 2xl:gap-6 text-sm font-medium text-gray-300 whitespace-nowrap">
+            <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-300">
                 <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
                 <a href="#catalog" class="hover:text-brand-teal transition-colors">Каталог запчастей</a>
                 <a href="#articles" class="hover:text-brand-teal transition-colors">Статьи & Гайды</a>
@@ -106,8 +105,7 @@
                 <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
             </nav>
 
-            <div class="hidden xl:flex items-center gap-3 shrink-0">
-                <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
+            <div class="hidden sm:flex items-center gap-3">
                 <a href="https://t.me/bgx80" target="_blank" class="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105">
                     <i class="fa-brands font-semibold fa-telegram text-base text-blue-400"></i>
                     <span>Чат Telegram</span>
@@ -117,19 +115,18 @@
                 </button>
             </div>
 
-            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="xl:hidden text-gray-300 hover:text-white p-2" aria-label="Открыть меню" aria-controls="mobile-menu" aria-expanded="false">
+            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden text-gray-300 hover:text-white p-2">
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
         </div>
 
-        <div id="mobile-menu" class="hidden xl:hidden bg-brand-card border-b border-brand-border px-4 pt-2 pb-6 space-y-3">
+        <div id="mobile-menu" class="hidden lg:hidden bg-brand-card border-b border-brand-border px-4 pt-2 pb-6 space-y-3">
             <a href="#specs" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Характеристики</a>
             <a href="#catalog" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Каталог запчастей</a>
             <a href="#articles" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Доработки и статьи</a>
             <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
-                <a href="login.html" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
                 <a href="https://t.me/bgx80" target="_blank" class="w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
                 </a>
@@ -321,7 +318,7 @@
                     <p class="text-gray-400 text-sm mt-1">Пошаговые руководства по антикору, прошивке, шумоизоляции и эксплуатации</p>
                 </div>
                 
-                <button onclick="openSubmission()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all whitespace-nowrap">
+                <button onclick="toggleModal('add-article-modal')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all whitespace-nowrap">
                     <i class="fa-solid fa-plus text-sm"></i>
                     <span>Добавить статью / гайд</span>
                 </button>
@@ -401,28 +398,34 @@
         </div>
     </section>
 
-    <!-- COMMUNITY -->
+    <!-- COMMUNITY (TELEGRAM CHAT BANNER) -->
     <section id="community" class="py-16 border-b border-brand-border relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-12">
+            <div class="text-center max-w-2xl mx-auto mb-10">
                 <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Сообщество Владельцев</span>
                 <h2 class="text-3xl font-display font-bold text-white mt-1">Клуб BELGEE X80 Беларуси</h2>
-                <p class="text-gray-400 text-sm mt-1">Присоединяйтесь к активным участникам нашего Telegram-чата</p>
+                <p class="text-gray-400 text-sm mt-1">Присоединяйтесь к нашему официальному сообществу</p>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="members-grid"></div>
-
-            <div class="mt-12 bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 rounded-3xl border border-blue-500/30 text-center relative overflow-hidden">
-                <div class="relative z-10 max-w-2xl mx-auto space-y-4">
-                    <i class="fa-brands fa-telegram text-5xl text-blue-400"></i>
-                    <h3 class="text-2xl font-bold font-display text-white">Вступайте в официальный чат клуба!</h3>
-                    <p class="text-sm text-gray-300">
-                        Задавайте вопросы по ремонту, делитесь опытом, находите проверенные автосервисы и участвуйте в сходках владельцев.
+            <!-- Telegram CTA Banner -->
+            <div class="max-w-3xl mx-auto bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 sm:p-10 rounded-3xl border border-blue-500/30 text-center relative overflow-hidden card-glow">
+                <div class="relative z-10 space-y-5">
+                    <div class="w-16 h-16 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-blue-500/20">
+                        <i class="fa-brands fa-telegram"></i>
+                    </div>
+                    
+                    <h3 class="text-2xl sm:text-3xl font-bold font-display text-white">Официальный Telegram Чат Владельцев</h3>
+                    
+                    <p class="text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
+                        Задавайте вопросы по ремонту и ТО, делитесь опытом доработок, находите проверенные сервисы и общайтесь с другими владельцами BELGEE X80 в режиме реального времени.
                     </p>
-                    <a href="https://t.me/bgx80" target="_blank" class="inline-flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30">
-                        <span>Перейти в Telegram Чат</span>
-                        <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </a>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="https://t.me/bgx80" target="_blank" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3">
+                            <i class="fa-brands fa-telegram text-xl"></i>
+                            <span>Присоединиться к чату</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -450,7 +453,7 @@
                     <h4 class="font-bold text-white mb-3">Сообщество</h4>
                     <ul class="space-y-2">
                         <li><a href="https://t.me/bgx80" target="_blank" class="hover:text-brand-teal"><i class="fa-brands fa-telegram mr-1 text-blue-400"></i> Telegram Чат</a></li>
-                        <li><a href="#community" class="hover:text-brand-teal">Участники клуба</a></li>
+                        <li><a href="#community" class="hover:text-brand-teal">Клуб владельцев</a></li>
                     </ul>
                 </div>
                 <div>
@@ -475,9 +478,9 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="text-xl font-bold font-display text-white mb-2">Написать статью или гайд</h3>
-            <p class="text-xs text-gray-400 mb-6">Поделитесь опытом обслуживания или тюнинга. Материал появится на сайте только после проверки администратором.</p>
+            <p class="text-xs text-gray-400 mb-6">Поделитесь вашим опытом обслуживания или тюнинга BELGEE X80 с другими владельцами.</p>
 
-            <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="space-y-4"><div class="hp-field" aria-hidden="true"><label>Оставьте поле пустым<input type="text" id="article-website" tabindex="-1" autocomplete="off"></label></div>
+            <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Заголовок статьи</label>
                     <input type="text" id="new-title" required placeholder="Например: Установка омывателя камеры заднего вида" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
@@ -512,7 +515,7 @@
                     <input type="text" id="new-author" required placeholder="Например: Club_Member" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
                 </div>
                 <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
-                    Отправить на модерацию
+                    Опубликовать статью
                 </button>
             </form>
         </div>
@@ -527,14 +530,14 @@
             <h3 class="text-xl font-bold font-display text-white mb-2">Обратная связь</h3>
             <p class="text-xs text-gray-400 mb-6">Предложите новый каталожный номер, статью или задайте вопрос администрации клуба.</p>
 
-            <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)" class="space-y-4"><div class="hp-field" aria-hidden="true"><input id="feedback-website" tabindex="-1" autocomplete="off"></div>
+            <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Ваше имя или Telegram Nick</label>
-                    <input id="feedback-name" type="text" maxlength="80" required placeholder="@username" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                    <input type="text" required placeholder="@username" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Сообщение</label>
-                    <textarea id="feedback-message" rows="4" maxlength="4000" required placeholder="Опишите предложение..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
+                    <textarea rows="4" required placeholder="Опишите предложение..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
                 </div>
                 <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
                     Отправить сообщение
@@ -619,15 +622,90 @@
             }
         ];
 
-        const clubMembers = [
-            { name: "Дмитрий М.", role: "Основатель", handle: "@dim_x80", avatar: "D" },
-            { name: "Сергей К.", role: "Модератор", handle: "@serg_minsk", avatar: "S" },
-            { name: "Артем В.", role: "Эксперт ТО", handle: "@artem_tech", avatar: "A" },
-            { name: "Елена П.", role: "Участник", handle: "@elena_bel", avatar: "E" },
-            { name: "Михаил Б.", role: "Автоэлектрик", handle: "@misha_elec", avatar: "M" },
-            { name: "Игорь Г.", role: "Участник", handle: "@igor_x80", avatar: "I" }
-        ];
+        function renderArticles(filterQuery = '') {
+            const grid = document.getElementById('articles-grid');
+            const customArticles = JSON.parse(localStorage.getItem('belgee_articles') || '[]');
+            const allArticles = [...defaultArticles, ...customArticles];
 
+            const q = filterQuery.toLowerCase();
+            const filtered = allArticles.filter(art => 
+                art.title.toLowerCase().includes(q) || 
+                art.summary.toLowerCase().includes(q) || 
+                art.category.toLowerCase().includes(q) ||
+                art.author.toLowerCase().includes(q)
+            );
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">По вашему запросу статьи не найдены</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(art => `
+                <article class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow flex flex-col justify-between">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between text-xs text-gray-400 mb-3">
+                            <span class="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 font-medium">${art.category}</span>
+                            <span>${art.readTime}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white hover:text-brand-teal transition-colors cursor-pointer" onclick="openArticleFull('${art.id}')">${art.title}</h3>
+                        <p class="text-xs text-gray-400 mt-2 line-clamp-3">${art.summary}</p>
+                    </div>
+                    <div class="px-6 pb-6 pt-2 border-t border-brand-border/40 flex items-center justify-between text-xs">
+                        <span class="text-gray-400"><i class="fa-solid fa-user text-gray-500 mr-1"></i> ${art.author}</span>
+                        <button onclick="openArticleFull('${art.id}')" class="text-brand-teal font-semibold hover:underline flex items-center gap-1">
+                            Читать <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function handleArticlesSearch() {
+            const query = document.getElementById('articles-search-input').value;
+            renderArticles(query);
+        }
+
+        function openArticleFull(id) {
+            const customArticles = JSON.parse(localStorage.getItem('belgee_articles') || '[]');
+            const allArticles = [...defaultArticles, ...customArticles];
+            const article = allArticles.find(a => a.id === id);
+
+            if(!article) return;
+
+            document.getElementById('info-modal-category').innerText = article.category;
+            document.getElementById('info-modal-title').innerText = article.title;
+            document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
+            document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readTime}`;
+            document.getElementById('info-modal-content').innerHTML = article.content;
+
+            toggleModal('info-modal');
+        }
+
+        function handleAddArticleSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('new-title').value;
+            const category = document.getElementById('new-category').value;
+            const readTime = document.getElementById('new-readtime').value;
+            const summary = document.getElementById('new-summary').value;
+            const content = document.getElementById('new-content').value;
+            const author = document.getElementById('new-author').value;
+
+            const newArt = {
+                id: 'custom-' + Date.now(),
+                title, category, readTime, summary,
+                content: `<p>${content.replace(/\n/g, '<br>')}</p>`,
+                author
+            };
+
+            const customArticles = JSON.parse(localStorage.getItem('belgee_articles') || '[]');
+            customArticles.unshift(newArt);
+            localStorage.setItem('belgee_articles', JSON.stringify(customArticles));
+
+            renderArticles();
+            toggleModal('add-article-modal');
+            showToast('Статья успешно опубликована!');
+            e.target.reset();
+        }
 
         function renderPartsTable(items) {
             const tbody = document.getElementById('parts-table-body');
@@ -644,17 +722,6 @@
                         </button>
                     </td>
                 </tr>
-            `).join('');
-        }
-
-        function renderMembers() {
-            document.getElementById('members-grid').innerHTML = clubMembers.map(m => `
-                <div class="bg-brand-card p-4 rounded-2xl border border-brand-border text-center card-glow">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-brand-teal to-blue-600 text-black font-extrabold text-lg flex items-center justify-center mx-auto mb-2 shadow-md">${m.avatar}</div>
-                    <div class="font-bold text-sm text-white truncate">${m.name}</div>
-                    <div class="text-[10px] text-brand-teal font-medium mb-1">${m.role}</div>
-                    <div class="text-[11px] text-gray-400 truncate">${m.handle}</div>
-                </div>
             `).join('');
         }
 
@@ -686,17 +753,29 @@
         }
 
         function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const button = document.getElementById('mobile-menu-btn');
-            const isOpen = menu.classList.toggle('hidden') === false;
-            button.setAttribute('aria-expanded', String(isOpen));
+            document.getElementById('mobile-menu').classList.toggle('hidden');
         }
 
         function openVideoModal(title) {
-            const query = encodeURIComponent(title);
-            window.open('https://www.youtube.com/results?search_query=' + query, '_blank', 'noopener,noreferrer');
+            document.getElementById('info-modal-category').innerText = "Видеообзор";
+            document.getElementById('info-modal-title').innerText = title;
+            document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-video text-brand-teal mr-1"></i> YouTube`;
+            document.getElementById('info-modal-time').innerText = "Обзор";
+            
+            document.getElementById('info-modal-content').innerHTML = `
+                <div class="aspect-video bg-black rounded-xl overflow-hidden border border-brand-border">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            `;
+            toggleModal('info-modal');
         }
 
+        function handleFeedbackSubmit(e) {
+            e.preventDefault();
+            toggleModal('feedback-modal');
+            showToast('Спасибо! Ваше сообщение отправлено модераторам.');
+            e.target.reset();
+        }
 
         function showToast(message) {
             const toast = document.createElement('div');
@@ -706,12 +785,10 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        window.initStaticSections = function() {
+        window.onload = function() {
             renderPartsTable(partsData);
-            renderMembers();
-        };
+            renderArticles();
+        }
     </script>
-    <script type="module" src="./js/articles.js"></script>
-    <script type="module" src="./js/feedback.js"></script>
 </body>
 </html>
