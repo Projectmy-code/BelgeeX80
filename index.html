@@ -106,6 +106,8 @@
             </nav>
 
             <div class="hidden sm:flex items-center gap-3">
+                <a href="login.html" class="text-cyan-400 text-sm">Вход / Регистрация</a>
+                <a href="admin.html" class="text-gray-400 text-sm">Админ</a>
                 <a href="https://t.me" target="_blank" class="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105">
                     <i class="fa-brands font-semibold fa-telegram text-base text-blue-400"></i>
                     <span>Чат Telegram</span>
@@ -127,6 +129,7 @@
             <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
+                <a href="login.html" class="text-cyan-400">Вход / Регистрация</a>
                 <a href="https://t.me" target="_blank" class="w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
                 </a>
@@ -318,7 +321,7 @@
                     <p class="text-gray-400 text-sm mt-1">Пошаговые руководства по антикору, прошивке, шумоизоляции и эксплуатации</p>
                 </div>
                 
-                <button onclick="toggleModal('add-article-modal')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all whitespace-nowrap">
+                <button onclick="openSubmission()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all whitespace-nowrap">
                     <i class="fa-solid fa-plus text-sm"></i>
                     <span>Добавить статью / гайд</span>
                 </button>
@@ -509,7 +512,7 @@
                     <input type="text" id="new-author" required placeholder="Например: Club_Member" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
                 </div>
                 <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
-                    Опубликовать статью
+                    Отправить на модерацию
                 </button>
             </form>
         </div>
@@ -799,11 +802,11 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        window.onload = function() {
+        window.initStaticSections = function() {
             renderPartsTable(partsData);
-            renderArticles();
             renderMembers();
-        }
+        };
     </script>
+    <script type="module" src="./js/articles.js"></script>
 </body>
 </html>
