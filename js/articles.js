@@ -1,27 +1,173 @@
-import {db,currentUser,submissionMode,escapeHtml} from './api.js';
-import {configured} from './config.js';
-let articles=[];
-const $=id=>document.getElementById(id);
-function message(s){window.showToast?.(s) ?? alert(s);}
-async function refresh(){
- if(!db)return;
- const {data,error}=await db.from('articles').select('id,title,category,summary,content,guest_name,created_at,author_id,status').eq('status','published').order('created_at',{ascending:false}).limit(100);
- if(error){message('Не удалось загрузить статьи: '+error.message);return;}
- articles=data||[];search();
+import { supabase } from './supabase.js';
+
+// Переменная для нашего редактора
+let quill = null;
+let loadedArticles = []; // Храним загруженные статьи для поиска
+
+// 1. Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    loadArticlesFromDB();
+
+    // Настраиваем Quill (Визуальный редактор)
+    const editorContainer = document.getElementById('editor-container');
+    if (editorContainer) {
+        quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Напишите здесь вашу статью. Используйте панель сверху для форматирования текста...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'clean']
+                ]
+            }
+        });
+    }
+});
+
+// 2. Загрузка статей из базы на главную
+export async function loadArticlesFromDB() {
+    const grid = document.getElementById('articles-grid');
+    if(!grid) return;
+    grid.innerHTML = '<p class="text-gray-400 col-span-3">Загрузка статей...</p>';
+
+    try {
+        const { data: articles, error } = await supabase
+            .from('articles')
+            .select('*')
+            .eq('status', 'published')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        loadedArticles = articles || []; // Сохраняем для поиска
+        renderArticles(loadedArticles);
+
+    } catch (e) {
+        console.error(e);
+        grid.innerHTML = '<p class="text-red-400">Ошибка загрузки статей.</p>';
+    }
 }
-function search(){const q=($('articles-search-input')?.value||'').toLowerCase();const rows=articles.filter(a=>[a.title,a.summary,a.category,a.guest_name].some(x=>String(x||'').toLowerCase().includes(q)));
- $('articles-grid').innerHTML=rows.length?rows.map(a=>`<article class="bg-brand-card rounded-2xl border border-brand-border p-6 card-glow"><div class="text-xs text-brand-teal mb-2">${escapeHtml(a.category)}</div><h3 class="text-lg font-bold text-white mb-2">${escapeHtml(a.title)}</h3><p class="text-xs text-gray-400 mb-4">${escapeHtml(a.summary)}</p><div class="flex justify-between items-center gap-2 text-xs text-gray-400"><span>${escapeHtml(a.guest_name||'Участник клуба')}</span><button data-article-id="${a.id}" class="text-brand-teal font-semibold">Читать →</button></div></article>`).join(''):'<p class="text-gray-400 col-span-full">Опубликованных статей пока нет.</p>';
+
+// 3. Отрисовка карточек статей
+function renderArticles(articles) {
+    const grid = document.getElementById('articles-grid');
+    if (!grid) return;
+
+    if (articles.length === 0) {
+        grid.innerHTML = '<p class="text-gray-400 col-span-3">Пока нет статей по вашему запросу.</p>';
+        return;
+    }
+
+    grid.innerHTML = '';
+    articles.forEach((article) => {
+        const div = document.createElement('div');
+        div.className = 'bg-brand-card p-6 rounded-2xl border border-brand-border card-glow cursor-pointer';
+        div.onclick = () => openArticleModal(article);
+        div.innerHTML = `
+            <div class="flex justify-between items-start mb-3">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-brand-teal bg-brand-teal/10 px-2 py-1 rounded">${article.category}</span>
+                <span class="text-xs text-gray-500"><i class="fa-regular fa-clock"></i> ${article.readtime}</span>
+            </div>
+            <h3 class="font-bold text-lg text-white mb-2 line-clamp-2">${article.title}</h3>
+            <p class="text-sm text-gray-400 line-clamp-3 mb-4">${article.summary}</p>
+            <div class="flex items-center justify-between border-t border-brand-border/60 pt-4 mt-auto">
+                <span class="text-xs text-gray-300"><i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}</span>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
 }
-$('articles-grid').addEventListener('click',e=>{const btn=e.target.closest('[data-article-id]');if(!btn)return;const a=articles.find(x=>x.id===btn.dataset.articleId);if(!a)return;$('info-modal-category').textContent=a.category;$('info-modal-title').textContent=a.title;$('info-modal-author').textContent='Автор: '+(a.guest_name||'Участник клуба');$('info-modal-time').textContent=new Date(a.created_at).toLocaleDateString('ru-RU');$('info-modal-content').textContent=a.content;window.toggleModal('info-modal');});
-window.handleArticlesSearch=search;
-window.openSubmission=async()=>{if(!configured){message('Сначала настройте подключение Supabase в js/config.js');return;}try{const mode=await submissionMode(),user=await currentUser();if(mode==='admin'){message('Приём статей временно закрыт.');return;}if(mode==='registered'&&!user){message('Для отправки статьи необходимо войти.');location.href='login.html';return;}window.toggleModal('add-article-modal');}catch(e){message(e.message);}};
-window.handleAddArticleSubmit=async e=>{e.preventDefault();if(!db)return message('Сначала подключите Supabase.');const button=e.target.querySelector('[type=submit]');button.disabled=true;try{
- if($('article-website')?.value)throw Error('Не удалось отправить форму.');
- const user=await currentUser(),mode=await submissionMode();if(mode==='admin'||(mode==='registered'&&!user))throw Error('Отправка статей сейчас недоступна.');
- const title=$('new-title').value.trim(),category=$('new-category').value,summary=$('new-summary').value.trim(),content=$('new-content').value.trim(),guest_name=$('new-author').value.trim();
- if(title.length<5||title.length>180||summary.length<10||summary.length>800||content.length<30||content.length>30000||guest_name.length<2||guest_name.length>80)throw Error('Проверьте длину заголовка, описания, текста и имени.');
- const {error}=await db.from('articles').insert({title,category,summary,content,guest_name,author_id:user?.id||null,status:'pending'});
- if(error)throw error;window.toggleModal('add-article-modal');e.target.reset();message('Статья отправлена на модерацию!');
- }catch(err){message('Ошибка: '+err.message);}finally{button.disabled=false;}};
-if(configured){refresh();db.auth.onAuthStateChange(()=>{});}else{$('articles-grid').innerHTML='<p class="text-gray-400 col-span-full">Подключите Supabase, чтобы загрузить статьи. Инструкция в README.md.</p>';}
-window.onload=()=>{window.initStaticSections();if(configured)refresh();};
+
+// 4. Поиск по статьям (подключен к input на главной)
+window.handleArticlesSearch = function() {
+    const query = document.getElementById('articles-search-input').value.toLowerCase();
+    const filtered = loadedArticles.filter(a => 
+        a.title.toLowerCase().includes(query) || 
+        a.summary.toLowerCase().includes(query) ||
+        a.author.toLowerCase().includes(query)
+    );
+    renderArticles(filtered);
+}
+
+// 5. Открытие модального окна статьи
+export function openArticleModal(article) {
+    document.getElementById('info-modal-category').textContent = article.category;
+    document.getElementById('info-modal-title').textContent = article.title;
+    document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
+    document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readtime}`;
+    
+    // Выводим красивый HTML из базы
+    document.getElementById('info-modal-content').innerHTML = article.content;
+    
+    document.getElementById('info-modal').classList.remove('hidden');
+}
+
+// 6. Проверка прав и открытие формы
+export async function openSubmission() {
+    const { data: { session } } = await supabase.auth.getSession();
+    const { data: settings } = await supabase.from('site_settings').select('publish_mode').eq('id', 1).single();
+    const mode = settings ? settings.publish_mode : 'all';
+
+    if (mode === 'registered' && !session) {
+        alert("Публиковать статьи могут только зарегистрированные пользователи. Пожалуйста, войдите в аккаунт.");
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Очищаем редактор перед открытием
+    if (quill) quill.root.innerHTML = '';
+    
+    document.getElementById('add-article-modal').classList.remove('hidden');
+}
+
+// 7. Отправка статьи в базу
+export async function handleAddArticleSubmit(e) {
+    e.preventDefault();
+    
+    if (!quill) return;
+    
+    // Получаем текст из визуального редактора
+    const contentHTML = quill.root.innerHTML;
+    
+    // Проверка на пустой текст
+    if (quill.getText().trim().length === 0) {
+        alert('Пожалуйста, напишите текст статьи.');
+        return;
+    }
+
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.textContent = 'Отправка...';
+    btn.disabled = true;
+
+    const newArticle = {
+        title: document.getElementById('new-title').value,
+        category: document.getElementById('new-category').value,
+        readtime: document.getElementById('new-readtime').value,
+        summary: document.getElementById('new-summary').value,
+        content: contentHTML, // <-- Сохраняем отформатированный HTML
+        author: document.getElementById('new-author').value,
+        status: 'pending'
+    };
+
+    try {
+        const { error } = await supabase.from('articles').insert([newArticle]);
+        if (error) throw error;
+
+        alert('Статья отправлена! Она появится на сайте после проверки администратором.');
+        e.target.reset();
+        quill.root.innerHTML = ''; 
+        document.getElementById('add-article-modal').classList.add('hidden');
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка: ' + error.message);
+    } finally {
+        btn.textContent = 'Отправить на модерацию';
+        btn.disabled = false;
+    }
+}
+
+// Глобальные привязки для HTML
+window.openSubmission = openSubmission;
+window.handleAddArticleSubmit = handleAddArticleSubmit;
