@@ -311,17 +311,24 @@
     <!-- ARTICLES SECTION -->
     <section id="articles" class="py-16 border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                 <div>
                     <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">База знаний и инструкции</span>
                     <h2 class="text-3xl font-display font-bold text-white mt-1">Полезные статьи и Доработки</h2>
                     <p class="text-gray-400 text-sm mt-1">Пошаговые руководства по антикору, прошивке, шумоизоляции и эксплуатации</p>
                 </div>
                 
-                <button onclick="toggleModal('add-article-modal')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all">
+                <button onclick="toggleModal('add-article-modal')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all whitespace-nowrap">
                     <i class="fa-solid fa-plus text-sm"></i>
                     <span>Добавить статью / гайд</span>
                 </button>
+            </div>
+
+            <!-- SEARCH INPUT FOR ARTICLES -->
+            <div class="mb-8 relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="articles-search-input" onkeyup="handleArticlesSearch()" placeholder="Поиск по статьям и доработкам (например: 'антикор', 'шумоизоляция', 'навигатор')..." 
+                       class="w-full bg-brand-card border border-brand-border rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors shadow-lg">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="articles-grid"></div>
@@ -618,12 +625,25 @@
             { name: "Игорь Г.", role: "Участник", handle: "@igor_x80", avatar: "I" }
         ];
 
-        function renderArticles() {
+        function renderArticles(filterQuery = '') {
             const grid = document.getElementById('articles-grid');
             const customArticles = JSON.parse(localStorage.getItem('belgee_articles') || '[]');
             const allArticles = [...defaultArticles, ...customArticles];
 
-            grid.innerHTML = allArticles.map(art => `
+            const q = filterQuery.toLowerCase();
+            const filtered = allArticles.filter(art => 
+                art.title.toLowerCase().includes(q) || 
+                art.summary.toLowerCase().includes(q) || 
+                art.category.toLowerCase().includes(q) ||
+                art.author.toLowerCase().includes(q)
+            );
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">По вашему запросу статьи не найдены</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(art => `
                 <article class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow flex flex-col justify-between">
                     <div class="p-6">
                         <div class="flex items-center justify-between text-xs text-gray-400 mb-3">
@@ -641,6 +661,11 @@
                     </div>
                 </article>
             `).join('');
+        }
+
+        function handleArticlesSearch() {
+            const query = document.getElementById('articles-search-input').value;
+            renderArticles(query);
         }
 
         function openArticleFull(id) {
@@ -750,12 +775,10 @@
             document.getElementById('info-modal-title').innerText = title;
             document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-video text-brand-teal mr-1"></i> YouTube`;
             document.getElementById('info-modal-time').innerText = "Обзор";
+            
             document.getElementById('info-modal-content').innerHTML = `
-                <div class="aspect-video bg-black rounded-xl flex items-center justify-center text-gray-500 border border-brand-border">
-                    <div class="text-center">
-                        <i class="fa-brands fa-youtube text-5xl text-red-500 mb-2"></i>
-                        <p class="text-xs text-gray-400">Плеер загружает видеообзор...</p>
-                    </div>
+                <div class="aspect-video bg-black rounded-xl overflow-hidden border border-brand-border">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
             `;
             toggleModal('info-modal');
