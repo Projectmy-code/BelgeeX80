@@ -78,6 +78,7 @@
             background: #00f0ff;
         }
     </style>
+    <link rel="stylesheet" href="./css/shared.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
@@ -97,12 +98,14 @@
                 </div>
             </a>
 
-            <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-300">
+            <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-300">
                 <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
                 <a href="#catalog" class="hover:text-brand-teal transition-colors">Каталог запчастей</a>
                 <a href="#articles" class="hover:text-brand-teal transition-colors">Статьи & Гайды</a>
                 <a href="#videos" class="hover:text-brand-teal transition-colors">Видео</a>
                 <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
+                <a href="login.html" class="hover:text-brand-teal transition-colors">Войти</a>
+                <a href="admin.html" class="hover:text-brand-teal transition-colors">Админ</a>
             </nav>
 
             <div class="hidden sm:flex items-center gap-3">
@@ -129,6 +132,8 @@
             <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
+                <a href="login.html" class="block py-2 text-brand-teal">Войти / Регистрация</a>
+                <a href="admin.html" class="block py-2 text-brand-teal">Админ-панель</a>
                 <a href="login.html" class="text-cyan-400">Вход / Регистрация</a>
                 <a href="https://t.me" target="_blank" class="w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
