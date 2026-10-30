@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Приёмка авто BELGEE X80">
+    <title>Чек-лист приёмки автомобиля — BELGEE X80</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            teal: '#00f0ff',
+                            dark: '#0c1017',
+                            card: '#161e2b',
+                            border: '#253142',
+                            accent: '#10b981',
+                            blue: '#2563eb'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0c1017;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .glass-panel {
+            background: rgba(22, 30, 43, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .card-glow { transition: all 0.3s ease; }
+        .card-glow:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c1017; }
+        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+
+        /* Чек-лист */
+        .cl-section { margin-bottom: 24px; }
+        .cl-section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: #6b7891;
+            text-transform: uppercase;
+            padding: 0 4px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cl-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #253142;
+        }
+
+        .cl-item {
+            background: #161e2b;
+            border: 1px solid #253142;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .cl-item.checked {
+            background: #0f1e14;
+            border-color: #1a3d28;
+        }
+        .cl-item > label {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            gap: 14px;
+            cursor: pointer;
+            min-height: 52px;
+        }
+        .cl-item input[type="checkbox"] { display: none; }
+
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            border: 2px solid #2e3a4e;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            background: #1e2535;
+        }
+        .cl-item.checked .checkmark,
+        .cl-sub.checked .checkmark {
+            background: #10b981;
+            border-color: #10b981;
+        }
+        .checkmark svg {
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s ease;
+        }
+        .cl-item.checked .checkmark svg,
+        .cl-sub.checked .checkmark svg {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .cl-text {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #e2e8f0;
+            transition: color 0.25s;
+        }
+        .cl-item.checked > label .cl-text {
+            color: #3d7a52;
+            text-decoration: line-through;
+            text-decoration-color: #10b981;
+        }
+
+        .cl-subs {
+            padding: 0 16px 12px 54px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .cl-sub {
+            background: #1e2535;
+            border: 1px solid #253142;
+            border-radius: 9px;
+            overflow: hidden;
+        }
+        .cl-sub.checked { background: #0c1a10; border-color: #1a3d28; }
+        .cl-sub > label {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            gap: 10px;
+            cursor: pointer;
+            min-height: 40px;
+        }
+        .cl-sub .checkmark { width: 20px; height: 20px; border-radius: 5px; }
+        .cl-sub .cl-text { font-size: 13px; font-weight: 400; color: #cbd5e1; }
+        .cl-sub.checked .cl-text {
+            color: #3d7a52;
+            text-decoration: line-through;
+            text-decoration-color: #10b981;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .banner-show { display: block !important; animation: pop 0.4s ease; }
+    </style>
+    <link rel="stylesheet" href="./css/shared.css">
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-3 group shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
+                    <span class="font-display font-black text-black text-xl">X</span>
+                </div>
+                <div>
+                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">
+                        BELGEE <span class="text-brand-teal">X80</span>
+                    </div>
+                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Сообщество & Запчасти</div>
+                </div>
+            </a>
+
+            <nav class="hidden xl:flex items-center gap-4 2xl:gap-6 text-sm font-medium text-gray-300 whitespace-nowrap">
+                <a href="index.html#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
+                <a href="index.html#catalog" class="hover:text-brand-teal transition-colors">Каталог запчастей</a>
+                <a href="index.html#articles" class="hover:text-brand-teal transition-colors">Статьи & Гайды</a>
+                <a href="checklist.html" class="text-brand-teal transition-colors">Приёмка авто</a>
+                <a href="index.html#community" class="hover:text-brand-teal transition-colors">Клуб</a>
+            </nav>
+
+            <div class="hidden xl:flex items-center gap-3 shrink-0">
+                <a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105">
+                    <i class="fa-brands fa-telegram text-base text-blue-400"></i>
+                    <span>Чат Telegram</span>
+                </a>
+                <button onclick="resetAll()" class="bg-brand-border hover:bg-brand-teal hover:text-black text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Сбросить
+                </button>
+            </div>
+
+            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="xl:hidden text-gray-300 hover:text-white p-2" aria-label="Меню">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="hidden xl:hidden bg-brand-card border-b border-brand-border px-4 pt-2 pb-6 space-y-3">
+            <a href="index.html#specs" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Характеристики</a>
+            <a href="index.html#catalog" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Каталог запчастей</a>
+            <a href="index.html#articles" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Статьи</a>
+            <a href="checklist.html" class="block py-2 text-brand-teal font-semibold border-b border-gray-800">Приёмка авто</a>
+            <a href="index.html#community" class="block py-2 text-gray-300 hover:text-brand-teal">Клуб</a>
+            <div class="pt-2 flex flex-col gap-2">
+                <a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer" class="w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
+                    <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
+                </a>
+                <button onclick="resetAll()" class="w-full py-2.5 bg-brand-border text-white font-semibold rounded-xl">
+                    Сбросить чек-лист
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO / PROGRESS -->
+    <section class="py-8 sm:py-12 border-b border-brand-border bg-gradient-to-br from-brand-card to-brand-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-3">
+                <i class="fa-solid fa-clipboard-check"></i>
+                Чек-лист у дилера
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight leading-tight">
+                Приёмка автомобиля <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal via-blue-400 to-indigo-400">BELGEE X80</span>
+            </h1>
+            <p class="text-sm text-gray-400 mt-2 max-w-2xl">
+                Полный чек-лист осмотра нового автомобиля при получении у дилера. Прогресс сохраняется автоматически в вашем браузере.
+            </p>
+
+            <div class="mt-6">
+                <div class="h-2 bg-brand-border rounded-full overflow-hidden">
+                    <div id="progressFill" class="h-full bg-gradient-to-r from-brand-teal via-blue-500 to-emerald-500 rounded-full transition-all duration-500" style="width:0%"></div>
+                </div>
+                <div class="flex items-center justify-between mt-2 text-xs">
+                    <span class="text-gray-400">Проверено: <span id="doneCount" class="text-brand-teal font-bold">0</span> / <span id="totalCount" class="text-gray-300 font-semibold">0</span></span>
+                    <span id="percentText" class="text-emerald-400 font-bold">0%</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CHECKLIST -->
+    <main class="flex-1">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="checklist"></div>
+
+            <div id="banner" class="hidden mt-6 bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 border border-emerald-500/40 rounded-2xl p-6 text-center">
+                <div class="text-5xl mb-2">✅</div>
+                <h2 class="font-display font-bold text-2xl text-emerald-300">Всё проверено!</h2>
+                <p class="text-sm text-emerald-400/80 mt-1">Можно подписывать документы и забирать ключи</p>
+            </div>
+
+            <div class="mt-8 p-4 rounded-xl bg-blue-900/20 border border-blue-500/30 text-xs text-blue-300 flex items-start gap-3">
+                <i class="fa-solid fa-circle-info text-blue-400 text-base mt-0.5"></i>
+                <p>
+                    <strong>Совет:</strong> проходите чек-лист прямо на стоянке дилера. Все замечания фиксируйте в акте приёма-передачи до подписания. Отмечайте пункты по мере проверки — прогресс сохранится в браузере.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark py-10 text-gray-400 text-xs border-t border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="font-display font-black text-base text-white">BELGEE <span class="text-brand-teal">X80</span></div>
+            <p>© 2026 BELGEE X80 Club Portal</p>
+            <a href="index.html" class="hover:text-brand-teal"><i class="fa-solid fa-arrow-left mr-1"></i> На главную</a>
+        </div>
+    </footer>
+
+    <script>
+        const checklistData = [
+            {
+                section: "📄 Документы и VIN",
+                items: [
+                    { text: "Сверить VIN с документами", sub: ["Под передним пассажирским сиденьем", "Наклейка на проёме двери"] },
+                    { text: "Договор купли-продажи" },
+                    { text: "Акт приёма-передачи (проверить дату)" },
+                    { text: "Сервисная книжка с отметкой о предпродажной подготовке" },
+                    { text: "Гарантийки на допы, если есть" },
+                    { text: "Руководство по эксплуатации на русском языке" },
+                    { text: "2 ключа + жетон с номером ключа" },
+                ]
+            },
+            {
+                section: "🎨 Кузов и ЛКП",
+                items: [
+                    { text: "Зазоры и выступы кузовных панелей", sub: ["Капот", "Переднее правое крыло", "Передняя правая дверь", "Задняя правая дверь", "Заднее правое крыло", "Багажник", "Заднее левое крыло", "Задняя левая дверь", "Передняя левая дверь", "Переднее левое крыло", "Внутренние пороги"] },
+                    { text: "Бамперы — сколы, трещины, нижние кромки" },
+                    { text: "Стёкла — дата, трещины/сколы включая кромки" },
+                    { text: "Колёсные диски — царапины и сколы" },
+                ]
+            },
+            {
+                section: "🔧 Механика и открывание",
+                items: [
+                    { text: "Все двери открываются/закрываются с одинаковым усилием" },
+                    { text: "Капот — открытие/закрытие" },
+                    { text: "Багажник — открытие/закрытие" },
+                    { text: "Лючок бензобака / зарядки" },
+                    { text: "Бардачок и все ёмкости" },
+                    { text: "Уровни жидкостей", sub: ["Масло в двигателе", "Антифриз", "Тормозная жидкость"] },
+                    { text: "Давление в шинах" },
+                ]
+            },
+            {
+                section: "🛋 Салон и электрика",
+                items: [
+                    { text: "Стеклоподъёмники — все двери + с водительского места" },
+                    { text: "Регулировка передних сидений" },
+                    { text: "Складывание задних сидений" },
+                    { text: "Центральный замок" },
+                    { text: "Закрывание/открывание с обоих ключей" },
+                    { text: "Замки ремней безопасности" },
+                    { text: "Руль — регулировка + кнопки на панели" },
+                    { text: "Боковые зеркала — настройка" },
+                ]
+            },
+            {
+                section: "💡 Свет и приборы",
+                items: [
+                    { text: "Бортовой компьютер — отсутствие ошибок" },
+                    { text: "Индикация положений КПП" },
+                    { text: "Световые приборы", sub: ["Ближний свет", "Дальний свет", "Поворотники", "Габариты", "Стоп-сигналы", "Аварийка"] },
+                    { text: "Камеры" },
+                    { text: "Салонное освещение / интерьерная подсветка" },
+                    { text: "Звуковой сигнал" },
+                ]
+            },
+            {
+                section: "❄️ Климат и комфорт",
+                items: [
+                    { text: "Печка — горячий воздух (обогрев на макс)" },
+                    { text: "Кондиционер — холодный воздух (охлаждение на мин)" },
+                    { text: "Переключение потоков воздуха" },
+                    { text: "Обогрев", sub: ["Заднее стекло", "Лобовое стекло", "Боковые зеркала", "Все сиденья"] },
+                    { text: "Вентиляция передних сидений" },
+                    { text: "Дворники — все режимы" },
+                    { text: "Омыватель лобового стекла" },
+                    { text: "Шторка (работа)" },
+                    { text: "Люк — работа, заломы резинки" },
+                ]
+            },
+            {
+                section: "🎵 Мультимедиа",
+                items: [
+                    { text: "Радио" },
+                    { text: "Динамики, режимы работы: перед и зад" },
+                    { text: "Связь с телефоном (Bluetooth/CarPlay)" },
+                ]
+            },
+            {
+                section: "🎁 Комплектность",
+                items: [
+                    { text: "Багажник — содержимое", sub: ["Ремкомплект / запаска", "Буксировочный крюк", "Шторка", "Провод (если предусмотрен)"] },
+                    { text: "Коврики" },
+                    { text: "Брызговики" },
+                ]
+            },
+            {
+                section: "🛡 Дополнительно",
+                items: [
+                    { text: "Антикор" },
+                    { text: "Защитные плёнки", sub: ["Капот — полоса", "Крылья", "Стойки", "Полоса над лобовым", "Маникюр + торцы", "Полка багажника"] },
+                ]
+            },
+        ];
+
+        const STORAGE_KEY = 'belgee_x80_checklist';
+        let total = 0;
+        let done = 0;
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist');
+            let idCounter = 0;
+
+            checklistData.forEach(section => {
+                const sec = document.createElement('div');
+                sec.className = 'cl-section';
+
+                const title = document.createElement('div');
+                title.className = 'cl-section-title';
+                title.textContent = section.section;
+                sec.appendChild(title);
+
+                section.items.forEach(item => {
+                    const id = 'item_' + (idCounter++);
+                    total++;
+
+                    const div = document.createElement('div');
+                    div.className = 'cl-item';
+                    div.id = 'wrap_' + id;
+
+                    const lbl = document.createElement('label');
+                    lbl.htmlFor = id;
+                    lbl.innerHTML = `
+                        <input type="checkbox" id="${id}">
+                        <div class="checkmark">
+                            <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+                                <path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="cl-text">${item.text}</span>
+                    `;
+                    div.appendChild(lbl);
+
+                    if (item.sub && item.sub.length > 0) {
+                        const subs = document.createElement('div');
+                        subs.className = 'cl-subs';
+                        item.sub.forEach(s => {
+                            const sid = 'item_' + (idCounter++);
+                            total++;
+
+                            const subDiv = document.createElement('div');
+                            subDiv.className = 'cl-sub';
+                            subDiv.id = 'wrap_' + sid;
+
+                            const subLbl = document.createElement('label');
+                            subLbl.htmlFor = sid;
+                            subLbl.innerHTML = `
+                                <input type="checkbox" id="${sid}">
+                                <div class="checkmark">
+                                    <svg width="10" height="8" viewBox="0 0 12 10" fill="none">
+                                        <path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="cl-text">${s}</span>
+                            `;
+                            subDiv.appendChild(subLbl);
+                            subs.appendChild(subDiv);
+                        });
+                        div.appendChild(subs);
+                    }
+
+                    sec.appendChild(div);
+                });
+
+                container.appendChild(sec);
+            });
+
+            // Навешиваем обработчики
+            document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', () => toggle(cb.id));
+            });
+
+            document.getElementById('totalCount').textContent = total;
+            loadState();
+        }
+
+        function toggle(id) {
+            const cb = document.getElementById(id);
+            const wrap = document.getElementById('wrap_' + id);
+            if (!cb || !wrap) return;
+
+            // 1. Обновляем визуал текущего чекбокса
+            if (cb.checked) wrap.classList.add('checked');
+            else wrap.classList.remove('checked');
+
+            // 2. Если это подпункт (cl-sub) — проверяем, все ли отмечены
+            if (wrap.classList.contains('cl-sub')) {
+                const parentWrap = wrap.closest('.cl-item');
+                if (parentWrap) {
+                    const parentCb = parentWrap.querySelector(':scope > label > input[type="checkbox"]');
+                    const subCbs = parentWrap.querySelectorAll('.cl-subs input[type="checkbox"]');
+                    if (parentCb && subCbs.length > 0) {
+                        const allChecked = Array.from(subCbs).every(c => c.checked);
+                        parentCb.checked = allChecked;
+                        if (allChecked) parentWrap.classList.add('checked');
+                        else parentWrap.classList.remove('checked');
+                    }
+                }
+            }
+
+            // 3. Если это родительский пункт (cl-item) — синхронизируем все подпункты
+            if (wrap.classList.contains('cl-item')) {
+                const subCbs = wrap.querySelectorAll('.cl-subs input[type="checkbox"]');
+                subCbs.forEach(subCb => {
+                    subCb.checked = cb.checked;
+                    const subWrap = document.getElementById('wrap_' + subCb.id);
+                    if (subWrap) {
+                        if (cb.checked) subWrap.classList.add('checked');
+                        else subWrap.classList.remove('checked');
+                    }
+                });
+            }
+
+            updateProgress();
+            saveState();
+        }
+
+        function syncParentStates() {
+            document.querySelectorAll('.cl-item').forEach(parentWrap => {
+                const parentCb = parentWrap.querySelector(':scope > label > input[type="checkbox"]');
+                const subCbs = parentWrap.querySelectorAll('.cl-subs input[type="checkbox"]');
+                if (parentCb && subCbs.length > 0) {
+                    const allChecked = Array.from(subCbs).every(c => c.checked);
+                    parentCb.checked = allChecked;
+                    if (allChecked) parentWrap.classList.add('checked');
+                    else parentWrap.classList.remove('checked');
+                }
+            });
+        }
+
+        function updateProgress() {
+            done = document.querySelectorAll('#checklist input[type="checkbox"]:checked').length;
+            document.getElementById('doneCount').textContent = done;
+            const percent = total ? Math.round((done / total) * 100) : 0;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('percentText').textContent = percent + '%';
+
+            const banner = document.getElementById('banner');
+            if (done === total && total > 0) banner.classList.add('banner-show');
+            else banner.classList.remove('banner-show');
+        }
+
+        function saveState() {
+            const state = {};
+            document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+                state[cb.id] = cb.checked;
+            });
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+        }
+
+        function loadState() {
+            let state = {};
+            try { state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (e) {}
+            document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+                if (state[cb.id]) {
+                    cb.checked = true;
+                    document.getElementById('wrap_' + cb.id).classList.add('checked');
+                }
+            });
+            syncParentStates();
+            updateProgress();
+        }
+
+        function resetAll() {
+            if (!confirm('Сбросить весь прогресс чек-листа?')) return;
+            document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+                document.getElementById('wrap_' + cb.id).classList.remove('checked');
+            });
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            updateProgress();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        renderChecklist();
+    </script>
+    <script type="module" src="./js/articles.js"></script>
+    <script type="module" src="./js/feedback.js"></script>
+</body>
+</html>
