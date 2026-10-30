@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js';
+import { supabase } from './js/config.js';
 
 // Переменная для нашего редактора
 let quill = null;
