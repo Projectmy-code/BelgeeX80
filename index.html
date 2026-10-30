@@ -108,7 +108,7 @@
 
             <div class="hidden xl:flex items-center gap-3 shrink-0">
                 <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
-                <a href="https://t.me/bgx80" target="_blank" class="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105">
+                <a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105">
                     <i class="fa-brands font-semibold fa-telegram text-base text-blue-400"></i>
                     <span>Чат Telegram</span>
                 </a>
@@ -130,7 +130,7 @@
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
                 <a href="login.html" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
-                <a href="https://t.me" target="_blank" class="w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
+                <a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer" class="w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
                 </a>
                 <button onclick="toggleModal('feedback-modal'); toggleMobileMenu()" class="w-full py-2.5 bg-brand-teal text-black font-semibold rounded-xl">
@@ -401,28 +401,47 @@
         </div>
     </section>
 
-    <!-- COMMUNITY -->
+    <!-- COMMUNITY SECTION WITH TELEGRAM CARD -->
     <section id="community" class="py-16 border-b border-brand-border relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-12">
+            <div class="text-center max-w-2xl mx-auto mb-10">
                 <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Сообщество Владельцев</span>
                 <h2 class="text-3xl font-display font-bold text-white mt-1">Клуб BELGEE X80 Беларуси</h2>
-                <p class="text-gray-400 text-sm mt-1">Присоединяйтесь к активным участникам нашего Telegram-чата</p>
+                <p class="text-gray-400 text-sm mt-1">Присоединяйтесь к нашему Telegram-сообществу владельцев</p>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="members-grid"></div>
+            <!-- Telegram Card Banner -->
+            <div class="max-w-3xl mx-auto bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 sm:p-10 rounded-3xl border border-blue-500/30 text-center relative overflow-hidden card-glow">
+                <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
 
-            <div class="mt-12 bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 rounded-3xl border border-blue-500/30 text-center relative overflow-hidden">
-                <div class="relative z-10 max-w-2xl mx-auto space-y-4">
-                    <i class="fa-brands fa-telegram text-5xl text-blue-400"></i>
-                    <h3 class="text-2xl font-bold font-display text-white">Вступайте в официальный чат клуба!</h3>
-                    <p class="text-sm text-gray-300">
-                        Задавайте вопросы по ремонту, делитесь опытом, находите проверенные автосервисы и участвуйте в сходках владельцев.
+                <div class="relative z-10 space-y-5">
+                    <div class="w-16 h-16 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-blue-500/20">
+                        <i class="fa-brands fa-telegram"></i>
+                    </div>
+
+                    <h3 class="text-2xl sm:text-3xl font-bold font-display text-white">Официальный Telegram Чат Владельцев</h3>
+
+                    <p class="text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
+                        Задавайте вопросы по ремонту и ТО, делитесь опытом доработок, находите проверенные сервисы и общайтесь с другими владельцами BELGEE X80 в режиме реального времени.
                     </p>
-                    <a href="https://t.me" target="_blank" class="inline-flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30">
-                        <span>Перейти в Telegram Чат</span>
-                        <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </a>
+
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-semibold">
+                        <i class="fa-brands fa-telegram"></i>
+                        <span>@bgx80</span>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer"
+                           class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 hover:scale-105">
+                            <i class="fa-brands fa-telegram text-xl"></i>
+                            <span>Присоединиться к чату</span>
+                        </a>
+                        <button onclick="toggleModal('feedback-modal')"
+                                class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-envelope text-brand-teal"></i>
+                            <span>Написать администрации</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -449,7 +468,7 @@
                 <div>
                     <h4 class="font-bold text-white mb-3">Сообщество</h4>
                     <ul class="space-y-2">
-                        <li><a href="https://t.me" target="_blank" class="hover:text-brand-teal"><i class="fa-brands fa-telegram mr-1 text-blue-400"></i> Telegram Чат</a></li>
+                        <li><a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer" class="hover:text-brand-teal"><i class="fa-brands fa-telegram mr-1 text-blue-400"></i> Telegram Чат</a></li>
                         <li><a href="#community" class="hover:text-brand-teal">Участники клуба</a></li>
                     </ul>
                 </div>
@@ -648,7 +667,9 @@
         }
 
         function renderMembers() {
-            document.getElementById('members-grid').innerHTML = clubMembers.map(m => `
+            const grid = document.getElementById('members-grid');
+            if (!grid) return; // сетка участников удалена — блок заменён Telegram-карточкой
+            grid.innerHTML = clubMembers.map(m => `
                 <div class="bg-brand-card p-4 rounded-2xl border border-brand-border text-center card-glow">
                     <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-brand-teal to-blue-600 text-black font-extrabold text-lg flex items-center justify-center mx-auto mb-2 shadow-md">${m.avatar}</div>
                     <div class="font-bold text-sm text-white truncate">${m.name}</div>
