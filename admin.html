@@ -139,10 +139,11 @@
             const selectedMode = document.querySelector('input[name="publish_mode"]:checked');
             if (!selectedMode) return;
             const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Сохранение...';
             btn.disabled = true;
             await supabase.from('site_settings').update({ value: selectedMode.value }).eq('key', 'submission_mode');
-            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Сохранить';
+            btn.innerHTML = originalText;
             btn.disabled = false;
             alert('Настройки сохранены!');
         }
@@ -160,9 +161,18 @@
 
             const table = currentTab === 'articles' ? 'articles' : 'models_3d';
             
+            // Отладочный вывод: проверяем, что мы запрашиваем
+            console.log(`Запрос к таблице: ${table}, статус: pending`);
+
             const { data: items, error } = await supabase.from(table).select('*').eq('status', 'pending').order('created_at', { ascending: false });
             
-            if (error || !items || items.length === 0) {
+            if (error) {
+                console.error('Ошибка загрузки:', error);
+                container.innerHTML = `<p class="text-red-400 text-sm col-span-full">Ошибка: ${error.message}</p>`;
+                return;
+            }
+
+            if (!items || items.length === 0) {
                 container.innerHTML = `<div class="col-span-full py-12 text-center border-2 border-dashed border-brand-border rounded-2xl bg-brand-dark/50">
                     <i class="fa-regular fa-face-smile text-4xl mb-3 text-gray-500"></i>
                     <h3 class="text-white font-semibold mb-1">Очередь пуста</h3>
@@ -176,10 +186,9 @@
                 const div = document.createElement('div');
                 div.className = 'card-glow border border-brand-border p-5 rounded-2xl bg-brand-dark flex flex-col justify-between';
                 
-                // Разный рендер для статей и моделей
-                const title = currentTab === 'articles' ? item.title : item.title;
+                const title = item.title;
                 const sub = currentTab === 'articles' ? item.summary : item.description;
-                const cat = currentTab === 'articles' ? item.category : item.category;
+                const cat = item.category;
 
                 div.innerHTML = `
                     <div>
