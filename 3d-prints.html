@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D-печать для BELGEE X80 — Клубные модели</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
+    </script>
+    <style>
+        body { background-color: #0c1017; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .card-glow { transition: all 0.3s ease; }
+        .card-glow:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15); transform: translateY(-2px); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c1017; }
+        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-3 group shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
+                    <span class="font-display font-black text-black text-xl">X</span>
+                </div>
+                <div>
+                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">BELGEE <span class="text-brand-teal">X80</span></div>
+                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Сообщество & Запчасти</div>
+                </div>
+            </a>
+
+            <nav class="hidden xl:flex items-center gap-4 2xl:gap-6 text-sm font-medium text-gray-300 whitespace-nowrap">
+                <a href="index.html#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
+                <a href="index.html#catalog" class="hover:text-brand-teal transition-colors">Каталог запчастей</a>
+                <a href="index.html#articles" class="hover:text-brand-teal transition-colors">Статьи</a>
+                <a href="3d-prints.html" class="text-brand-teal font-semibold transition-colors">3D Печать</a>
+                <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка авто</a>
+            </nav>
+
+            <a href="index.html" class="hidden sm:block text-cyan-400 text-sm font-semibold hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left mr-1"></i> На главную
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-4">
+                    <i class="fa-solid fa-cube"></i> 3D-Модели клуба
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-display font-black text-white tracking-tight leading-tight mb-4">3D-печать для BELGEE X80</h1>
+                <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                    Полезные модели для вашего автомобиля, напечатанные на 3D-принтере. Держатели, заглушки, органайзеры и крепления, созданные участниками клуба.
+                </p>
+            </div>
+
+            <!-- Сетка моделей -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="models-grid">
+                <!-- Карточка 1 -->
+                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
+                    <div class="relative h-48 bg-slate-800 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1615845865313-24558a105113?auto=format&fit=crop&w=600&q=80');"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">STL / 3MF</div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">Салон</span>
+                            <h3 class="font-bold text-white text-base mt-1">Держатель для телефона (под дефлектор)</h3>
+                            <p class="text-xs text-gray-400 mt-2">Удобное крепление для смартфона, которое устанавливается на решетку воздуховода без клея и скотча.</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between">
+                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> Club_Member</span>
+                            <a href="https://www.thingiverse.com" target="_blank" class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors">
+                                <i class="fa-solid fa-download mr-1"></i> Скачать
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 2 -->
+                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
+                    <div class="relative h-48 bg-slate-800 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80');"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">STL</div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">Кузов</span>
+                            <h3 class="font-bold text-white text-base mt-1">Заглушки на болты крепления колес</h3>
+                            <p class="text-xs text-gray-400 mt-2">Комплект защитных колпачков (4 шт), которые закрывают колесные болты от грязи и придают эстетичный вид.</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between">
+                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> X80_Tech</span>
+                            <a href="https://www.thingiverse.com" target="_blank" class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors">
+                                <i class="fa-solid fa-download mr-1"></i> Скачать
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 3 -->
+                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
+                    <div class="relative h-48 bg-slate-800 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1621939514649-280e2c49a39b?auto=format&fit=crop&w=600&q=80');"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">STL</div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">Багажник</span>
+                            <h3 class="font-bold text-white text-base mt-1">Органайзер в подполье багажника</h3>
+                            <p class="text-xs text-gray-400 mt-2">Разделитель для инструментов и мелочей, который идеально вписывается в нишу вокруг запаски.</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between">
+                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> Dimon</span>
+                            <a href="https://www.thingiverse.com" target="_blank" class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors">
+                                <i class="fa-solid fa-download mr-1"></i> Скачать
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Форма предложки -->
+            <div class="mt-16 max-w-2xl mx-auto bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 rounded-3xl border border-blue-500/30 text-center">
+                <h3 class="text-xl font-bold font-display text-white mb-2">Создали свою 3D-модель?</h3>
+                <p class="text-sm text-gray-400 mb-6">Поделитесь ей с сообществом! Загрузите ссылку на вашу модель (Thingiverse, Printables, Cults3D), и мы добавим её на сайт.</p>
+                <a href="https://t.me/bgx80" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg">
+                    <i class="fa-brands fa-telegram"></i> Предложить в Telegram
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark py-8 text-gray-400 text-xs border-t border-brand-border text-center">
+        <p>© 2026 BELGEE X80 Club Portal. Все права защищены.</p>
+    </footer>
+</body>
+</html>
