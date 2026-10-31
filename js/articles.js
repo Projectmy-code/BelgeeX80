@@ -94,11 +94,9 @@ export function openArticleModal(article) {
     document.getElementById('info-modal').classList.remove('hidden');
 }
 
-// ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОВЕРКИ НАСТРОЕК
 export async function openSubmission() {
     const { data: { session } } = await supabase.auth.getSession();
     
-    // Запрашиваем значение по ключу submission_mode
     const { data: settings } = await supabase
         .from('site_settings')
         .select('value')
@@ -114,7 +112,6 @@ export async function openSubmission() {
     }
 
     if (quill) quill.root.innerHTML = '';
-    
     document.getElementById('add-article-modal').classList.remove('hidden');
 }
 
@@ -134,6 +131,9 @@ export async function handleAddArticleSubmit(e) {
     btn.textContent = 'Отправка...';
     btn.disabled = true;
 
+    // ПОЛУЧАЕМ СЕССИЮ ПОЛЬЗОВАТЕЛЯ
+    const { data: { session } } = await supabase.auth.getSession();
+
     const newArticle = {
         title: document.getElementById('new-title').value,
         category: document.getElementById('new-category').value,
@@ -141,7 +141,8 @@ export async function handleAddArticleSubmit(e) {
         summary: document.getElementById('new-summary').value,
         content: contentHTML,
         author: document.getElementById('new-author').value,
-        status: 'pending'
+        status: 'pending',
+        user_id: session ? session.user.id : null // ПРИВЯЗКА К ПОЛЬЗОВАТЕЛЮ
     };
 
     try {
