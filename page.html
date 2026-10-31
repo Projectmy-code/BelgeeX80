@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка — BELGEE X80</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
+    </script>
+    <style>
+        body { background-color: #0c1017; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .content-html img { max-width: 100%; height: auto; border-radius: 12px; margin: 20px 0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+        .content-html p { margin-bottom: 16px; line-height: 1.7; }
+        .content-html h2 { font-size: 24px; font-weight: bold; margin: 32px 0 16px; color: #00f0ff; font-family: 'Montserrat', sans-serif;}
+        .content-html h3 { font-size: 20px; font-weight: bold; margin: 24px 0 12px; color: white; }
+        .content-html ul { list-style-type: disc; padding-left: 24px; margin-bottom: 16px; }
+        .content-html li { margin-bottom: 8px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-black">
+    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-3 group shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform"><span class="font-display font-black text-black text-xl">X</span></div>
+                <div><div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">BELGEE <span class="text-brand-teal">X80</span></div><div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Клубный портал</div></div>
+            </a>
+            <a href="index.html" class="text-sm font-medium text-brand-teal hover:text-white transition-colors"><i class="fa-solid fa-arrow-left mr-1"></i> На главную</a>
+        </div>
+    </header>
+
+    <main class="flex-1 py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 id="page-title" class="text-4xl sm:text-5xl font-display font-black text-white mb-8 border-b border-brand-border pb-4">Загрузка...</h1>
+            <div id="page-content" class="content-html text-gray-300"></div>
+            <div id="page-error" class="hidden text-center py-20"><i class="fa-solid fa-triangle-exclamation text-5xl text-red-500 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Страница не найдена</h2><p class="text-gray-400">Возможно, она была удалена или еще не опубликована.</p></div>
+        </div>
+    </main>
+
+    <footer class="bg-brand-dark py-8 text-gray-400 text-xs border-t border-brand-border text-center"><p>© 2026 BELGEE X80 Club Portal. Все права защищены.</p></footer>
+
+    <script type="module">
+        import { supabase } from './js/config.js';
+        async function loadPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('p');
+            if (!slug) { document.getElementById('page-error').classList.remove('hidden'); document.getElementById('page-title').classList.add('hidden'); return; }
+            const { data: page, error } = await supabase.from('custom_pages').select('*').eq('slug', slug).eq('status', 'published').single();
+            if (error || !page) { document.getElementById('page-error').classList.remove('hidden'); document.getElementById('page-title').classList.add('hidden'); return; }
+            document.title = page.title + " — BELGEE X80";
+            document.getElementById('page-title').textContent = page.title;
+            const container = document.getElementById('page-content');
+            const blocks = page.blocks || [];
+            if (blocks.length === 0) { container.innerHTML = '<p class="text-gray-500 italic">Эта страница пока пуста.</p>'; return; }
+            let htmlContent = '';
+            blocks.forEach(block => {
+                if (block.type === 'text') htmlContent += `<div>${block.content}</div>`;
+                else if (block.type === 'image') htmlContent += `<img src="${block.url}" alt="${block.alt || 'Изображение'}" loading="lazy">`;
+                else if (block.type === 'video') htmlContent += `<div class="relative w-full aspect-video my-6 rounded-xl overflow-hidden border border-brand-border"><iframe class="absolute inset-0 w-full h-full" src="${block.url}" title="Видео" frameborder="0" allowfullscreen></iframe></div>`;
+                else if (block.type === 'alert') htmlContent += `<div class="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 my-6 flex items-start gap-3"><i class="fa-solid fa-circle-info text-blue-400 text-lg mt-1"></i><div class="text-sm text-blue-300">${block.content}</div></div>`;
+            });
+            container.innerHTML = htmlContent;
+        }
+        loadPage();
+    </script>
+</body>
+</html>
