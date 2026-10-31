@@ -21,8 +21,18 @@
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         #stl-viewer-container { width: 100%; height: 60vh; min-height: 400px; }
+
+        /* Анимации для стильных уведомлений */
+        @keyframes slideIn {
+            0% { transform: translateX(50px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
     </style>
-    <!-- Подключаем Three.js и загрузчик 3MF -->
+    <!-- Подключаем Three.js и загрузчики -->
     <script type="importmap">
     {
         "imports": {
@@ -107,7 +117,7 @@
             <form id="add-model-form" onsubmit="handleAddModelSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Название модели</label>
-                    <input type="text" id="model-title" required placeholder="Например: Держатель для очков" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                    <input type="text" id="model-title" required placeholder="Например: Гайка подкрылка" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
@@ -126,7 +136,6 @@
                     </div>
                 </div>
 
-                <!-- ЗАГРУЗКА ФАЙЛА -->
                 <div class="p-4 border border-brand-teal/30 rounded-xl bg-brand-teal/5">
                     <label class="block text-xs font-semibold text-brand-teal mb-1">Файл модели (.stl, .3mf)</label>
                     <input type="file" id="model-file" accept=".stl,.3mf" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-brand-teal file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-teal file:text-black hover:file:bg-brand-teal/80 mb-2">
@@ -135,11 +144,10 @@
                         <i class="fa-solid fa-cloud-arrow-up"></i> Загрузить и сделать превью
                     </button>
 
-                    <div id="upload-status" class="text-xs text-brand-teal mt-2 hidden"></div>
+                    <div id="upload-status" class="text-xs text-brand-teal mt-2 hidden text-center font-semibold"></div>
 
-                    <!-- Контейнер для превью -->
                     <div id="preview-container" class="hidden mt-4">
-                        <span class="block text-xs text-gray-400 mb-2">Сгенерированное превью:</span>
+                        <span class="block text-xs text-gray-400 mb-2 text-center">Сгенерированное превью:</span>
                         <img id="preview-image" class="w-full h-48 object-cover rounded-lg border border-brand-border bg-black/50" alt="Превью">
                     </div>
                 </div>
@@ -170,8 +178,32 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         const grid = document.getElementById('models-grid');
-        let generatedBase64Image = null; // Превью
-        let uploadedFileUrl = null;      // Ссылка на файл в Supabase
+        let generatedBase64Image = null;
+        let uploadedFileUrl = null;
+
+        // === ФУНКЦИЯ КРАСИВЫХ УВЕДОМЛЕНИЙ (TOAST) ===
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const isSuccess = type === 'success';
+            const borderColor = isSuccess ? 'border-emerald-500' : 'border-red-500';
+            const iconColor = isSuccess ? 'text-emerald-400' : 'text-red-400';
+            const iconClass = isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation';
+
+            toast.className = `fixed bottom-6 right-6 z-[100] bg-brand-card border ${borderColor} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold text-white`;
+            toast.style.animation = 'slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+            
+            toast.innerHTML = `
+                <i class="fa-solid ${iconClass} text-xl ${iconColor}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+
+            // Автоматическое скрытие
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
 
         // === 1. ЗАГРУЗКА МОДЕЛЕЙ ИЗ БАЗЫ ===
         async function loadModels() {
@@ -208,8 +240,7 @@
                         <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between gap-2">
                             <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> ${model.author}</span>
                             <div class="flex gap-2">
-                                ${model.stl_url ? `<button onclick="openSTLModal('${model.stl_url}', '${model.title}')" class="px-3 py-1.5 bg-brand-teal/20 text-brand-teal font-bold text-xs rounded-lg hover:bg-brand-teal/30 transition-colors border border-brand-teal/30"><i class="fa-solid fa-cube mr-1"></i> Смотреть 3D</button>` : ''}
-                                <!-- Кнопка скачивания файла прямо из Storage -->
+                                ${model.stl_url ? `<button onclick="openSTLModal('${model.stl_url}', '${model.title}')" class="px-3 py-1.5 bg-brand-teal/20 text-brand-teal font-bold text-xs rounded-lg hover:bg-brand-teal/30 transition-colors border border-brand-teal/30"><i class="fa-solid fa-cube mr-1"></i> 3D</button>` : ''}
                                 ${model.stl_url ? `<a href="${model.stl_url}" download class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors"><i class="fa-solid fa-download"></i></a>` : ''}
                             </div>
                         </div>
@@ -219,11 +250,11 @@
             });
         }
 
-        // === 2. ЗАГРУЗКА ФАЙЛА В SUPABASE И РЕНДЕР ПРЕВЬЮ ===
+        // === 2. ЗАГРУЗКА ФАЙЛА И РЕНДЕР ПРЕВЬЮ ===
         window.processUpload = async function() {
             const fileInput = document.getElementById('model-file');
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert('Пожалуйста, выберите файл .stl или .3mf');
+                showToast('Пожалуйста, выберите файл .stl или .3mf', 'error');
                 return;
             }
 
@@ -234,26 +265,24 @@
             const btn = document.getElementById('gen-preview-btn');
             const status = document.getElementById('upload-status');
             
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Загрузка на сервер...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Загрузка...';
             btn.disabled = true;
             status.classList.remove('hidden');
             status.textContent = 'Шаг 1: Загрузка файла в облако...';
 
             try {
-                // 2.1 Загружаем файл в Supabase Storage
                 const { data: uploadData, error: uploadError } = await supabase.storage
                     .from('models')
                     .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
                 if (uploadError) throw uploadError;
 
-                // Получаем публичную ссылку
                 const { data: urlData } = supabase.storage.from('models').getPublicUrl(fileName);
                 uploadedFileUrl = urlData.publicUrl;
                 
                 status.textContent = 'Шаг 2: Генерация 3D-превью...';
 
-                // 2.2 Генерируем превью (создаем скрытую сцену)
+                // Рендер
                 const width = 600, height = 400;
                 const scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x161e2b);
@@ -268,26 +297,20 @@
                 scene.add(dirLight);
 
                 const loader = fileExt === '3mf' ? new ThreeMFLoader() : new STLLoader();
-                
-                // Используем FileReader или Blob URL для локального чтения файла (без повторного скачивания)
                 const objectUrl = URL.createObjectURL(file);
 
                 loader.load(objectUrl, (geometry) => {
                     let mesh;
                     if (fileExt === '3mf') {
-                        // 3MF возвращает группу
                         mesh = geometry;
-                        // Красим все дочерние меши в 3MF
                         mesh.traverse(child => {
                             if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: 0x00f0ff, specular: 0x111111, shininess: 100 });
                         });
                     } else {
-                        // STL возвращает геометрию
                         geometry.center();
                         mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0x00f0ff, specular: 0x111111, shininess: 100 }));
                     }
                     
-                    // Масштабируем
                     const box = new THREE.Box3().setFromObject(mesh);
                     const size = box.getSize(new THREE.Vector3()).length();
                     const scale = 3 / size;
@@ -309,7 +332,7 @@
                     URL.revokeObjectURL(objectUrl);
                 }, undefined, (err) => {
                     console.error(err);
-                    alert('Ошибка чтения 3D файла. Возможно, он поврежден.');
+                    showToast('Ошибка чтения 3D файла. Возможно, он поврежден.', 'error');
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Попробовать снова';
                     status.textContent = 'Ошибка рендера.';
@@ -317,20 +340,20 @@
 
             } catch (error) {
                 console.error(error);
-                alert('Ошибка загрузки: ' + error.message);
+                showToast('Ошибка загрузки: ' + error.message, 'error');
                 btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Загрузить и сделать превью';
                 btn.disabled = false;
                 status.textContent = 'Ошибка.';
             }
         };
 
-        // === 3. ОТПРАВКА ФОРМЫ В БАЗУ ===
+        // === 3. ОТПРАВКА ФОРМЫ ===
         window.handleAddModelSubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submit-model-btn');
             
             if (!generatedBase64Image || !uploadedFileUrl) {
-                alert('Пожалуйста, сначала нажмите "Загрузить и сделать превью".');
+                showToast('Пожалуйста, сначала нажмите "Загрузить и сделать превью".', 'error');
                 return;
             }
 
@@ -342,9 +365,9 @@
                 category: document.getElementById('model-category').value,
                 author: document.getElementById('model-author').value,
                 description: document.getElementById('model-desc').value,
-                link: uploadedFileUrl, // Ссылка на скачивание файла из Storage
-                stl_url: uploadedFileUrl, // Ссылка для 3D-просмотра
-                image_url: generatedBase64Image, // Наша сгенерированная картинка
+                link: uploadedFileUrl,
+                stl_url: uploadedFileUrl,
+                image_url: generatedBase64Image,
                 status: 'pending'
             };
 
@@ -354,9 +377,11 @@
             btn.disabled = false;
 
             if (error) {
-                alert('Ошибка: ' + error.message);
+                showToast('Ошибка при отправке: ' + error.message, 'error');
             } else {
-                alert('Спасибо! Ваша модель отправлена на проверку.');
+                showToast('Спасибо! Ваша модель отправлена на проверку.'); // Используем красивый Toast
+                
+                // Очищаем форму
                 e.target.reset();
                 document.getElementById('preview-container').classList.add('hidden');
                 document.getElementById('upload-status').classList.add('hidden');
@@ -364,7 +389,11 @@
                 document.getElementById('gen-preview-btn').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Загрузить и сделать превью';
                 generatedBase64Image = null;
                 uploadedFileUrl = null;
-                document.getElementById('add-model-modal').classList.add('hidden');
+                
+                // Плавно закрываем окно
+                setTimeout(() => {
+                    document.getElementById('add-model-modal').classList.add('hidden');
+                }, 500);
             }
         };
 
@@ -375,8 +404,8 @@
             const { data: { session } } = await supabase.auth.getSession();
 
             if (mode === 'registered' && !session) {
-                alert("Предлагать модели могут только зарегистрированные пользователи. Пожалуйста, войдите.");
-                window.location.href = 'login.html';
+                showToast('Предлагать модели могут только авторизованные пользователи.', 'error');
+                setTimeout(() => { window.location.href = 'login.html'; }, 1500);
                 return;
             }
             document.getElementById('add-model-modal').classList.remove('hidden');
@@ -384,7 +413,7 @@
 
         window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); }
 
-        // === 5. 3D ПРОСМОТР В МОДАЛЬНОМ ОКНЕ ===
+        // === 5. 3D ПРОСМОТР ===
         let viewerScene, viewerCamera, viewerRenderer, viewerControls, animId;
         
         window.openSTLModal = (url, title) => {
@@ -411,7 +440,7 @@
             
             viewerRenderer = new THREE.WebGLRenderer({ antialias: true });
             viewerRenderer.setSize(width, height);
-            container.innerHTML = ''; // Очищаем
+            container.innerHTML = '';
             container.appendChild(viewerRenderer.domElement);
 
             viewerScene.add(new THREE.AmbientLight(0xffffff, 1.5));
@@ -422,7 +451,6 @@
             viewerControls = new OrbitControls(viewerCamera, viewerRenderer.domElement);
             viewerControls.enableDamping = true;
 
-            // Определяем загрузчик по расширению
             const is3mf = url.toLowerCase().endsWith('.3mf');
             const loader = is3mf ? new ThreeMFLoader() : new STLLoader();
 
