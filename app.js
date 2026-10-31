@@ -7,108 +7,87 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const viewport = document.getElementById('viewport');
 const scene = new THREE.Scene();
 
-// Красивый градиентный фон вместо сплошного черного
-scene.background = new THREE.Color(0x0f172a);
-// Добавляем туман, чтобы пол растворялся вдали
-scene.fog = new THREE.FogExp2(0x0f172a, 0.03);
-
-// Камера
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(5, 3, 8);
-
-// Рендерер
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+// Убираем сплошной черный фон, чтобы использовать красивый CSS-градиент
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 1.2;
 viewport.appendChild(renderer.domElement);
 
-// === 2. РЕАЛИСТИЧНОЕ ОКРУЖЕНИЕ (ДЛЯ ОТРАЖЕНИЙ) ===
+// Красивое студийное окружение для отражений
 const pmremGenerator = new THREE.PMREMGenerator(renderer);
 scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
-// === 3. ОСВЕЩЕНИЕ ===
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+// === 2. ОСВЕЩЕНИЕ ===
+// Мягкий общий свет
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 2);
-dirLight.position.set(10, 20, 10);
-dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = 2048;
-dirLight.shadow.mapSize.height = 2048;
-dirLight.shadow.camera.near = 0.5;
-dirLight.shadow.camera.far = 50;
-dirLight.shadow.camera.left = -10;
-dirLight.shadow.camera.right = 10;
-dirLight.shadow.camera.top = 10;
-dirLight.shadow.camera.bottom = -10;
-dirLight.shadow.bias = -0.0005;
-scene.add(dirLight);
+// Основной направленный свет (сверху справа)
+const mainLight = new THREE.DirectionalLight(0xffffff, 2);
+mainLight.position.set(5, 10, 5);
+mainLight.castShadow = true;
+mainLight.shadow.mapSize.width = 2048;
+mainLight.shadow.mapSize.height = 2048;
+mainLight.shadow.camera.near = 0.5;
+mainLight.shadow.camera.far = 50;
+mainLight.shadow.camera.left = -10;
+mainLight.shadow.camera.right = 10;
+mainLight.shadow.camera.top = 10;
+mainLight.shadow.camera.bottom = -10;
+mainLight.shadow.bias = -0.0005;
+scene.add(mainLight);
 
-// Подсветка сзади (для бликов)
-const rimLight = new THREE.DirectionalLight(0x00f0ff, 1.5);
-rimLight.position.set(-10, 5, -10);
-scene.add(rimLight);
+// Подсветка спереди (чтобы выделить решетку и фары)
+const frontLight = new THREE.DirectionalLight(0xffffff, 1.5);
+frontLight.position.set(0, 2, 10);
+scene.add(frontLight);
 
-// === 4. СТИЛЬНЫЙ ПОЛ (ВМЕСТО СЕТКИ) ===
-// Создаем глянцевый круглый подиум
-const floorGeometry = new THREE.CircleGeometry(15, 64);
+// === 3. СТИЛЬНЫЙ ПОЛ (БЕЗ СЕТКИ) ===
+const floorGeometry = new THREE.CircleGeometry(50, 64);
 const floorMaterial = new THREE.MeshStandardMaterial({ 
-    color: 0x1e293b, // Темно-синий графит
-    metalness: 0.8,  // Делаем поверхность металлической для отражений
-    roughness: 0.2,  // Гладкая поверхность
-    envMapIntensity: 1.0
+    color: 0x1e293b, 
+    metalness: 0.9, 
+    roughness: 0.15,
+    envMapIntensity: 1.5 
 });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
-floor.position.y = 0;
+floor.position.y = -0.05;
 floor.receiveShadow = true;
 scene.add(floor);
 
-// Добавляем очень тонкую неоновую сетку (как стилизованную разметку)
-const gridHelper = new THREE.GridHelper(30, 60, 0x00f0ff, 0x00f0ff);
-gridHelper.material.opacity = 0.05; // Делаем её почти прозрачной
-gridHelper.material.transparent = true;
-gridHelper.position.y = 0.01;
-scene.add(gridHelper);
+// === 4. УПРАВЛЕНИЕ (МЫШЬ) ===
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(5, 2, 8);
 
-// === 5. УПРАВЛЕНИЕ (МЫШЬ) ===
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.maxPolarAngle = Math.PI / 2 - 0.05;
+controls.maxPolarAngle = Math.PI / 2 - 0.02;
 controls.minDistance = 4;
 controls.maxDistance = 20;
-controls.autoRotateSpeed = 1.5;
+controls.autoRotateSpeed = 1.0;
 controls.target.set(0, 1, 0);
 
-// === 6. ЗАГРУЗКА МОДЕЛИ ===
+// === 5. ЗАГРУЗКА МОДЕЛИ ===
 const loader = new GLTFLoader();
 let carModel = null;
-
-const loadTimeout = setTimeout(() => {
-    if (!carModel) {
-        document.getElementById('loader').classList.add('hidden');
-        document.getElementById('error-screen').classList.remove('hidden');
-        document.getElementById('error-message').textContent = "Превышено время ожидания.";
-    }
-}, 15000);
 
 loader.load(
     'models/car.glb', 
     (gltf) => {
-        clearTimeout(loadTimeout);
         carModel = gltf.scene;
         
         carModel.traverse((child) => {
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                if (child.material) {
-                    child.material.envMapIntensity = 1.5; 
+                if (child.material && child.material.isMeshStandardMaterial) {
+                    child.material.envMapIntensity = 2.0; // Усиливаем отражения
                 }
             }
         });
@@ -118,7 +97,7 @@ loader.load(
         const center = box.getCenter(new THREE.Vector3());
         
         carModel.position.x = -center.x;
-        carModel.position.y = -center.y + (size.y / 2) + 0.01; // Чуть приподнимаем над полом
+        carModel.position.y = -center.y + (size.y / 2);
         carModel.position.z = -center.z;
         
         const maxDim = Math.max(size.x, size.y, size.z);
@@ -127,7 +106,7 @@ loader.load(
         
         scene.add(carModel);
 
-        // Инициализируем цвет по умолчанию (первый в списке)
+        // Инициализируем цвет по умолчанию
         changeColor(colors[0]);
 
         document.getElementById('loader').classList.add('hidden');
@@ -139,20 +118,20 @@ loader.load(
         }
     },
     (error) => {
-        clearTimeout(loadTimeout);
+        console.error(error);
         document.getElementById('loader').classList.add('hidden');
         document.getElementById('error-screen').classList.remove('hidden');
-        document.getElementById('error-message').textContent = "Файл models/car.glb не найден.";
+        document.getElementById('error-message').textContent = "Ошибка загрузки модели.";
     }
 );
 
-// === 7. ЦВЕТА КУЗОВА ===
+// === 6. ЦВЕТА КУЗОВА ===
 const colors = [
-    { name: 'A08 · Crystal White', hex: '#ffffff', metal: 0.3, rough: 0.2 },
-    { name: 'A12 · Obsidian Black', hex: '#0a0a0a', metal: 0.8, rough: 0.1 },
-    { name: 'A05 · Metallic Grey', hex: '#6b7280', metal: 0.6, rough: 0.3 },
-    { name: 'A22 · Sport Red', hex: '#b91c1c', metal: 0.6, rough: 0.2 },
-    { name: 'A30 · Ocean Blue', hex: '#1d4ed8', metal: 0.6, rough: 0.2 }
+    { name: 'A08 · Crystal White', hex: '#ffffff', metal: 0.4, rough: 0.1 },
+    { name: 'A12 · Obsidian Black', hex: '#050505', metal: 0.9, rough: 0.1 },
+    { name: 'A05 · Metallic Grey', hex: '#6b7280', metal: 0.8, rough: 0.2 },
+    { name: 'A22 · Sport Red', hex: '#991b1b', metal: 0.7, rough: 0.15 },
+    { name: 'A30 · Ocean Blue', hex: '#1e3a8a', metal: 0.7, rough: 0.15 }
 ];
 
 const swatchesContainer = document.getElementById('color-swatches');
@@ -184,18 +163,19 @@ function changeColor(colorObj) {
         if (child.isMesh) {
             const mat = child.material;
             if (mat) {
-                if (mat.name.toLowerCase().includes('body') || 
-                    mat.name.toLowerCase().includes('paint') || 
-                    mat.name.toLowerCase().includes('car') ||
-                    child.name.toLowerCase().includes('body') ||
-                    mat.name === '') { // Иногда основной материал без имени
-                    
+                // Более надежный поиск кузова
+                const isBody = mat.name.toLowerCase().includes('body') || 
+                               mat.name.toLowerCase().includes('paint') || 
+                               child.name.toLowerCase().includes('body') || 
+                               child.name.toLowerCase().includes('paint');
+                               
+                if (isBody) {
                     mat.color.set(colorObj.hex);
                     
                     if (mat.isMeshStandardMaterial) {
                         mat.metalness = colorObj.metal;
                         mat.roughness = colorObj.rough;
-                        mat.envMapIntensity = 1.5;
+                        mat.envMapIntensity = 2.0; 
                         mat.needsUpdate = true;
                     }
                 }
@@ -212,14 +192,14 @@ btnRotate.onclick = () => {
     controls.autoRotate = !isPressed;
 };
 
-// === 8. КАМЕРЫ (ВИДЫ) ===
+// === 7. КАМЕРЫ ===
 const views = {
-    front: { pos: [0, 2.5, 10], target: [0, 1, 0] },
-    rear: { pos: [0, 2.5, -10], target: [0, 1, 0] },
-    left: { pos: [-10, 2.5, 0], target: [0, 1, 0] },
-    right: { pos: [10, 2.5, 0], target: [0, 1, 0] },
-    'front-left': { pos: [-7, 4, 7], target: [0, 1, 0] },
-    'front-right': { pos: [7, 4, 7], target: [0, 1, 0] }
+    front: { pos: [0, 1.5, 9], target: [0, 0.8, 0] },
+    rear: { pos: [0, 1.5, -9], target: [0, 0.8, 0] },
+    left: { pos: [-9, 1.5, 0], target: [0, 0.8, 0] },
+    right: { pos: [9, 1.5, 0], target: [0, 0.8, 0] },
+    'front-left': { pos: [-6, 3, 6], target: [0, 0.8, 0] },
+    'front-right': { pos: [6, 3, 6], target: [0, 0.8, 0] }
 };
 
 document.querySelectorAll('.view-btn').forEach(btn => {
@@ -236,7 +216,7 @@ document.querySelectorAll('.view-btn').forEach(btn => {
     };
 });
 
-// === 9. АНИМАЦИЯ И РЕСАЙЗ ===
+// Анимация
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
