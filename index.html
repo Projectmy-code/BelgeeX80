@@ -88,10 +88,11 @@
                 </div>
             </a>
 
-            <!-- ВЕРХНЕЕ МЕНЮ (СТАТИЧНОЕ + ДИНАМИЧЕСКОЕ) -->
+            <!-- ВЕРХНЕЕ МЕНЮ -->
             <nav class="hidden xl:flex items-center gap-3 2xl:gap-5 text-sm font-medium text-gray-300 whitespace-nowrap">
                 <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
                 <a href="#catalog" class="hover:text-brand-teal transition-colors">Каталог</a>
+                <a href="configurator.html" class="hover:text-brand-teal transition-colors">3D Конфигуратор</a>
                 <a href="manual.html" class="hover:text-brand-teal transition-colors">Мануал</a>
                 <a href="articles.html" class="hover:text-brand-teal transition-colors">Статьи</a>
                 <a href="#videos" class="hover:text-brand-teal transition-colors">Видео</a>
@@ -118,6 +119,7 @@
         <div id="mobile-menu" class="hidden xl:hidden bg-brand-card border-b border-brand-border px-4 pt-2 pb-6 space-y-3">
             <a href="#specs" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Характеристики</a>
             <a href="#catalog" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Каталог запчастей</a>
+            <a href="configurator.html" class="block py-2 text-brand-teal font-semibold border-b border-gray-800">3D Конфигуратор</a>
             <a href="manual.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Руководство (PDF)</a>
             <a href="articles.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Все статьи</a>
             <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
@@ -182,6 +184,32 @@
                 <div>
                     <div class="text-2xl font-bold font-display text-blue-400">45+</div>
                     <div class="text-xs text-gray-400">Статей</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D CONFIGURATOR PROMO SECTION -->
+    <section id="configurator-promo" class="py-12 bg-brand-dark border-b border-brand-border relative overflow-hidden">
+        <!-- Декоративный фон -->
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/80 to-transparent"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="bg-brand-card/80 backdrop-blur-md rounded-3xl border border-brand-teal/30 p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 card-glow">
+                <div class="max-w-xl text-center md:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-4">
+                        <i class="fa-solid fa-cube"></i> 3D Интерактив
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-display font-bold text-white mb-4">Создай свой BELGEE X80</h2>
+                    <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                        Изучи автомобиль в мельчайших деталях. Покрути 3D-модель, оцени дизайн со всех сторон и выбери идеальный цвет кузова с помощью нашего интерактивного конфигуратора.
+                    </p>
+                </div>
+                <div class="shrink-0">
+                    <a href="configurator.html" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-2xl shadow-lg shadow-brand-teal/20 hover:scale-105 transition-all text-lg">
+                        <i class="fa-solid fa-play"></i> Запустить 3D
+                    </a>
                 </div>
             </div>
         </div>
@@ -443,6 +471,7 @@
                     <ul class="space-y-2">
                         <li><a href="#specs" class="hover:text-brand-teal">Характеристики</a></li>
                         <li><a href="#catalog" class="hover:text-brand-teal">Каталог запчастей</a></li>
+                        <li><a href="configurator.html" class="hover:text-brand-teal">3D Конфигуратор</a></li>
                         <li><a href="manual.html" class="hover:text-brand-teal">Руководство (PDF)</a></li>
                         <li><a href="articles.html" class="hover:text-brand-teal">Статьи</a></li>
                         <li><a href="#videos" class="hover:text-brand-teal">Видео</a></li>
@@ -793,7 +822,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadPartsFromDB();
             loadSiteContent();
-            loadDynamicPages(); // Запускаем только добавление страниц, не трогая основное меню
+            loadDynamicPages();
             updateAuthUI();
         });
     </script>
