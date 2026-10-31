@@ -88,13 +88,20 @@
                 </div>
             </a>
 
-            <!-- ВЕРХНЕЕ МЕНЮ (ДИНАМИЧЕСКОЕ) -->
+            <!-- ВЕРХНЕЕ МЕНЮ (СТАТИЧНОЕ + ДИНАМИЧЕСКОЕ) -->
             <nav class="hidden xl:flex items-center gap-3 2xl:gap-5 text-sm font-medium text-gray-300 whitespace-nowrap">
-                <!-- Меню из БД -->
-                <div id="dynamic-menu-header" class="flex items-center gap-3 2xl:gap-5"></div>
+                <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
+                <a href="#catalog" class="hover:text-brand-teal transition-colors">Каталог</a>
+                <a href="manual.html" class="hover:text-brand-teal transition-colors">Мануал</a>
+                <a href="articles.html" class="hover:text-brand-teal transition-colors">Статьи</a>
+                <a href="#videos" class="hover:text-brand-teal transition-colors">Видео</a>
+                <a href="3d-prints.html" class="hover:text-brand-teal transition-colors">3D Печать</a>
+                <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка</a>
                 
-                <!-- Динамические страницы из Конструктора -->
+                <!-- СЮДА ДОБАВЛЯЮТСЯ СТРАНИЦЫ ИЗ КОНСТРУКТОРА -->
                 <div id="dynamic-pages-nav" class="flex items-center gap-3 2xl:gap-5"></div>
+
+                <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
             </nav>
 
             <!-- Контейнер для авторизации (генерируется скриптом) -->
@@ -109,11 +116,17 @@
 
         <!-- МОБИЛЬНОЕ МЕНЮ -->
         <div id="mobile-menu" class="hidden xl:hidden bg-brand-card border-b border-brand-border px-4 pt-2 pb-6 space-y-3">
-            <!-- Меню из БД -->
-            <div id="dynamic-menu-mobile" class="space-y-3 border-b border-gray-800 pb-3"></div>
-            <!-- Динамические страницы -->
-            <div id="dynamic-pages-mobile" class="space-y-3"></div>
+            <a href="#specs" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Характеристики</a>
+            <a href="#catalog" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Каталог запчастей</a>
+            <a href="manual.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Руководство (PDF)</a>
+            <a href="articles.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Все статьи</a>
+            <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
+            <a href="3d-prints.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">3D Печать</a>
+            <a href="checklist.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Приёмка авто</a>
             
+            <div id="dynamic-pages-mobile" class="space-y-3"></div>
+
+            <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
                 <a href="login.html" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
                 <a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
@@ -427,8 +440,16 @@
                 
                 <div>
                     <h4 class="font-bold text-white mb-3">Разделы</h4>
-                    <!-- ДИНАМИЧЕСКОЕ МЕНЮ ФУТЕРА -->
-                    <ul id="dynamic-menu-footer" class="space-y-2"></ul>
+                    <ul class="space-y-2">
+                        <li><a href="#specs" class="hover:text-brand-teal">Характеристики</a></li>
+                        <li><a href="#catalog" class="hover:text-brand-teal">Каталог запчастей</a></li>
+                        <li><a href="manual.html" class="hover:text-brand-teal">Руководство (PDF)</a></li>
+                        <li><a href="articles.html" class="hover:text-brand-teal">Статьи</a></li>
+                        <li><a href="#videos" class="hover:text-brand-teal">Видео</a></li>
+                        <li><a href="3d-prints.html" class="hover:text-brand-teal">3D Печать</a></li>
+                        <li><a href="checklist.html" class="hover:text-brand-teal">Приёмка авто</a></li>
+                        <li><a href="#community" class="hover:text-brand-teal">Клуб</a></li>
+                    </ul>
                 </div>
                 
                 <div>
@@ -692,7 +713,7 @@
             });
         }
 
-        // === АВТОМАТИЧЕСКОЕ МЕНЮ ИЗ КОНСТРУКТОРА (СТРАНИЦЫ) ===
+        // === АВТОМАТИЧЕСКОЕ МЕНЮ ИЗ КОНСТРУКТОРА (ТОЛЬКО ДОБАВЛЯЕМ СТРАНИЦЫ) ===
         async function loadDynamicPages() {
             const { data: pages } = await supabase.from('custom_pages').select('title, slug').eq('status', 'published');
             if (!pages || pages.length === 0) return;
@@ -713,39 +734,6 @@
                 linkMobile.textContent = page.title;
                 mobileContainer.appendChild(linkMobile);
             });
-        }
-
-        // === ДИНАМИЧЕСКИЕ МЕНЮ ИЗ АДМИНКИ ===
-        async function loadDynamicMenus() {
-            const { data } = await supabase.from('menus').select('*');
-            if (!data) return;
-
-            const headerMenu = data.find(m => m.id === 'header')?.items || [];
-            const footerMenu = data.find(m => m.id === 'footer')?.items || [];
-
-            // Шапка
-            const headerContainer = document.getElementById('dynamic-menu-header');
-            if (headerContainer) {
-                headerContainer.innerHTML = headerMenu.map(item => 
-                    `<a href="${item.url}" class="hover:text-brand-teal transition-colors">${item.title}</a>`
-                ).join('');
-            }
-
-            // Мобильное меню
-            const mobileContainer = document.getElementById('dynamic-menu-mobile');
-            if (mobileContainer) {
-                mobileContainer.innerHTML = headerMenu.map(item => 
-                    `<a href="${item.url}" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">${item.title}</a>`
-                ).join('');
-            }
-
-            // Футер
-            const footerContainer = document.getElementById('dynamic-menu-footer');
-            if (footerContainer) {
-                footerContainer.innerHTML = footerMenu.map(item => 
-                    `<li><a href="${item.url}" class="hover:text-brand-teal">${item.title}</a></li>`
-                ).join('');
-            }
         }
 
         // === ОБРАТНАЯ СВЯЗЬ ===
@@ -805,8 +793,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadPartsFromDB();
             loadSiteContent();
-            loadDynamicMenus(); 
-            loadDynamicPages();
+            loadDynamicPages(); // Запускаем только добавление страниц, не трогая основное меню
             updateAuthUI();
         });
     </script>
