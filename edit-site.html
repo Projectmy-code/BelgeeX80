@@ -28,66 +28,118 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- ЛЕВАЯ КОЛОНКА: Тексты и ссылки -->
             <div class="bg-brand-card p-6 rounded-2xl border border-brand-border space-y-6">
                 <h2 class="text-lg font-bold text-brand-teal border-b border-brand-border pb-2"><i class="fa-solid fa-pen"></i> Контент</h2>
+                
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Заголовок (Hero)</label>
                     <input type="text" id="hero_title" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal outline-none">
                 </div>
+
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Ссылка на Telegram</label>
                     <input type="text" id="tg_link" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal outline-none">
                 </div>
+
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Видео 1 (Embed URL)</label>
                     <input type="text" id="video_1_url" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal outline-none">
                 </div>
+
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Видео 2 (Embed URL)</label>
                     <input type="text" id="video_2_url" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal outline-none">
                 </div>
+
+                <!-- ДОБАВЛЕНО 3-Е ВИДЕО -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Видео 3 (Embed URL)</label>
+                    <input type="text" id="video_3_url" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal outline-none">
+                </div>
             </div>
 
+            <!-- ПРАВАЯ КОЛОНКА: Виджеты (Вкл/Выкл) -->
             <div class="space-y-6">
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
                     <h2 class="text-lg font-bold text-brand-teal border-b border-brand-border pb-2 mb-4"><i class="fa-solid fa-puzzle-piece"></i> Блоки на главной</h2>
+                    
                     <div class="flex items-center justify-between mb-4">
-                        <div><div class="font-semibold text-white">Раздел «Видео»</div><div class="text-xs text-gray-400">Обзоры на главной</div></div>
-                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in"><input type="checkbox" id="show_videos" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/><label for="show_videos" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label></div>
+                        <div>
+                            <div class="font-semibold text-white">Раздел «Видео»</div>
+                            <div class="text-xs text-gray-400">Обзоры на главной</div>
+                        </div>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="show_videos" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/>
+                            <label for="show_videos" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label>
+                        </div>
                     </div>
+
                     <div class="flex items-center justify-between mb-4">
-                        <div><div class="font-semibold text-white">Раздел «Каталог»</div><div class="text-xs text-gray-400">Таблица с запчастями</div></div>
-                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in"><input type="checkbox" id="show_catalog" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/><label for="show_catalog" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label></div>
+                        <div>
+                            <div class="font-semibold text-white">Раздел «Каталог»</div>
+                            <div class="text-xs text-gray-400">Таблица с запчастями</div>
+                        </div>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="show_catalog" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/>
+                            <label for="show_catalog" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label>
+                        </div>
                     </div>
+
                     <div class="flex items-center justify-between mb-4">
-                        <div><div class="font-semibold text-white">Ссылка на 3D-печать</div><div class="text-xs text-gray-400">Кнопка в меню и баннере</div></div>
-                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in"><input type="checkbox" id="show_3d" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/><label for="show_3d" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label></div>
+                        <div>
+                            <div class="font-semibold text-white">Ссылка на 3D-печать</div>
+                            <div class="text-xs text-gray-400">Кнопка в меню и баннере</div>
+                        </div>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="show_3d" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/>
+                            <label for="show_3d" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label>
+                        </div>
                     </div>
+
                     <div class="flex items-center justify-between">
-                        <div><div class="font-semibold text-white">Блок «Сообщество»</div><div class="text-xs text-gray-400">Большой блок с Telegram</div></div>
-                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in"><input type="checkbox" id="show_community" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/><label for="show_community" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label></div>
+                        <div>
+                            <div class="font-semibold text-white">Блок «Сообщество»</div>
+                            <div class="text-xs text-gray-400">Большой блок с Telegram</div>
+                        </div>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="show_community" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/>
+                            <label for="show_community" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-300"></label>
+                        </div>
                     </div>
                 </div>
-                <button onclick="saveSettings()" id="save-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-lg"><i class="fa-solid fa-floppy-disk"></i> Сохранить всё</button>
+
+                <button onclick="saveSettings()" id="save-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-floppy-disk"></i> Сохранить всё
+                </button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { supabase } from './js/config.js';
-        const textFields = ['hero_title', 'tg_link', 'video_1_url', 'video_2_url'];
+
+        // ОБНОВЛЕНО: добавлено video_3_url
+        const textFields = ['hero_title', 'tg_link', 'video_1_url', 'video_2_url', 'video_3_url'];
         const toggleFields = ['show_videos', 'show_catalog', 'show_3d', 'show_community'];
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'login.html'; return; }
+            
             const { data: adminData } = await supabase.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
             if (!adminData) { window.location.href = 'index.html'; return; }
+
             const { data } = await supabase.from('site_content').select('*');
             if (data) {
                 data.forEach(item => {
-                    if (textFields.includes(item.key) && document.getElementById(item.key)) document.getElementById(item.key).value = item.value;
-                    if (toggleFields.includes(item.key) && document.getElementById(item.key)) document.getElementById(item.key).checked = (item.value === '1');
+                    if (textFields.includes(item.key) && document.getElementById(item.key)) {
+                        document.getElementById(item.key).value = item.value;
+                    }
+                    if (toggleFields.includes(item.key) && document.getElementById(item.key)) {
+                        document.getElementById(item.key).checked = (item.value === '1');
+                    }
                 });
             }
         }
@@ -96,15 +148,29 @@
             const btn = document.getElementById('save-btn');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Сохранение...';
             btn.disabled = true;
+
             let updates = [];
-            textFields.forEach(key => updates.push({ key: key, value: document.getElementById(key).value }));
-            toggleFields.forEach(key => updates.push({ key: key, value: document.getElementById(key).checked ? '1' : '0' }));
+
+            textFields.forEach(key => {
+                updates.push({ key: key, value: document.getElementById(key).value });
+            });
+
+            toggleFields.forEach(key => {
+                updates.push({ key: key, value: document.getElementById(key).checked ? '1' : '0' });
+            });
+
             const { error } = await supabase.from('site_content').upsert(updates);
+
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Сохранить всё';
             btn.disabled = false;
-            if (error) alert('Ошибка: ' + error.message);
-            else alert('Настройки успешно сохранены!');
+
+            if (error) {
+                alert('Ошибка: ' + error.message);
+            } else {
+                alert('Настройки успешно сохранены!');
+            }
         };
+
         init();
     </script>
 </body>
