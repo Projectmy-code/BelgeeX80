@@ -55,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Вкладки -->
             <div class="flex gap-2 border-b border-brand-border pb-4 mb-8">
                 <button id="tab-articles" onclick="switchTab('articles')" class="px-5 py-2.5 rounded-xl bg-brand-teal text-black font-bold text-sm transition-all">
                     <i class="fa-regular fa-file-lines mr-2"></i> Мои статьи
@@ -65,7 +64,6 @@
                 </button>
             </div>
 
-            <!-- Контейнер для контента -->
             <div id="content-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Сюда будут загружаться карточки -->
             </div>
@@ -101,7 +99,6 @@
 
             const table = currentTab === 'articles' ? 'articles' : 'models_3d';
             
-            // Запрашиваем записи, где user_id совпадает с текущим пользователем
             const { data: items, error } = await supabase
                 .from(table)
                 .select('*')
@@ -127,7 +124,6 @@
 
             container.innerHTML = '';
             items.forEach(item => {
-                // Определяем статус
                 let statusBadge = '';
                 if (item.status === 'published') {
                     statusBadge = `<span class="px-2.5 py-1 bg-brand-published/10 text-brand-published border border-brand-published/20 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-check mr-1"></i> Опубликовано</span>`;
@@ -160,7 +156,7 @@
                         </div>
                     </div>
                 `;
-                container.appendChild(div);
+                container.appendChild(card);
             });
         }
 
