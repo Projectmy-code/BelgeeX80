@@ -11,6 +11,16 @@
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
+    <!-- Подключаем Three.js для генерации превью 3D-моделей -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.154.0/examples/jsm/"
+        }
+    }
+    </script>
+
     <script>
         tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb', pending: '#f59e0b' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
     </script>
@@ -25,7 +35,6 @@
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         
-        /* Стили для темного Quill в модалке */
         .ql-toolbar.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 12px 12px 0 0; }
         .ql-container.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 0 0 12px 12px; font-family: 'Inter', sans-serif; font-size: 14px; color: #e2e8f0; }
         .ql-editor { min-height: 200px; color: #e2e8f0; }
@@ -82,6 +91,9 @@
             </a>
             <a href="edit-site.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
                 <i class="fa-solid fa-sliders w-5 text-center"></i> Редактор главной
+            </a>
+            <a href="#" onclick="switchView('3d_tools')" id="nav-3d_tools" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-screwdriver-wrench w-5 text-center"></i> 3D Инструменты
             </a>
             <a href="#" onclick="switchView('settings')" id="nav-settings" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
                 <i class="fa-solid fa-gear w-5 text-center"></i> Настройки
@@ -184,6 +196,11 @@
 
     <script type="module">
         import { supabase } from './js/config.js';
+        
+        // Импорты для 3D-рендера
+        import * as THREE from 'three';
+        import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+        import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 
         let currentUser = null;
         let allData = { articles: [], models: [], feedback: [], media: [], menus: {} };
@@ -271,6 +288,7 @@
                 if (viewName === 'settings') renderSettings(c);
                 if (viewName === 'media') renderMedia(c);
                 if (viewName === 'menus') renderMenus(c);
+                if (viewName === '3d_tools') render3DTools(c);
             }, 100);
         };
 
@@ -436,6 +454,141 @@
             await supabase.from('menus').update({ items: allData.menus[id] }).eq('id', id);
             showToast('Меню сохранено!');
         }
+
+        // === 3D ИНСТРУМЕНТЫ ===
+        function render3DTools(c) {
+            c.innerHTML = `
+                <h1 class="text-3xl font-display font-bold text-white mb-8">3D Инструменты</h1>
+                <div class="bg-brand-card p-8 rounded-3xl border border-brand-border max-w-3xl">
+                    <h2 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-images text-brand-teal mr-2"></i> Перегенерация превью</h2>
+                    <p class="text-sm text-gray-400 mb-6">
+                        Если модели на сайте выглядят как плоские пятна или не влезают в кадр, нажмите кнопку ниже. 
+                        Скрипт скачает все STL-файлы, заново отрендерит их с правильным светом, центровкой и сохранит новые красивые картинки в базу.
+                    </p>
+                    
+                    <div id="3d-tools-progress" class="hidden mb-4 p-4 rounded-xl bg-brand-dark border border-brand-border">
+                        <div class="flex justify-between text-xs text-brand-teal font-semibold mb-2">
+                            <span id="3d-tools-status">Обработка...</span>
+                            <span id="3d-tools-count">0 / 0</span>
+                        </div>
+                        <div class="w-full bg-brand-border rounded-full h-2 overflow-hidden">
+                            <div id="3d-tools-bar" class="bg-brand-teal h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <button onclick="regenerateAllPreviews()" id="regen-btn" class="px-6 py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold text-sm rounded-xl hover:scale-105 transition-all shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-rotate"></i> Запустить обновление
+                    </button>
+                </div>
+            `;
+        }
+
+        window.regenerateAllPreviews = async function() {
+            const btn = document.getElementById('regen-btn');
+            const progressContainer = document.getElementById('3d-tools-progress');
+            const statusText = document.getElementById('3d-tools-status');
+            const countText = document.getElementById('3d-tools-count');
+            const bar = document.getElementById('3d-tools-bar');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Загрузка данных...';
+            progressContainer.classList.remove('hidden');
+
+            // 1. Получаем все модели
+            const { data: models, error } = await supabase.from('models_3d').select('*');
+            if (error || !models || models.length === 0) {
+                showToast('Модели не найдены или ошибка загрузки', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Запустить обновление';
+                return;
+            }
+
+            let processed = 0;
+            let total = models.length;
+            countText.textContent = `0 / ${total}`;
+
+            // 2. Настраиваем невидимую 3D-сцену
+            const width = 600, height = 400;
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x161e2b);
+
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(width, height);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight1.position.set(5, 10, 7);
+            scene.add(dirLight1);
+            const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5);
+            dirLight2.position.set(-5, -5, -5);
+            scene.add(dirLight2);
+
+            // 3. Проходимся по каждой модели
+            for (let i = 0; i < models.length; i++) {
+                const model = models[i];
+                if (!model.stl_url) continue;
+
+                statusText.textContent = `Обработка: ${model.title}`;
+                countText.textContent = `${i + 1} / ${total}`;
+                bar.style.width = `${((i + 1) / total) * 100}%`;
+
+                try {
+                    const fileExt = model.stl_url.split('.').pop().toLowerCase();
+                    const loader = fileExt === '3mf' ? new ThreeMFLoader() : new STLLoader();
+
+                    const geometry = await new Promise((resolve, reject) => {
+                        loader.load(model.stl_url, resolve, undefined, reject);
+                    });
+
+                    while(scene.children.length > 3) { scene.remove(scene.children[3]); }
+
+                    let mesh;
+                    if (fileExt === '3mf') {
+                        mesh = geometry;
+                        mesh.traverse(child => {
+                            if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
+                        });
+                    } else {
+                        geometry.computeVertexNormals();
+                        mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 }));
+                    }
+
+                    // Центровка и масштаб
+                    const box = new THREE.Box3().setFromObject(mesh);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3()).length();
+                    
+                    mesh.position.sub(center);
+                    const scale = 3 / size;
+                    mesh.scale.set(scale, scale, scale);
+                    
+                    scene.add(mesh);
+                    camera.position.set(2, 2, 4);
+                    camera.lookAt(scene.position);
+                    renderer.render(scene, camera);
+
+                    const base64Image = renderer.domElement.toDataURL('image/jpeg', 0.8);
+                    await supabase.from('models_3d').update({ image_url: base64Image }).eq('id', model.id);
+
+                } catch (err) {
+                    console.error(`Ошибка с моделью ${model.title}:`, err);
+                }
+            }
+
+            renderer.dispose();
+            statusText.textContent = 'Все превью успешно обновлены!';
+            countText.textContent = `${total} / ${total}`;
+            bar.className = 'bg-green-500 h-full rounded-full transition-all duration-300';
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Готово';
+            btn.classList.replace('from-brand-teal', 'from-green-500');
+            btn.classList.replace('to-blue-600', 'to-emerald-600');
+            
+            showToast('Все превью обновлены!');
+            await loadAllData();
+        };
 
         // === ARTICLE EDITING ===
         window.openEditArticle = function(id) {
