@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обновление превью 3D-моделей</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.154.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style> body { background-color: #0c1017; color: #e2e8f0; font-family: sans-serif; } </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-[#161e2b] border border-[#253142] p-8 rounded-2xl max-w-lg w-full text-center">
+        <h1 class="text-2xl font-bold text-white mb-4">Перегенерация превью</h1>
+        <p class="text-sm text-gray-400 mb-6">Этот скрипт обновит все старые картинки моделей на новые (с правильным светом и тенью).</p>
+        
+        <button id="start-btn" onclick="fixAllPreviews()" class="w-full py-3 bg-cyan-400 text-black font-bold rounded-xl hover:bg-cyan-300 transition-colors">
+            Запустить обновление
+        </button>
+        
+        <div id="status" class="mt-6 text-sm text-cyan-400 font-mono hidden"></div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './js/config.js';
+        import * as THREE from 'three';
+        import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+        import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
+
+        window.fixAllPreviews = async function() {
+            const btn = document.getElementById('start-btn');
+            const status = document.getElementById('status');
+            btn.disabled = true;
+            btn.textContent = 'Загрузка данных...';
+            status.classList.remove('hidden');
+
+            // 1. Получаем все модели
+            const { data: models, error } = await supabase.from('models_3d').select('*');
+            if (error || !models) {
+                status.textContent = 'Ошибка загрузки моделей';
+                return;
+            }
+
+            status.textContent = `Найдено моделей: ${models.length}. Начинаем...`;
+
+            // 2. Настраиваем невидимую 3D-сцену
+            const width = 600, height = 400;
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x161e2b);
+
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(width, height);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            
+            const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight1.position.set(5, 10, 7);
+            scene.add(dirLight1);
+
+            const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5);
+            dirLight2.position.set(-5, -5, -5);
+            scene.add(dirLight2);
+
+            // 3. Проходимся по каждой модели
+            for (let i = 0; i < models.length; i++) {
+                const model = models[i];
+                if (!model.stl_url) continue;
+
+                status.textContent = `Обработка ${i + 1} из ${models.length}: ${model.title}...`;
+
+                try {
+                    const fileExt = model.stl_url.split('.').pop().toLowerCase();
+                    const loader = fileExt === '3mf' ? new ThreeMFLoader() : new STLLoader();
+
+                    // Загружаем 3D-файл
+                    const geometry = await new Promise((resolve, reject) => {
+                        loader.load(model.stl_url, resolve, undefined, reject);
+                    });
+
+                    // Очищаем сцену от предыдущей модели
+                    while(scene.children.length > 3) { // 3 - это наши источники света
+                        scene.remove(scene.children[3]); 
+                    }
+
+                    let mesh;
+                    if (fileExt === '3mf') {
+                        mesh = geometry;
+                        mesh.traverse(child => {
+                            if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
+                        });
+                    } else {
+                        geometry.center();
+                        geometry.computeVertexNormals(); // Лечим плоские грани
+                        mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 }));
+                    }
+
+                    // Масштабируем, чтобы влезло в кадр
+                    const box = new THREE.Box3().setFromObject(mesh);
+                    const size = box.getSize(new THREE.Vector3()).length();
+                    const scale = 3 / size;
+                    mesh.scale.set(scale, scale, scale);
+                    
+                    scene.add(mesh);
+                    camera.position.set(3, 3, 4);
+                    camera.lookAt(scene.position);
+                    renderer.render(scene, camera);
+
+                    // Делаем фото и отправляем в базу
+                    const base64Image = renderer.domElement.toDataURL('image/jpeg', 0.8);
+                    await supabase.from('models_3d').update({ image_url: base64Image }).eq('id', model.id);
+
+                } catch (err) {
+                    console.error(`Ошибка с моделью ${model.title}:`, err);
+                }
+            }
+
+            status.textContent = '✅ Все превью успешно обновлены!';
+            btn.textContent = 'Готово';
+            btn.classList.replace('bg-cyan-400', 'bg-green-500');
+        }
+    </script>
+</body>
+</html>
