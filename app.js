@@ -7,25 +7,32 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const viewport = document.getElementById('viewport');
 const scene = new THREE.Scene();
 
-// Убираем сплошной черный фон
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+// Тёмный, дорогой фон (как в премиум-автосалонах)
+scene.background = new THREE.Color(0x0c1017);
+// Легкий туман, чтобы пол растворялся в темноте
+scene.fog = new THREE.Fog(0x0c1017, 20, 50);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// Убираем пересвет
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2;
+renderer.toneMappingExposure = 1.0; 
 viewport.appendChild(renderer.domElement);
 
-// Красивое студийное окружение для отражений
+// Окружение для реалистичных бликов (лампы в студии)
 const pmremGenerator = new THREE.PMREMGenerator(renderer);
 scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
-// === 2. ОСВЕЩЕНИЕ ===
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+// === 2. ОСВЕЩЕНИЕ (СТУДИЙНОЕ) ===
+// Мягкий общий свет
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
 scene.add(ambientLight);
 
-const mainLight = new THREE.DirectionalLight(0xffffff, 2);
+// Один мощный софтбокс сверху-слева (как в студии)
+const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
 mainLight.position.set(5, 10, 5);
 mainLight.castShadow = true;
 mainLight.shadow.mapSize.width = 2048;
@@ -39,38 +46,26 @@ mainLight.shadow.camera.bottom = -10;
 mainLight.shadow.bias = -0.0005;
 scene.add(mainLight);
 
-// Добавляем прожектор (SpotLight), который светит на пол прямо под машиной
-const spotLight = new THREE.SpotLight(0xffffff, 2000, 30, Math.PI / 4, 0.5, 1);
-spotLight.position.set(0, 10, 0);
-spotLight.target.position.set(0, 0, 0);
-spotLight.castShadow = true;
-scene.add(spotLight);
-scene.add(spotLight.target);
+// Подсветка спереди, чтобы выделить решетку
+const fillLight = new THREE.DirectionalLight(0x00f0ff, 0.5);
+fillLight.position.set(-5, 5, 5);
+scene.add(fillLight);
 
-const frontLight = new THREE.DirectionalLight(0xffffff, 1.5);
-frontLight.position.set(0, 2, 10);
-scene.add(frontLight);
+// НИКАКИХ ЛИШНИХ ПРОЖЕКТОРОВ, КОТОРЫЕ ВЫЖИГАЮТ ПОЛ!
 
-// === 3. СТИЛЬНЫЙ ПОЛ (МАТОВЫЙ, НЕ ЧЕРНЫЙ) ===
+// === 3. ПОЛ (ТЕМНЫЙ МАТОВЫЙ АСФАЛЬТ/БЕТОН) ===
 const floorGeometry = new THREE.CircleGeometry(50, 64);
 const floorMaterial = new THREE.MeshStandardMaterial({ 
-    color: 0x1e2532,    // Светло-графитовый цвет
-    metalness: 0.2,     // Уменьшили металличность (убрали эффект черного зеркала)
-    roughness: 0.4,     // Сделали более матовым, чтобы свет рассеивался
-    envMapIntensity: 0.8 
+    color: 0x111827,    // Очень темный серый (почти черный)
+    metalness: 0.1,     // Не зеркалим
+    roughness: 0.8,     // Матовая поверхность
+    envMapIntensity: 0.5 
 });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.05;
 floor.receiveShadow = true;
 scene.add(floor);
-
-// Тонкая сетка для красоты (едва заметная)
-const gridHelper = new THREE.GridHelper(100, 100, 0x00f0ff, 0x00f0ff);
-gridHelper.material.opacity = 0.03;
-gridHelper.material.transparent = true;
-gridHelper.position.y = -0.04;
-scene.add(gridHelper);
 
 // === 4. УПРАВЛЕНИЕ (МЫШЬ) ===
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -98,8 +93,9 @@ loader.load(
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
+                // Не перекручиваем отражения, чтобы стекла не зеленели
                 if (child.material && child.material.isMeshStandardMaterial) {
-                    child.material.envMapIntensity = 2.0;
+                    child.material.envMapIntensity = 1.0; 
                 }
             }
         });
@@ -138,12 +134,12 @@ loader.load(
 
 // === 6. ЦВЕТА КУЗОВА (Палитра Geely EX5) ===
 const colors = [
-    { name: 'A08 · Crystal White', hex: '#f2f4f8', metal: 0.2, rough: 0.15 },
-    { name: 'A12 · Ink Black', hex: '#0a0b0e', metal: 0.9, rough: 0.08 },
-    { name: 'A05 · Magnetic Grey', hex: '#4a4f57', metal: 0.8, rough: 0.25 },
-    { name: 'A22 · Moon Silver', hex: '#a8adb4', metal: 0.9, rough: 0.2 },
-    { name: 'A30 · Water Reflection Blue', hex: '#1b3b5c', metal: 0.7, rough: 0.2 },
-    { name: 'A33 · Jungle Green', hex: '#2d4a3e', metal: 0.75, rough: 0.2 }
+    { name: 'A08 · Crystal White', hex: '#f2f4f8', metal: 0.3, rough: 0.2 },
+    { name: 'A12 · Ink Black', hex: '#0a0b0e', metal: 0.8, rough: 0.1 },
+    { name: 'A05 · Magnetic Grey', hex: '#4a4f57', metal: 0.7, rough: 0.3 },
+    { name: 'A22 · Moon Silver', hex: '#a8adb4', metal: 0.8, rough: 0.2 },
+    { name: 'A30 · Water Reflection Blue', hex: '#1b3b5c', metal: 0.6, rough: 0.2 },
+    { name: 'A33 · Jungle Green', hex: '#2d4a3e', metal: 0.6, rough: 0.2 }
 ];
 
 const swatchesContainer = document.getElementById('color-swatches');
@@ -186,7 +182,7 @@ function changeColor(colorObj) {
                     if (mat.isMeshStandardMaterial) {
                         mat.metalness = colorObj.metal;
                         mat.roughness = colorObj.rough;
-                        mat.envMapIntensity = 2.0; 
+                        mat.envMapIntensity = 1.0; 
                         mat.needsUpdate = true;
                     }
                 }
