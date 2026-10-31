@@ -66,14 +66,8 @@
         .ql-snow.ql-toolbar button:hover, .ql-snow.ql-toolbar button.ql-active { color: #00f0ff !important; }
 
         /* Анимации для уведомлений */
-        @keyframes slideIn {
-            0% { transform: translateX(50px); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; transform: translateY(-10px); }
-        }
+        @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
     </style>
     <link rel="stylesheet" href="./css/shared.css">
 </head>
@@ -204,7 +198,7 @@
         </div>
     </section>
 
-    <!-- SPECS SECTION (Актуальные данные PHEV) -->
+    <!-- SPECS SECTION -->
     <section id="specs" class="py-16 border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-12">
@@ -213,7 +207,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Двигатель -->
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
                     <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-4 border border-blue-500/20">
                         <i class="fa-solid fa-bolt"></i>
@@ -227,7 +220,6 @@
                     </ul>
                 </div>
 
-                <!-- Трансмиссия и привод -->
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
                     <div class="w-12 h-12 rounded-xl bg-brand-teal/10 text-brand-teal flex items-center justify-center text-xl mb-4 border border-brand-teal/20">
                         <i class="fa-solid fa-gears"></i>
@@ -241,7 +233,6 @@
                     </ul>
                 </div>
 
-                <!-- Габариты и клиренс -->
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
                     <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl mb-4 border border-purple-500/20">
                         <i class="fa-solid fa-ruler-combined"></i>
@@ -255,7 +246,6 @@
                     </ul>
                 </div>
 
-                <!-- Динамика и расход -->
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
                     <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4 border border-emerald-500/20">
                         <i class="fa-solid fa-gauge-high"></i>
@@ -272,22 +262,26 @@
         </div>
     </section>
 
-    <!-- CATALOG SECTION -->
+    <!-- CATALOG SECTION (ОБНОВЛЕННЫЙ) -->
     <section id="catalog" class="py-16 bg-brand-dark border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                 <div>
                     <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Официальные и Аналоговые детали</span>
                     <h2 class="text-3xl font-display font-bold text-white mt-1">Каталог запчастей & Артикулы ТО</h2>
-                    <p class="text-gray-400 text-sm mt-1">База OEM номеров для проведения планового технического обслуживания BELGEE X80</p>
+                    <p class="text-gray-400 text-sm mt-1">Полная база OEM номеров и проверенных аналогов для BELGEE X80</p>
                 </div>
 
-                <div class="flex flex-wrap gap-2">
+                <!-- Категории (Фильтры) -->
+                <div class="flex flex-wrap gap-2 max-w-full">
                     <button onclick="filterCategory('all')" class="cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all" data-cat="all">Все</button>
+                    <button onclick="filterCategory('oils')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="oils">Моторные масла</button>
                     <button onclick="filterCategory('filters')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="filters">Фильтры</button>
-                    <button onclick="filterCategory('brakes')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="brakes">Тормоза</button>
-                    <button onclick="filterCategory('fluids')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="fluids">Жидкости</button>
-                    <button onclick="filterCategory('spark')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="spark">Свечи</button>
+                    <button onclick="filterCategory('spark')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="spark">Свечи и катушки</button>
+                    <button onclick="filterCategory('transmission')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="transmission">КПП/Редуктор</button>
+                    <button onclick="filterCategory('fluids')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="fluids">Техжидкости</button>
+                    <button onclick="filterCategory('wheels')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="wheels">Колёса</button>
+                    <button onclick="filterCategory('wipers')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="wipers">Щётки</button>
                 </div>
             </div>
 
@@ -298,7 +292,7 @@
                             <th class="p-4">Наименование</th>
                             <th class="p-4">Регламент</th>
                             <th class="p-4">OEM Артикул</th>
-                            <th class="p-4">Аналоги</th>
+                            <th class="p-4">Аналоги / Примечания</th>
                             <th class="p-4 text-right">Цена</th>
                             <th class="p-4 text-center">Действие</th>
                         </tr>
@@ -348,16 +342,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                <!-- Видео 1: Автопанорама -->
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
                     <div class="relative w-full aspect-video bg-slate-800">
-                        <iframe class="absolute inset-0 w-full h-full" 
-                                src="https://www.youtube.com/embed/IMb8q6G7HAI" 
-                                title="Belgee X80 PHEV — Тест-драйв от Автопанорама" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                allowfullscreen>
-                        </iframe>
+                        <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/IMb8q6G7HAI" title="Belgee X80 PHEV — Тест-драйв от Автопанорама" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
@@ -372,16 +359,9 @@
                     </div>
                 </div>
 
-                <!-- Видео 2: Ваше видео -->
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
                     <div class="relative w-full aspect-video bg-slate-800">
-                        <iframe class="absolute inset-0 w-full h-full" 
-                                src="https://www.youtube.com/embed/ilfsu2HprjQ" 
-                                title="Видеообзор Belgee X80" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                allowfullscreen>
-                        </iframe>
+                        <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/ilfsu2HprjQ" title="Видеообзор Belgee X80" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
@@ -396,7 +376,6 @@
                     </div>
                 </div>
 
-                <!-- Видео 3: Отзывы владельцев -->
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
                     <div class="relative w-full aspect-video bg-slate-800 flex items-center justify-center">
                         <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80');"></div>
@@ -450,13 +429,11 @@
                     </div>
 
                     <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer"
-                           class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 hover:scale-105">
+                        <a href="https://t.me/bgx80" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 hover:scale-105">
                             <i class="fa-brands fa-telegram text-xl"></i>
                             <span>Присоединиться к чату</span>
                         </a>
-                        <button onclick="toggleModal('feedback-modal')"
-                                class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
+                        <button onclick="toggleModal('feedback-modal')" class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
                             <i class="fa-solid fa-envelope text-brand-teal"></i>
                             <span>Написать администрации</span>
                         </button>
@@ -623,27 +600,65 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC (Каталог и меню) -->
+    <!-- JAVASCRIPT LOGIC: ОГРОМНЫЙ КАТАЛОГ ЗАПЧАСТЕЙ -->
     <script>
         const partsData = [
-            { id: 1, name: "Масляный фильтр (2.0T)", cat: "filters", interval: "10 000 км", oem: "1056022300", analog: "MANN W7015", price: "~25 BYN" },
-            { id: 2, name: "Фильтр воздушный", cat: "filters", interval: "15 000 км", oem: "2032040500", analog: "Filtron AP198/3", price: "~30 BYN" },
-            { id: 3, name: "Свечи зажигания", cat: "spark", interval: "30 000 км", oem: "2036001100", analog: "NGK SILZKFR8D7S", price: "~180 BYN" },
-            { id: 4, name: "Колодки передние", cat: "brakes", interval: "По износу", oem: "4048043100", analog: "Sangsin SP4372", price: "~120 BYN" },
-            { id: 5, name: "Масло 0W-20", cat: "fluids", interval: "10 000 км", oem: "LUB-0W20-VOL", analog: "Shell Helix Ultra", price: "~160 BYN" }
+            // --- МОТОРНЫЕ МАСЛА ---
+            { id: 1, name: "Моторное масло Geely (4л)", cat: "oils", interval: "10 000 км", oem: "9020009200", analog: "1л: 9020009100. Допуск VCC RBS0-2AE", price: "-" },
+            { id: 2, name: "Lopal 1 Advanced (0W-20, 4л)", cat: "oils", interval: "10 000 км", oem: "LP0W20AFS4L", analog: "LPL36585. API SP, ACEA C5", price: "-" },
+            { id: 3, name: "Lopal 1 HYBRID (0W-20, 4л)", cat: "oils", interval: "10 000 км", oem: "LPL35922", analog: "Специально для гибридов", price: "-" },
+            { id: 4, name: "Shell Helix Ultra SP (0W-20)", cat: "oils", interval: "10 000 км", oem: "550061077O004", analog: "5л: 550063071. Заводская заливка", price: "-" },
+            { id: 5, name: "LiquiMoly Special Tec V (0W-20)", cat: "oils", interval: "10 000 км", oem: "20632", analog: "Стабильное качество", price: "-" },
+            { id: 6, name: "ZIC TOP ES (0W-20)", cat: "oils", interval: "10 000 км", oem: "162045 (4л)", analog: "1л: 132045", price: "-" },
+            
+            // --- ФИЛЬТРЫ ---
+            { id: 7, name: "Фильтр масляный (Оригинал)", cat: "filters", interval: "10 000 км", oem: "1016056847", analog: "MANN W7056/W7030, MAHLE OC614, RAF ROF015", price: "-" },
+            { id: 8, name: "Фильтр салона (Оригинал)", cat: "filters", interval: "15 000 км", oem: "8025530600", analog: "MANN CUK 25 055, AM Point LAK 1803, RAF RF027VOL", price: "-" },
+            { id: 9, name: "Фильтр воздушный (Оригинал)", cat: "filters", interval: "15 000 км", oem: "6608123825", analog: "BSV BSV49058141, RAF AF317", price: "-" },
+            { id: 10, name: "Сливная пробка картера (с шайбой)", cat: "filters", interval: "При замене масла", oem: "1056005000", analog: "Шайба отдельно: 1056005900. Магнитная Masuma: M-49", price: "-" },
+
+            // --- СВЕЧИ И КАТУШКИ ---
+            { id: 11, name: "Свеча зажигания (Оригинал)", cat: "spark", interval: "30 000 км", oem: "5511700290", analog: "M12x1.25, длина 26.5мм, ключ 14. TORCH VH7RTI-1BH, Miles ALSP144", price: "-" },
+            { id: 12, name: "Катушка зажигания", cat: "spark", interval: "По износу", oem: "5511695966", analog: "Оригинал", price: "-" },
+
+            // --- ТРАНСМИССИЯ ---
+            { id: 13, name: "Масло в КПП (Редуктор)", cat: "transmission", interval: "60 000 км", oem: "9020009000 (Shell E-Fluids E6)", analog: "Lopal E21 E-ATF (LPL37926)", price: "-" },
+            { id: 14, name: "Пробка сливная КПП", cat: "transmission", interval: "При замене масла", oem: "3045001600", analog: "Кольцо: 3045001500. Трубка: 5501684165", price: "-" },
+            { id: 15, name: "Клапан для заправки масла АКПП", cat: "transmission", interval: "При замене масла", oem: "4114870644", analog: "Штуцер М16x1.5", price: "-" },
+
+            // --- ТЕХЖИДКОСТИ ---
+            { id: 16, name: "Антифриз (G12+, OAT, LEC-II)", cat: "fluids", interval: "По регламенту", oem: "889885252", analog: "Оригинал Geely", price: "-" },
+            { id: 17, name: "Тормозная жидкость (DOT4)", cat: "fluids", interval: "По регламенту", oem: "4060206008", analog: "Оригинал Geely", price: "-" },
+            { id: 18, name: "Масло для кондиционера PVE 68", cat: "fluids", interval: "При ремонте", oem: "AF-PVE 68", analog: "Синтетическое AFROST", price: "-" },
+            { id: 19, name: "Фреон R134a", cat: "fluids", interval: "При ремонте", oem: "4134000102", analog: "Оригинал Geely", price: "-" },
+
+            // --- КОЛЕСА ---
+            { id: 20, name: "Диск колесный R19", cat: "wheels", interval: "-", oem: "6608147700", analog: "19x7.5J, 5x114.3, ET52, DIA54.1. Резина: 235/50 R19", price: "-" },
+            { id: 21, name: "Диск колесный R18", cat: "wheels", interval: "-", oem: "6608147701", analog: "18x7J, 5x114.3, ET47, DIA54.1. Резина: 225/55 R18", price: "-" },
+            { id: 22, name: "Датчик давления в шинах (TPMS)", cat: "wheels", interval: "-", oem: "8894215959", analog: "Оригинал Geely", price: "-" },
+            { id: 23, name: "Колпачок (заглушка) ЦО", cat: "wheels", interval: "-", oem: "6608062181B03", analog: "Оригинал Geely", price: "-" },
+
+            // --- ЩЕТКИ ---
+            { id: 24, name: "Щетки стеклоочистителя (комплект)", cat: "wipers", interval: "По износу", oem: "600мм + 480мм", analog: "Крепление Push Button 16mm. Bosch AeroTwin 3397007620", price: "-" }
         ];
 
         function renderPartsTable(items) {
             const tbody = document.getElementById('parts-table-body');
+            
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">Ничего не найдено</td></tr>';
+                return;
+            }
+
             tbody.innerHTML = items.map(part => `
                 <tr class="hover:bg-brand-border/30 transition-colors">
                     <td class="p-4 font-semibold text-white">${part.name}</td>
                     <td class="p-4 text-xs text-gray-400">${part.interval}</td>
-                    <td class="p-4"><span class="font-mono text-xs bg-brand-dark px-2.5 py-1 rounded border border-brand-border text-brand-teal">${part.oem}</span></td>
+                    <td class="p-4"><span class="font-mono text-xs bg-brand-dark px-2.5 py-1 rounded border border-brand-border text-brand-teal break-all">${part.oem}</span></td>
                     <td class="p-4 text-xs text-gray-300">${part.analog}</td>
                     <td class="p-4 text-right font-semibold text-emerald-400 text-xs">${part.price}</td>
                     <td class="p-4 text-center">
-                        <button onclick="navigator.clipboard.writeText('${part.oem}'); alert('Артикул ${part.oem} скопирован!')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium">Код</button>
+                        <button onclick="navigator.clipboard.writeText('${part.oem}'); alert('Артикул ${part.oem} скопирован!')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium" title="Скопировать артикул">Код</button>
                     </td>
                 </tr>
             `).join('');
@@ -652,7 +667,7 @@
         function filterCategory(cat) {
             document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.className = (btn.dataset.cat === cat)
-                    ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all'
+                    ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md'
                     : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
             });
             renderPartsTable(cat === 'all' ? partsData : partsData.filter(p => p.cat === cat));
@@ -660,11 +675,24 @@
 
         function handleGlobalSearch() {
             const q = document.getElementById('global-search-input').value.toLowerCase();
-            renderPartsTable(partsData.filter(p => p.name.toLowerCase().includes(q) || p.oem.toLowerCase().includes(q)));
+            renderPartsTable(partsData.filter(p => 
+                p.name.toLowerCase().includes(q) || 
+                p.oem.toLowerCase().includes(q) || 
+                p.analog.toLowerCase().includes(q)
+            ));
         }
 
         function quickFilter(term) {
-            renderPartsTable(term === 'все' ? partsData : partsData.filter(p => p.name.toLowerCase().includes(term.toLowerCase()) || p.cat.toLowerCase().includes(term.toLowerCase())));
+            const q = term.toLowerCase();
+            if(term === 'все') {
+                renderPartsTable(partsData);
+                return;
+            }
+            renderPartsTable(partsData.filter(p => 
+                p.name.toLowerCase().includes(q) || 
+                p.cat.toLowerCase().includes(q) ||
+                p.analog.toLowerCase().includes(q)
+            ));
         }
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
