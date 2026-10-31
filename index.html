@@ -613,10 +613,12 @@
 
             tbody.innerHTML = items.map(part => `
                 <tr class="hover:bg-brand-border/30 transition-colors">
-                    <td class="p-4 font-semibold text-white">${part.name}</td>
+                    <td class="p-4 font-semibold text-white max-w-[200px] break-words">${part.name}</td>
                     <td class="p-4 text-xs text-gray-400">${part.interval || '-'}</td>
-                    <td class="p-4"><span class="font-mono text-xs bg-brand-dark px-2.5 py-1 rounded border border-brand-border text-brand-teal break-all">${part.oem}</span></td>
-                    <td class="p-4 text-xs text-gray-300">${part.analog || '-'}</td>
+                    <td class="p-4 max-w-[150px]">
+                        <span class="font-mono text-xs bg-brand-dark px-2.5 py-1 rounded border border-brand-border text-brand-teal inline-block break-all whitespace-normal">${part.oem}</span>
+                    </td>
+                    <td class="p-4 text-xs text-gray-300 max-w-[250px] break-words">${part.analog || '-'}</td>
                     <td class="p-4 text-right font-semibold text-emerald-400 text-xs">${part.price || '-'}</td>
                     <td class="p-4 text-center">
                         <button onclick="navigator.clipboard.writeText('${part.oem}'); alert('Артикул ${part.oem} скопирован!')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium" title="Скопировать артикул">Код</button>
@@ -625,25 +627,26 @@
             `).join('');
         }
 
-        function filterCategory(cat) {
+        // ВАЖНО: Добавляем window. чтобы кнопки в HTML могли вызывать эти функции!
+        window.filterCategory = function(cat) {
             document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.className = (btn.dataset.cat === cat)
                     ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md'
                     : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
             });
             renderPartsTable(cat === 'all' ? globalPartsData : globalPartsData.filter(p => p.cat === cat || p.category === cat));
-        }
+        };
 
-        function handleGlobalSearch() {
+        window.handleGlobalSearch = function() {
             const q = document.getElementById('global-search-input').value.toLowerCase();
             renderPartsTable(globalPartsData.filter(p => 
                 p.name.toLowerCase().includes(q) || 
                 p.oem.toLowerCase().includes(q) || 
                 (p.analog && p.analog.toLowerCase().includes(q))
             ));
-        }
+        };
 
-        function quickFilter(term) {
+        window.quickFilter = function(term) {
             const q = term.toLowerCase();
             if(term === 'все') {
                 renderPartsTable(globalPartsData);
@@ -654,7 +657,7 @@
                 (p.category && p.category.toLowerCase().includes(q)) ||
                 (p.analog && p.analog.toLowerCase().includes(q))
             ));
-        }
+        };
 
         // === ДИНАМИЧЕСКИЙ КОНТЕНТ (ВИДЖЕТЫ И ТЕКСТЫ) ===
         async function loadSiteContent() {
@@ -704,19 +707,16 @@
             const navContainer = document.getElementById('dynamic-pages-nav');
             const mobileContainer = document.getElementById('dynamic-pages-mobile');
 
-            // Очищаем контейнеры перед заполнением
             navContainer.innerHTML = '';
             mobileContainer.innerHTML = '';
 
             pages.forEach(page => {
-                // Ссылка для ПК
                 const linkDesktop = document.createElement('a');
                 linkDesktop.href = `page.html?p=${page.slug}`;
                 linkDesktop.className = 'hover:text-brand-teal transition-colors';
                 linkDesktop.textContent = page.title;
                 navContainer.appendChild(linkDesktop);
 
-                // Ссылка для мобилки
                 const linkMobile = document.createElement('a');
                 linkMobile.href = `page.html?p=${page.slug}`;
                 linkMobile.className = 'block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800';
@@ -751,10 +751,8 @@
         };
 
         // === СЛУЖЕБНЫЕ ФУНКЦИИ ===
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
-        window.toggleModal = toggleModal;
-        window.toggleMobileMenu = toggleMobileMenu;
+        window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); };
+        window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
         // === АВТОРИЗАЦИЯ ===
         async function updateAuthUI() {
@@ -784,7 +782,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadPartsFromDB();
             loadSiteContent();
-            loadDynamicMenu(); // Запускаем авто-меню
+            loadDynamicMenu(); 
             updateAuthUI();
         });
     </script>
