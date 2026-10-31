@@ -16,6 +16,9 @@
         .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .card-glow { transition: all 0.3s ease; }
         .card-glow:hover { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 4px 20px -5px rgba(0, 240, 255, 0.1); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c1017; }
+        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-black">
@@ -106,10 +109,62 @@
         </div>
     </main>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
+    <div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
+            <div class="w-14 h-14 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center text-2xl mb-4 mx-auto border border-red-500/20">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="confirm-title" class="text-xl font-bold text-center text-white mb-2">Вы уверены?</h3>
+            <p id="confirm-message" class="text-sm text-gray-400 text-center mb-6">Это действие нельзя отменить.</p>
+            <div class="flex gap-3">
+                <button id="confirm-cancel-btn" class="flex-1 py-2.5 rounded-xl bg-brand-border hover:bg-gray-700 text-white font-semibold text-sm transition-colors">Отмена</button>
+                <button id="confirm-ok-btn" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold text-sm transition-colors shadow-lg shadow-red-500/20">Удалить</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { supabase } from './js/config.js';
 
         let currentTab = 'articles';
+
+        // === ЛОГИКА КРАСИВОГО ОКНА ПОДТВЕРЖДЕНИЯ ===
+        let confirmResolve = null;
+
+        window.showConfirm = function(title, message, btnText = 'Удалить') {
+            return new Promise((resolve) => {
+                confirmResolve = resolve;
+                document.getElementById('confirm-title').textContent = title;
+                document.getElementById('confirm-message').textContent = message;
+                document.getElementById('confirm-ok-btn').textContent = btnText;
+                
+                const modal = document.getElementById('custom-confirm-modal');
+                modal.classList.remove('hidden');
+                
+                // Плавное появление
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('div').classList.remove('scale-95');
+                }, 10);
+            });
+        };
+
+        function closeConfirm(result) {
+            const modal = document.getElementById('custom-confirm-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (confirmResolve) confirmResolve(result);
+                confirmResolve = null;
+            }, 300);
+        }
+
+        document.getElementById('confirm-ok-btn').addEventListener('click', () => closeConfirm(true));
+        document.getElementById('confirm-cancel-btn').addEventListener('click', () => closeConfirm(false));
+        // ==============================================
 
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -142,10 +197,18 @@
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Сохранение...';
             btn.disabled = true;
+            
             await supabase.from('site_settings').update({ value: selectedMode.value }).eq('key', 'submission_mode');
+            
             btn.innerHTML = originalText;
             btn.disabled = false;
-            alert('Настройки сохранены!');
+            
+            // Красивое уведомление вместо alert
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 z-50 bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold shadow-2xl flex items-center gap-2 animate-bounce';
+            toast.innerHTML = '<i class="fa-solid fa-check-circle"></i> Настройки сохранены!';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
 
         window.switchTab = function(tab) {
@@ -157,18 +220,13 @@
 
         async function loadQueue() {
             const container = document.getElementById('queue-container');
-            container.innerHTML = '<p class="text-gray-400 text-sm col-span-full">Загрузка...</p>';
+            container.innerHTML = '<p class="text-gray-400 text-sm col-span-full text-center py-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка...</p>';
 
             const table = currentTab === 'articles' ? 'articles' : 'models_3d';
-            
-            // Отладочный вывод: проверяем, что мы запрашиваем
-            console.log(`Запрос к таблице: ${table}, статус: pending`);
-
             const { data: items, error } = await supabase.from(table).select('*').eq('status', 'pending').order('created_at', { ascending: false });
             
             if (error) {
-                console.error('Ошибка загрузки:', error);
-                container.innerHTML = `<p class="text-red-400 text-sm col-span-full">Ошибка: ${error.message}</p>`;
+                container.innerHTML = `<p class="text-red-400 text-sm col-span-full text-center">Ошибка: ${error.message}</p>`;
                 return;
             }
 
@@ -218,7 +276,14 @@
         }
 
         window.deleteItem = async function(id) {
-            if(confirm('Удалить навсегда?')) {
+            // ИСПОЛЬЗУЕМ НАШЕ КРАСИВОЕ ОКНО
+            const isConfirmed = await window.showConfirm(
+                'Удалить навсегда?', 
+                'Эта запись будет удалена из базы данных без возможности восстановления.', 
+                'Да, удалить'
+            );
+
+            if (isConfirmed) {
                 const table = currentTab === 'articles' ? 'articles' : 'models_3d';
                 await supabase.from(table).delete().eq('id', id);
                 loadQueue();
