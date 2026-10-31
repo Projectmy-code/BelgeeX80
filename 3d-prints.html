@@ -20,7 +20,6 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
@@ -34,14 +33,13 @@
                 </div>
                 <div>
                     <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">BELGEE <span class="text-brand-teal">X80</span></div>
-                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Сообщество & Запчасти</div>
+                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">3D Модели</div>
                 </div>
             </a>
 
             <nav class="hidden xl:flex items-center gap-4 2xl:gap-6 text-sm font-medium text-gray-300 whitespace-nowrap">
                 <a href="index.html#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
                 <a href="index.html#catalog" class="hover:text-brand-teal transition-colors">Каталог запчастей</a>
-                <a href="index.html#articles" class="hover:text-brand-teal transition-colors">Статьи</a>
                 <a href="3d-prints.html" class="text-brand-teal font-semibold transition-colors">3D Печать</a>
                 <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка авто</a>
             </nav>
@@ -56,97 +54,198 @@
     <main class="flex-1 py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <div class="text-center max-w-3xl mx-auto mb-12">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-4">
-                    <i class="fa-solid fa-cube"></i> 3D-Модели клуба
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-4">
+                        <i class="fa-solid fa-cube"></i> 3D-Модели клуба
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl font-display font-black text-white tracking-tight leading-tight mb-4">3D-печать для BELGEE X80</h1>
+                    <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                        Полезные модели для вашего автомобиля, напечатанные на 3D-принтере. Держатели, заглушки и крепления, созданные участниками клуба.
+                    </p>
                 </div>
-                <h1 class="text-4xl sm:text-5xl font-display font-black text-white tracking-tight leading-tight mb-4">3D-печать для BELGEE X80</h1>
-                <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
-                    Полезные модели для вашего автомобиля, напечатанные на 3D-принтере. Держатели, заглушки, органайзеры и крепления, созданные участниками клуба.
-                </p>
+                
+                <button onclick="openSubmission()" class="px-6 py-3 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-sm rounded-xl shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i> Предложить модель
+                </button>
             </div>
 
             <!-- Сетка моделей -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="models-grid">
-                <!-- Карточка 1 -->
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
-                    <div class="relative h-48 bg-slate-800 flex items-center justify-center">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1615845865313-24558a105113?auto=format&fit=crop&w=600&q=80');"></div>
-                        <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">STL / 3MF</div>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">Салон</span>
-                            <h3 class="font-bold text-white text-base mt-1">Держатель для телефона (под дефлектор)</h3>
-                            <p class="text-xs text-gray-400 mt-2">Удобное крепление для смартфона, которое устанавливается на решетку воздуховода без клея и скотча.</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between">
-                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> Club_Member</span>
-                            <a href="https://www.thingiverse.com" target="_blank" class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors">
-                                <i class="fa-solid fa-download mr-1"></i> Скачать
-                            </a>
-                        </div>
-                    </div>
+                <div class="col-span-full py-20 text-center text-gray-500">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-brand-teal"></i>
+                    <p>Загрузка моделей...</p>
                 </div>
-
-                <!-- Карточка 2 -->
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
-                    <div class="relative h-48 bg-slate-800 flex items-center justify-center">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80');"></div>
-                        <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">STL</div>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">Кузов</span>
-                            <h3 class="font-bold text-white text-base mt-1">Заглушки на болты крепления колес</h3>
-                            <p class="text-xs text-gray-400 mt-2">Комплект защитных колпачков (4 шт), которые закрывают колесные болты от грязи и придают эстетичный вид.</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between">
-                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> X80_Tech</span>
-                            <a href="https://www.thingiverse.com" target="_blank" class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors">
-                                <i class="fa-solid fa-download mr-1"></i> Скачать
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Карточка 3 -->
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
-                    <div class="relative h-48 bg-slate-800 flex items-center justify-center">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1621939514649-280e2c49a39b?auto=format&fit=crop&w=600&q=80');"></div>
-                        <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">STL</div>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">Багажник</span>
-                            <h3 class="font-bold text-white text-base mt-1">Органайзер в подполье багажника</h3>
-                            <p class="text-xs text-gray-400 mt-2">Разделитель для инструментов и мелочей, который идеально вписывается в нишу вокруг запаски.</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between">
-                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> Dimon</span>
-                            <a href="https://www.thingiverse.com" target="_blank" class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors">
-                                <i class="fa-solid fa-download mr-1"></i> Скачать
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Форма предложки -->
-            <div class="mt-16 max-w-2xl mx-auto bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 rounded-3xl border border-blue-500/30 text-center">
-                <h3 class="text-xl font-bold font-display text-white mb-2">Создали свою 3D-модель?</h3>
-                <p class="text-sm text-gray-400 mb-6">Поделитесь ей с сообществом! Загрузите ссылку на вашу модель (Thingiverse, Printables, Cults3D), и мы добавим её на сайт.</p>
-                <a href="https://t.me/bgx80" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg">
-                    <i class="fa-brands fa-telegram"></i> Предложить в Telegram
-                </a>
             </div>
 
         </div>
     </main>
 
+    <!-- MODAL: ДОБАВИТЬ МОДЕЛЬ -->
+    <div id="add-model-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-brand-card w-full max-w-xl rounded-3xl border border-brand-border p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="toggleModal('add-model-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold font-display text-white mb-2">Предложить 3D-модель</h3>
+            <p class="text-xs text-gray-400 mb-6">Модель появится на сайте после проверки администратором.</p>
+
+            <form id="add-model-form" onsubmit="handleAddModelSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Название модели</label>
+                    <input type="text" id="model-title" required placeholder="Например: Держатель для очков" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Категория</label>
+                        <select id="model-category" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                            <option value="Салон">Салон</option>
+                            <option value="Кузов">Кузов</option>
+                            <option value="Багажник">Багажник</option>
+                            <option value="Под капотом">Под капотом</option>
+                            <option value="Другое">Другое</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Ваш никнейм</label>
+                        <input type="text" id="model-author" required placeholder="Club_Member" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Краткое описание</label>
+                    <textarea id="model-desc" rows="3" required placeholder="Для чего эта модель и как ее использовать..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Ссылка на модель (Thingiverse, Printables и т.д.)</label>
+                    <input type="url" id="model-link" required placeholder="https://www.thingiverse.com/thing:12345" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Ссылка на фото (необязательно)</label>
+                    <input type="url" id="model-image" placeholder="https://..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                </div>
+                
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity mt-2">
+                    Отправить на проверку
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="bg-brand-dark py-8 text-gray-400 text-xs border-t border-brand-border text-center">
         <p>© 2026 BELGEE X80 Club Portal. Все права защищены.</p>
     </footer>
+
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        const grid = document.getElementById('models-grid');
+
+        // 1. Загрузка моделей из базы
+        async function loadModels() {
+            try {
+                const { data: models, error } = await supabase
+                    .from('models_3d')
+                    .select('*')
+                    .eq('status', 'published')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!models || models.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full py-20 text-center text-gray-500">
+                        <i class="fa-solid fa-cube text-5xl mb-4 opacity-50"></i>
+                        <p>Пока нет добавленных моделей. Станьте первым!</p>
+                    </div>`;
+                    return;
+                }
+
+                grid.innerHTML = '';
+                models.forEach(model => {
+                    // Если нет картинки, ставим заглушку
+                    const imgUrl = model.image_url || 'https://images.unsplash.com/photo-1615845865313-24558a105113?auto=format&fit=crop&w=600&q=80';
+
+                    const div = document.createElement('div');
+                    div.className = 'bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col';
+                    div.innerHTML = `
+                        <div class="relative h-48 bg-slate-800 flex items-center justify-center">
+                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('${imgUrl}');"></div>
+                            <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">3D MODEL</div>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">${model.category}</span>
+                                <h3 class="font-bold text-white text-base mt-1">${model.title}</h3>
+                                <p class="text-xs text-gray-400 mt-2 line-clamp-2">${model.description}</p>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between">
+                                <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> ${model.author}</span>
+                                <a href="${model.link}" target="_blank" class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors">
+                                    <i class="fa-solid fa-download mr-1"></i> Скачать
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = `<p class="text-red-400 text-center col-span-full">Ошибка загрузки моделей.</p>`;
+            }
+        }
+
+        // 2. Открытие формы (с проверкой настроек и авторизации)
+        window.openSubmission = async function() {
+            // Проверяем, кто может публиковать (тот же ключ, что и для статей)
+            const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'submission_mode').single();
+            const mode = settings ? settings.value : 'everyone';
+            
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (mode === 'registered' && !session) {
+                alert("Предлагать модели могут только зарегистрированные пользователи. Пожалуйста, войдите.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('add-model-modal').classList.remove('hidden');
+        }
+
+        window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        // 3. Отправка модели
+        window.handleAddModelSubmit = async function(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.textContent = 'Отправка...';
+            btn.disabled = true;
+
+            const newModel = {
+                title: document.getElementById('model-title').value,
+                category: document.getElementById('model-category').value,
+                author: document.getElementById('model-author').value,
+                description: document.getElementById('model-desc').value,
+                link: document.getElementById('model-link').value,
+                image_url: document.getElementById('model-image').value || null,
+                status: 'pending'
+            };
+
+            const { error } = await supabase.from('models_3d').insert([newModel]);
+
+            btn.textContent = 'Отправить на проверку';
+            btn.disabled = false;
+
+            if (error) {
+                alert('Ошибка: ' + error.message);
+            } else {
+                alert('Спасибо! Ваша модель отправлена на проверку администратору.');
+                e.target.reset();
+                document.getElementById('add-model-modal').classList.add('hidden');
+            }
+        }
+
+        // Запуск
+        loadModels();
+    </script>
 </body>
 </html>
