@@ -22,14 +22,8 @@
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         #stl-viewer-container { width: 100%; height: 60vh; min-height: 400px; }
 
-        @keyframes slideIn {
-            0% { transform: translateX(50px); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; transform: translateY(-10px); }
-        }
+        @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
     </style>
     <script type="importmap">
     {
@@ -94,7 +88,7 @@
                 <h3 id="stl-modal-title" class="text-xl font-bold font-display text-white">Просмотр 3D-модели</h3>
                 <button onclick="closeSTLModal()" class="text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="stl-viewer-container" class="w-full rounded-xl overflow-hidden bg-brand-dark relative">
+            <div id="stl-viewer-container" class="w-full rounded-xl overflow-hidden bg-[#0c1017] relative">
                 <div id="viewer-loading" class="absolute inset-0 flex items-center justify-center text-brand-teal text-sm">
                     <i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка 3D...
                 </div>
@@ -269,41 +263,61 @@
                 
                 status.textContent = 'Шаг 2: Генерация 3D-превью...';
 
+                // Рендер
                 const width = 600, height = 400;
                 const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x161e2b);
+                scene.background = new THREE.Color(0x161e2b); // Темный фон
 
                 const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
                 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
                 renderer.setSize(width, height);
 
-                scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-                const dirLight = new THREE.DirectionalLight(0xffffff, 2);
-                dirLight.position.set(10, 10, 10);
-                scene.add(dirLight);
+                // Настройка освещения (более реалистичное)
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); // Мягкий общий свет
+                scene.add(ambientLight);
+
+                const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2); // Основной свет
+                dirLight1.position.set(5, 10, 7);
+                scene.add(dirLight1);
+
+                const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5); // Дополнительный синий свет для контраста
+                dirLight2.position.set(-5, -5, -5);
+                scene.add(dirLight2);
 
                 const loader = fileExt === '3mf' ? new ThreeMFLoader() : new STLLoader();
                 const objectUrl = URL.createObjectURL(file);
 
                 loader.load(objectUrl, (geometry) => {
+                    // ВАЖНО: Вычисляем нормали для правильного отражения света
+                    if (fileExt !== '3mf') geometry.computeVertexNormals();
+                    
                     let mesh;
                     if (fileExt === '3mf') {
                         mesh = geometry;
                         mesh.traverse(child => {
-                            if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: 0x00f0ff, specular: 0x111111, shininess: 100 });
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.2 });
+                            }
                         });
                     } else {
                         geometry.center();
-                        mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0x00f0ff, specular: 0x111111, shininess: 100 }));
+                        // Используем MeshStandardMaterial для реалистичных бликов
+                        const material = new THREE.MeshStandardMaterial({ 
+                            color: 0x00f0ff, 
+                            roughness: 0.4, 
+                            metalness: 0.3 
+                        });
+                        mesh = new THREE.Mesh(geometry, material);
                     }
                     
+                    // Масштабируем
                     const box = new THREE.Box3().setFromObject(mesh);
                     const size = box.getSize(new THREE.Vector3()).length();
                     const scale = 3 / size;
                     mesh.scale.set(scale, scale, scale);
                     
                     scene.add(mesh);
-                    camera.position.set(2, 2, 3);
+                    camera.position.set(3, 3, 4); // Более удачная точка обзора
                     camera.lookAt(scene.position);
                     renderer.render(scene, camera);
 
@@ -345,7 +359,6 @@
             btn.textContent = 'Отправка...';
             btn.disabled = true;
 
-            // ПОЛУЧАЕМ СЕССИЮ ПОЛЬЗОВАТЕЛЯ
             const { data: { session } } = await supabase.auth.getSession();
 
             const newModel = {
@@ -357,7 +370,7 @@
                 stl_url: uploadedFileUrl,
                 image_url: generatedBase64Image,
                 status: 'pending',
-                user_id: session ? session.user.id : null // ПРИВЯЗКА К ПОЛЬЗОВАТЕЛЮ
+                user_id: session ? session.user.id : null
             };
 
             const { error } = await supabase.from('models_3d').insert([newModel]);
@@ -428,27 +441,40 @@
             container.innerHTML = '';
             container.appendChild(viewerRenderer.domElement);
 
-            viewerScene.add(new THREE.AmbientLight(0xffffff, 1.5));
-            const dLight = new THREE.DirectionalLight(0xffffff, 2);
-            dLight.position.set(5, 10, 7.5);
-            viewerScene.add(dLight);
+            // Настройка освещения для просмотрщика
+            viewerScene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            
+            const dLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+            dLight1.position.set(5, 10, 7.5);
+            viewerScene.add(dLight1);
+
+            const dLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5); // Синий контровой свет
+            dLight2.position.set(-5, -5, -5);
+            viewerScene.add(dLight2);
 
             viewerControls = new OrbitControls(viewerCamera, viewerRenderer.domElement);
             viewerControls.enableDamping = true;
+            viewerControls.autoRotate = true; // Включаем авто-вращение для красоты
+            viewerControls.autoRotateSpeed = 1.0;
+
+            // Отключаем авто-вращение при первом взаимодействии
+            viewerControls.addEventListener('start', () => { viewerControls.autoRotate = false; });
 
             const is3mf = url.toLowerCase().endsWith('.3mf');
             const loader = is3mf ? new ThreeMFLoader() : new STLLoader();
 
             loader.load(url, (geometry) => {
+                if (!is3mf) geometry.computeVertexNormals(); // Важно для 3D-просмотра
+
                 let mesh;
                 if (is3mf) {
                     mesh = geometry;
                     mesh.traverse(child => {
-                        if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: 0x00f0ff, specular: 0x111111, shininess: 100 });
+                        if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
                     });
                 } else {
                     geometry.center();
-                    mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0x00f0ff, specular: 0x111111, shininess: 100 }));
+                    mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 }));
                 }
                 
                 const box = new THREE.Box3().setFromObject(mesh);
