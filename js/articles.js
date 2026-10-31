@@ -17,6 +17,68 @@ function showToast(message, type = 'success') {
     }, 3500);
 }
 
+// === ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ===
+async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        // Если файл не картинка, возвращаем как есть
+        if (!file.type.startsWith('image/')) {
+            resolve(file);
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                // Вычисляем новые пропорции
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
+                // Рисуем на невидимом canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Конвертируем в WebP с заданным качеством
+                canvas.toBlob(
+                    (blob) => {
+                        if (blob) {
+                            // Создаем новый File для загрузки
+                            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+                                type: 'image/webp',
+                                lastModified: Date.now(),
+                            });
+                            resolve(newFile);
+                        } else {
+                            resolve(file); // Если что-то пошло не так, отправляем оригинал
+                        }
+                    },
+                    'image/webp',
+                    quality
+                );
+            };
+            img.onerror = (error) => resolve(file); // Если ошибка чтения, отправляем оригинал
+        };
+        reader.onerror = (error) => resolve(file);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadArticlesFromDB();
     
@@ -35,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // === ЗАГРУЗКА КАРТИНОК ВНУТРЬ ТЕКСТА СТАТЬИ ===
+        // === ЗАГРУЗКА КАРТИНОК ВНУТРЬ ТЕКСТА (СО СЖАТИЕМ) ===
         const toolbar = quill.getModule('toolbar');
         toolbar.addHandler('image', () => {
             const input = document.createElement('input');
@@ -46,27 +108,33 @@ document.addEventListener('DOMContentLoaded', () => {
             input.onchange = async () => {
                 const file = input.files[0];
                 if (file) {
-                    // Показываем, что идет загрузка
                     const range = quill.getSelection(true);
-                    quill.insertText(range.index, ' [Загрузка фото...] ');
+                    quill.insertText(range.index, ' [Сжатие и загрузка фото...] ');
                     
-                    const fileName = `inline_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
-                    const { error } = await supabase.storage.from('images').upload(fileName, file);
+                    try {
+                        // Сжимаем перед загрузкой
+                        const compressedFile = await compressImage(file);
+                        const fileName = `inline_${Date.now()}_${Math.random().toString(36).substring(2)}.webp`;
+                        
+                        const { error } = await supabase.storage.from('images').upload(fileName, compressedFile);
 
-                    if (error) {
-                        showToast('Ошибка загрузки фото: ' + error.message, 'error');
-                    } else {
+                        if (error) throw error;
+
                         const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
-                        // Удаляем текст загрузки и вставляем картинку
-                        quill.deleteText(range.index, 21);
+                        
+                        // Удаляем текст заглушку и вставляем картинку
+                        quill.deleteText(range.index, 30); // 30 — примерная длина заглушки
                         quill.insertEmbed(range.index, 'image', urlData.publicUrl);
+                    } catch (error) {
+                        showToast('Ошибка загрузки фото: ' + error.message, 'error');
+                        quill.deleteText(range.index, 30);
                     }
                 }
             };
         });
     }
 
-    // Предпросмотр обложки при выборе файла
+    // Предпросмотр обложки
     const imageInput = document.getElementById('new-image-file');
     if (imageInput) {
         imageInput.addEventListener('change', function() {
@@ -174,23 +242,26 @@ export async function handleAddArticleSubmit(e) {
 
     const btn = e.target.querySelector('button[type="submit"]');
     
-    // Подтверждение
     const isConfirmed = await window.showConfirm('Отправить статью?', 'Ваша статья будет отправлена на модерацию.', 'Отправить', 'bg-brand-teal', 'hover:bg-brand-teal/80', 'text-black');
     if (!isConfirmed) return;
 
-    btn.textContent = 'Отправка...'; btn.disabled = true;
+    btn.textContent = 'Сжатие и отправка...'; btn.disabled = true;
     
     const { data: { session } } = await supabase.auth.getSession();
     let imageUrl = null;
 
     try {
-        // 1. ЗАГРУЖАЕМ ОБЛОЖКУ (если выбрана)
+        // 1. ЗАГРУЖАЕМ И СЖИМАЕМ ОБЛОЖКУ
         const fileInput = document.getElementById('new-image-file');
         if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const fileName = `cover_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+            const originalFile = fileInput.files[0];
             
-            const { error: uploadError } = await supabase.storage.from('images').upload(fileName, file);
+            // Сжимаем картинку!
+            const compressedFile = await compressImage(originalFile);
+            
+            const fileName = `cover_${Date.now()}_${Math.random().toString(36).substring(2)}.webp`;
+            
+            const { error: uploadError } = await supabase.storage.from('images').upload(fileName, compressedFile);
             if (uploadError) throw new Error('Ошибка загрузки обложки: ' + uploadError.message);
             
             const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
@@ -203,7 +274,7 @@ export async function handleAddArticleSubmit(e) {
             category: document.getElementById('new-category').value,
             readtime: document.getElementById('new-readtime').value,
             summary: document.getElementById('new-summary').value,
-            image_url: imageUrl, // Ссылка на загруженную обложку
+            image_url: imageUrl,
             content: quill.root.innerHTML,
             author: document.getElementById('new-author').value,
             status: 'pending',
@@ -215,7 +286,6 @@ export async function handleAddArticleSubmit(e) {
 
         showToast('Статья успешно отправлена на модерацию!');
         
-        // Очищаем форму
         e.target.reset(); 
         quill.root.innerHTML = ''; 
         document.getElementById('cover-preview-container').classList.add('hidden');
