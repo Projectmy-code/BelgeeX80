@@ -64,6 +64,16 @@
         .ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: #00f0ff !important; }
         .ql-snow.ql-toolbar button:hover .ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-fill { fill: #00f0ff !important; }
         .ql-snow.ql-toolbar button:hover, .ql-snow.ql-toolbar button.ql-active { color: #00f0ff !important; }
+
+        /* Анимации для уведомлений */
+        @keyframes slideIn {
+            0% { transform: translateX(50px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
     </style>
     <link rel="stylesheet" href="./css/shared.css">
 </head>
@@ -598,6 +608,21 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
+    <div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
+            <div id="confirm-icon-container" class="w-14 h-14 rounded-full bg-brand-teal/10 text-brand-teal flex items-center justify-center text-2xl mb-4 mx-auto border border-brand-teal/20">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 id="confirm-title" class="text-xl font-bold text-center text-white mb-2">Вы уверены?</h3>
+            <p id="confirm-message" class="text-sm text-gray-400 text-center mb-6">...</p>
+            <div class="flex gap-3">
+                <button id="confirm-cancel-btn" class="flex-1 py-2.5 rounded-xl bg-brand-border hover:bg-gray-700 text-white font-semibold text-sm transition-colors">Отмена</button>
+                <button id="confirm-ok-btn" class="flex-1 py-2.5 rounded-xl bg-brand-teal text-black font-semibold text-sm transition-colors shadow-lg">ОК</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIC (Каталог и меню) -->
     <script>
         const partsData = [
@@ -648,6 +673,46 @@
 
         // Инициализация таблицы при загрузке
         renderPartsTable(partsData);
+    </script>
+
+    <!-- Универсальное окно подтверждения -->
+    <script>
+        let confirmResolve = null;
+
+        window.showConfirm = function(title, message, btnText = 'Подтвердить', btnBg = 'bg-brand-teal', btnHover = 'hover:bg-brand-teal/80', btnTextColor = 'text-black') {
+            return new Promise((resolve) => {
+                confirmResolve = resolve;
+                document.getElementById('confirm-title').textContent = title;
+                document.getElementById('confirm-message').textContent = message;
+                
+                const okBtn = document.getElementById('confirm-ok-btn');
+                okBtn.textContent = btnText;
+                okBtn.className = `flex-1 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-lg ${btnBg} ${btnHover} ${btnTextColor}`;
+                
+                const modal = document.getElementById('custom-confirm-modal');
+                modal.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('div').classList.remove('scale-95');
+                }, 10);
+            });
+        };
+
+        function closeConfirm(result) {
+            const modal = document.getElementById('custom-confirm-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (confirmResolve) confirmResolve(result);
+                confirmResolve = null;
+            }, 300);
+        }
+
+        document.getElementById('confirm-ok-btn').addEventListener('click', () => closeConfirm(true));
+        document.getElementById('confirm-cancel-btn').addEventListener('click', () => closeConfirm(false));
     </script>
 
     <!-- Скрипт авторизации -->
