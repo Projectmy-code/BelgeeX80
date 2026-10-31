@@ -266,21 +266,17 @@
                 // Рендер
                 const width = 600, height = 400;
                 const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x161e2b); // Темный фон
+                scene.background = new THREE.Color(0x161e2b);
 
                 const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
                 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
                 renderer.setSize(width, height);
 
-                // Настройка освещения (более реалистичное)
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); // Мягкий общий свет
-                scene.add(ambientLight);
-
-                const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2); // Основной свет
+                scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+                const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
                 dirLight1.position.set(5, 10, 7);
                 scene.add(dirLight1);
-
-                const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5); // Дополнительный синий свет для контраста
+                const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.6);
                 dirLight2.position.set(-5, -5, -5);
                 scene.add(dirLight2);
 
@@ -288,36 +284,30 @@
                 const objectUrl = URL.createObjectURL(file);
 
                 loader.load(objectUrl, (geometry) => {
-                    // ВАЖНО: Вычисляем нормали для правильного отражения света
                     if (fileExt !== '3mf') geometry.computeVertexNormals();
                     
                     let mesh;
                     if (fileExt === '3mf') {
                         mesh = geometry;
                         mesh.traverse(child => {
-                            if (child.isMesh) {
-                                child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.2 });
-                            }
+                            if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.2 });
                         });
                     } else {
                         geometry.center();
-                        // Используем MeshStandardMaterial для реалистичных бликов
-                        const material = new THREE.MeshStandardMaterial({ 
-                            color: 0x00f0ff, 
-                            roughness: 0.4, 
-                            metalness: 0.3 
-                        });
-                        mesh = new THREE.Mesh(geometry, material);
+                        mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.4, metalness: 0.3 }));
                     }
                     
-                    // Масштабируем
+                    // АВТОМАТИЧЕСКАЯ ЦЕНТРОВКА И МАСШТАБ
                     const box = new THREE.Box3().setFromObject(mesh);
+                    const center = box.getCenter(new THREE.Vector3());
                     const size = box.getSize(new THREE.Vector3()).length();
+                    
+                    mesh.position.sub(center); // Сдвигаем в 0,0,0
                     const scale = 3 / size;
                     mesh.scale.set(scale, scale, scale);
                     
                     scene.add(mesh);
-                    camera.position.set(3, 3, 4); // Более удачная точка обзора
+                    camera.position.set(2, 2, 4);
                     camera.lookAt(scene.position);
                     renderer.render(scene, camera);
 
@@ -441,30 +431,31 @@
             container.innerHTML = '';
             container.appendChild(viewerRenderer.domElement);
 
-            // Настройка освещения для просмотрщика
-            viewerScene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            // Свет
+            viewerScene.add(new THREE.AmbientLight(0xffffff, 0.5));
             
-            const dLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+            const dLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
             dLight1.position.set(5, 10, 7.5);
             viewerScene.add(dLight1);
 
-            const dLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5); // Синий контровой свет
+            const dLight2 = new THREE.DirectionalLight(0x00f0ff, 0.6);
             dLight2.position.set(-5, -5, -5);
             viewerScene.add(dLight2);
 
+            // Контролы
             viewerControls = new OrbitControls(viewerCamera, viewerRenderer.domElement);
             viewerControls.enableDamping = true;
-            viewerControls.autoRotate = true; // Включаем авто-вращение для красоты
-            viewerControls.autoRotateSpeed = 1.0;
+            viewerControls.dampingFactor = 0.05;
+            viewerControls.autoRotate = true; // Включаем авто-вращение
+            viewerControls.autoRotateSpeed = 1.5;
 
-            // Отключаем авто-вращение при первом взаимодействии
             viewerControls.addEventListener('start', () => { viewerControls.autoRotate = false; });
 
             const is3mf = url.toLowerCase().endsWith('.3mf');
             const loader = is3mf ? new ThreeMFLoader() : new STLLoader();
 
             loader.load(url, (geometry) => {
-                if (!is3mf) geometry.computeVertexNormals(); // Важно для 3D-просмотра
+                if (!is3mf) geometry.computeVertexNormals();
 
                 let mesh;
                 if (is3mf) {
@@ -473,15 +464,23 @@
                         if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
                     });
                 } else {
-                    geometry.center();
                     mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 }));
                 }
                 
+                // АВТОМАТИЧЕСКАЯ ЦЕНТРОВКА
                 const box = new THREE.Box3().setFromObject(mesh);
+                const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3()).length();
-                const scale = 3 / size;
+                
+                mesh.position.sub(center); // Центрируем
+                const scale = 3 / size; // Масштабируем под камеру
                 mesh.scale.set(scale, scale, scale);
+                
                 viewerScene.add(mesh);
+                
+                // Ставим камеру так, чтобы видеть всё
+                viewerCamera.position.set(2, 2, 4);
+                viewerCamera.lookAt(0, 0, 0); // Смотрим в центр
                 
                 if (loading) loading.style.display = 'none';
             }, undefined, (err) => {
