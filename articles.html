@@ -17,6 +17,9 @@
         .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .card-glow { transition: all 0.3s ease; }
         .card-glow:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15); transform: translateY(-2px); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c1017; }
+        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-black">
@@ -76,6 +79,30 @@
         </div>
     </main>
 
+    <!-- MODAL: FULL ARTICLE -->
+    <div id="info-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="article-modal-header" class="mb-4">
+                <span id="info-modal-category" class="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 text-xs font-medium">Категория</span>
+                <h3 id="info-modal-title" class="text-2xl font-bold font-display text-white mt-2">Заголовок</h3>
+                <div class="flex items-center gap-4 text-xs text-gray-400 mt-2 border-b border-brand-border/60 pb-3">
+                    <span id="info-modal-author"></span>
+                    <span id="info-modal-time"></span>
+                </div>
+            </div>
+            <div id="info-modal-content" class="text-sm text-gray-300 space-y-4 leading-relaxed"></div>
+            <div class="mt-6 pt-4 border-t border-brand-border/60 flex items-center justify-between">
+                <span class="text-xs text-gray-500">BELGEE X80 Knowledge Base</span>
+                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-brand-border hover:bg-brand-teal hover:text-black font-semibold text-xs transition-colors">
+                    Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="bg-brand-dark py-8 text-gray-400 text-xs border-t border-brand-border text-center">
         <p>© 2026 BELGEE X80 Club Portal. Все права защищены.</p>
@@ -85,10 +112,10 @@
     <script type="module">
         import { supabase } from './js/config.js';
 
-        let allArticles = [];      // Все загруженные статьи
-        let filteredArticles = []; // Отфильтрованные статьи
-        let displayedCount = 0;    // Сколько уже показано
-        const ITEMS_PER_PAGE = 6;  // Сколько показывать за раз
+        let allArticles = [];      
+        let filteredArticles = []; 
+        let displayedCount = 0;    
+        const ITEMS_PER_PAGE = 6;  
 
         async function loadArticles() {
             const { data, error } = await supabase
@@ -98,30 +125,27 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                document.getElementById('articles-grid').innerHTML = `<p class="text-red-400 col-span-3">Ошибка загрузки</p>`;
+                document.getElementById('articles-grid').innerHTML = `<p class="text-red-400 col-span-3 text-center">Ошибка загрузки</p>`;
                 return;
             }
 
             allArticles = data || [];
-            filterCat('all'); // Показываем все по умолчанию
+            filterCat('all'); 
         }
 
         window.filterCat = function(category) {
-            // Меняем стили кнопок
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = (btn.dataset.cat === category)
                     ? 'cat-btn px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-sm transition-all whitespace-nowrap'
                     : 'cat-btn px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-sm transition-all border border-brand-border whitespace-nowrap';
             });
 
-            // Фильтруем
             if (category === 'all') {
                 filteredArticles = [...allArticles];
             } else {
                 filteredArticles = allArticles.filter(a => a.category === category);
             }
 
-            // Сбрасываем пагинацию
             displayedCount = 0;
             document.getElementById('articles-grid').innerHTML = '';
             loadMore();
@@ -135,7 +159,6 @@
                 a.author.toLowerCase().includes(query)
             );
             
-            // Сбрасываем пагинацию
             displayedCount = 0;
             document.getElementById('articles-grid').innerHTML = '';
             loadMore();
@@ -148,19 +171,25 @@
             const nextItems = filteredArticles.slice(displayedCount, displayedCount + ITEMS_PER_PAGE);
             
             nextItems.forEach(article => {
+                const imgUrl = article.image_url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80';
+
                 const div = document.createElement('div');
-                div.className = 'bg-brand-card p-6 rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full';
+                div.className = 'bg-brand-card rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full overflow-hidden';
                 div.onclick = () => openArticle(article);
                 div.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-teal bg-brand-teal/10 px-2 py-1 rounded">${article.category}</span>
-                        <span class="text-xs text-gray-500"><i class="fa-regular fa-clock"></i> ${article.readtime}</span>
+                    <div class="h-48 bg-slate-800 relative shrink-0">
+                        <img src="${imgUrl}" class="w-full h-full object-cover" alt="${article.title}">
+                        <div class="absolute top-3 left-3">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-white bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10">${article.category}</span>
+                        </div>
                     </div>
-                    <h3 class="font-bold text-lg text-white mb-2 line-clamp-2">${article.title}</h3>
-                    <p class="text-sm text-gray-400 line-clamp-3 mb-4 flex-1">${article.summary}</p>
-                    <div class="flex items-center justify-between border-t border-brand-border/60 pt-4 mt-auto">
-                        <span class="text-xs text-gray-300"><i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}</span>
-                        <span class="text-xs text-brand-teal">Читать <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <h3 class="font-bold text-lg text-white mb-2 line-clamp-2">${article.title}</h3>
+                        <p class="text-sm text-gray-400 line-clamp-2 mb-4 flex-1">${article.summary}</p>
+                        <div class="flex items-center justify-between border-t border-brand-border/60 pt-4 mt-auto">
+                            <span class="text-xs text-gray-400"><i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}</span>
+                            <span class="text-xs text-brand-teal"><i class="fa-regular fa-clock mr-1"></i> ${article.readtime}</span>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(div);
@@ -168,7 +197,6 @@
 
             displayedCount += nextItems.length;
 
-            // Прячем или показываем кнопку
             if (displayedCount >= filteredArticles.length) {
                 btn.classList.add('hidden');
             } else {
@@ -176,10 +204,23 @@
             }
         }
 
-        function openArticle(article) {
-            // Здесь мы можем использовать тот же модал, что и на главной, или перекинуть на отдельную страницу.
-            // Для простоты — перекидываем на главную с открытием модала (можно передать параметр ?id=...)
-            window.location.href = `index.html#articles`; // В идеале тут должен быть прямой переход на страницу статьи
+        window.openArticle = function(article) {
+            document.getElementById('info-modal-category').textContent = article.category;
+            document.getElementById('info-modal-title').textContent = article.title;
+            document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
+            document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readtime}`;
+            
+            let content = article.content;
+            if (article.image_url) {
+                content = `<img src="${article.image_url}" class="w-full h-64 object-cover rounded-xl mb-6 shadow-lg" alt="${article.title}">` + content;
+            }
+            
+            document.getElementById('info-modal-content').innerHTML = content;
+            document.getElementById('info-modal').classList.remove('hidden');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('info-modal').classList.add('hidden');
         }
 
         // Инициализация
