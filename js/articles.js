@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Напишите здесь вашу статью...',
-            modules: { toolbar: [[{ 'header': [2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link', 'clean']] }
+            modules: { toolbar: [[{ 'header': [2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link', 'image', 'clean']] } // Добавлена кнопка картинки
         });
     }
 });
@@ -50,24 +50,31 @@ function renderArticles(articles) {
     if (articles.length === 0) { grid.innerHTML = '<p class="text-gray-400 col-span-3">Пока нет статей.</p>'; return; }
     
     grid.innerHTML = '';
-    
-    // БЕРЕМ ТОЛЬКО ПЕРВЫЕ 3 СТАТЬИ ДЛЯ ГЛАВНОЙ
     const articlesToShow = articles.slice(0, 3); 
 
     articlesToShow.forEach((article) => {
+        // Заглушка, если нет картинки
+        const imgUrl = article.image_url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80';
+
         const div = document.createElement('div');
-        div.className = 'bg-brand-card p-6 rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full';
+        div.className = 'bg-brand-card rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full overflow-hidden';
         div.onclick = () => openArticleModal(article);
         div.innerHTML = `
-            <div class="flex justify-between items-start mb-3">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-brand-teal bg-brand-teal/10 px-2 py-1 rounded">${article.category}</span>
-                <span class="text-xs text-gray-500"><i class="fa-regular fa-clock"></i> ${article.readtime}</span>
+            <div class="h-48 bg-slate-800 relative shrink-0">
+                <img src="${imgUrl}" class="w-full h-full object-cover" alt="${article.title}">
+                <div class="absolute top-3 left-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-white bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10">${article.category}</span>
+                </div>
             </div>
-            <h3 class="font-bold text-lg text-white mb-2 line-clamp-2">${article.title}</h3>
-            <p class="text-sm text-gray-400 line-clamp-3 mb-4 flex-1">${article.summary}</p>
-            <div class="flex items-center justify-between border-t border-brand-border/60 pt-4 mt-auto">
-                <span class="text-xs text-gray-300"><i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}</span>
-                <span class="text-xs text-brand-teal">Читать <i class="fa-solid fa-arrow-right ml-1"></i></span>
+            <div class="p-5 flex-1 flex flex-col">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-lg text-white line-clamp-2 pr-2">${article.title}</h3>
+                </div>
+                <p class="text-sm text-gray-400 line-clamp-2 mb-4 flex-1">${article.summary}</p>
+                <div class="flex items-center justify-between border-t border-brand-border/60 pt-4 mt-auto">
+                    <span class="text-xs text-gray-400"><i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}</span>
+                    <span class="text-xs text-brand-teal"><i class="fa-regular fa-clock mr-1"></i> ${article.readtime}</span>
+                </div>
             </div>
         `;
         grid.appendChild(div);
@@ -85,7 +92,14 @@ export function openArticleModal(article) {
     document.getElementById('info-modal-title').textContent = article.title;
     document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
     document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readtime}`;
-    document.getElementById('info-modal-content').innerHTML = article.content;
+    
+    // Вставляем картинку в начало статьи (если она есть)
+    let content = article.content;
+    if (article.image_url) {
+        content = `<img src="${article.image_url}" class="w-full h-64 object-cover rounded-xl mb-6 shadow-lg" alt="${article.title}">` + content;
+    }
+    
+    document.getElementById('info-modal-content').innerHTML = content;
     document.getElementById('info-modal').classList.remove('hidden');
 }
 
@@ -120,6 +134,7 @@ export async function handleAddArticleSubmit(e) {
         category: document.getElementById('new-category').value,
         readtime: document.getElementById('new-readtime').value,
         summary: document.getElementById('new-summary').value,
+        image_url: document.getElementById('new-image-url').value || null, // <-- ДОБАВЛЕНО
         content: contentHTML,
         author: document.getElementById('new-author').value,
         status: 'pending',
