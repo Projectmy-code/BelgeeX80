@@ -1,125 +1,112 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark scroll-smooth">
+<html lang="ru" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель управления — BELGEE X80</title>
+    <title>CMS — BELGEE X80</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb', pending: '#f59e0b' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
     </script>
     <style>
         body { background-color: #0c1017; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .font-display { font-family: 'Montserrat', sans-serif; }
-        .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .card-glow { transition: all 0.3s ease; }
-        .card-glow:hover { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 4px 20px -5px rgba(0, 240, 255, 0.1); }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        .glass-panel { background: rgba(22, 30, 43, 0.95); backdrop-filter: blur(12px); border-right: 1px solid #253142; }
+        .nav-item { transition: all 0.2s; border-left: 3px solid transparent; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: rgba(0, 240, 255, 0.1); border-left-color: #00f0ff; color: #00f0ff; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-black">
+<body class="min-h-screen flex antialiased">
 
-    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            <a href="index.html" class="flex items-center gap-3 group shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
-                    <span class="font-display font-black text-black text-xl">X</span>
+    <!-- ЛЕВОЕ МЕНЮ (SIDEBAR) -->
+    <aside class="w-64 glass-panel fixed h-full flex flex-col z-20">
+        <div class="h-20 flex items-center px-6 border-b border-brand-border">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center">
+                    <span class="font-display font-black text-black text-sm">X</span>
                 </div>
                 <div>
-                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">BELGEE <span class="text-brand-teal">X80</span></div>
-                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Админ-панель</div>
+                    <div class="font-display font-black text-sm text-white">CMS</div>
+                    <div class="text-[10px] text-gray-400 uppercase">BELGEE X80</div>
                 </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 py-6 flex flex-col gap-1 overflow-y-auto">
+            <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i> Дашборд
             </a>
-            <div class="flex items-center gap-4">
-                <a href="index.html" class="text-sm font-medium text-gray-400 hover:text-white hidden sm:block"><i class="fa-solid fa-arrow-left mr-1"></i> На сайт</a>
-                <div class="h-6 w-px bg-brand-border hidden sm:block"></div>
-                <div class="flex items-center gap-3">
-                    <span id="user-email" class="text-xs text-brand-teal font-semibold bg-brand-teal/10 px-3 py-1.5 rounded-lg border border-brand-teal/20"></span>
-                    <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors p-2" title="Выйти"><i class="fa-solid fa-arrow-right-from-bracket text-lg"></i></button>
+            <a href="#" onclick="switchView('moderation')" id="nav-moderation" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-shield-halved w-5 text-center"></i> Модерация
+                <span id="mod-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+            <a href="#" onclick="switchView('feedback')" id="nav-feedback" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-envelope w-5 text-center"></i> Сообщения
+                <span id="fb-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+            <a href="#" onclick="switchView('settings')" id="nav-settings" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Настройки
+            </a>
+            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-4">Инструменты</div>
+            <a href="edit-parts.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-list-check w-5 text-center"></i> Каталог запчастей
+            </a>
+            <a href="edit-site.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-sliders w-5 text-center"></i> Редактор главной
+            </a>
+            <a href="builder.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-wand-magic-sparkles w-5 text-center"></i> Конструктор страниц
+            </a>
+            <a href="index.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i> Открыть сайт
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-brand-border">
+            <div class="bg-brand-dark rounded-xl p-3 flex items-center gap-3 border border-brand-border">
+                <div class="w-8 h-8 rounded-full bg-brand-teal/20 text-brand-teal flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <div id="user-email" class="text-xs text-white truncate font-semibold">Загрузка...</div>
+                    <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300">Выйти</button>
                 </div>
             </div>
         </div>
-    </header>
+    </aside>
 
-    <main class="flex-1 py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
-            <div id="loading" class="flex flex-col items-center justify-center py-32">
-                <div class="w-10 h-10 border-4 border-brand-border border-t-brand-teal rounded-full animate-spin mb-4"></div>
-                <p class="text-gray-400 text-sm">Проверка прав доступа...</p>
-            </div>
-
-            <div id="access-denied" class="hidden text-center py-32 bg-brand-card rounded-3xl border border-red-500/30">
-                <h2 class="text-3xl font-display font-bold text-white mb-2">Доступ запрещен</h2>
-                <p class="text-gray-400 mb-6">Вы вошли как <span id="denied-email" class="text-white font-semibold"></span>, но у вас нет прав администратора.</p>
-                <a href="index.html" class="inline-block px-6 py-3 bg-brand-border hover:bg-gray-700 text-white font-semibold rounded-xl transition-colors">На главную</a>
-            </div>
-
-            <div id="admin-content" class="hidden space-y-8">
-                
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <div>
-                        <h1 class="text-3xl font-display font-bold text-white">Управление контентом</h1>
-                        <p class="text-gray-400 mt-1 text-sm">Модерация статей и 3D-моделей</p>
-                    </div>
-                </div>
-
-                <!-- Настройки публикации -->
-                <div class="bg-brand-card p-6 md:p-8 rounded-3xl border border-brand-border relative overflow-hidden">
-                    <h2 class="text-lg font-bold text-white mb-1 flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-teal"></i> Кто может предлагать контент?</h2>
-                    <div class="flex flex-col sm:flex-row gap-4 max-w-2xl mt-4">
-                        <label class="flex-1 relative cursor-pointer">
-                            <input type="radio" name="publish_mode" value="everyone" class="peer sr-only">
-                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all h-full">
-                                <span class="font-bold text-white text-sm">Разрешить всем</span>
-                                <p class="text-xs text-gray-500 mt-1">Любой гость сможет отправить статью или модель на проверку.</p>
-                            </div>
-                        </label>
-                        <label class="flex-1 relative cursor-pointer">
-                            <input type="radio" name="publish_mode" value="registered" class="peer sr-only">
-                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all h-full">
-                                <span class="font-bold text-white text-sm">Только для своих</span>
-                                <p class="text-xs text-gray-500 mt-1">Отправлять контент смогут только авторизованные пользователи.</p>
-                            </div>
-                        </label>
-                    </div>
-                    <div class="mt-6 flex justify-end">
-                        <button onclick="saveSettings()" class="px-6 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-sm rounded-xl hover:scale-105 transition-all shadow-lg flex items-center gap-2"><i class="fa-solid fa-floppy-disk"></i> Сохранить</button>
-                    </div>
-                </div>
-
-                <!-- Вкладки -->
-                <div class="flex gap-2 border-b border-brand-border pb-4">
-                    <button id="tab-articles" onclick="switchTab('articles')" class="px-4 py-2 rounded-xl bg-brand-teal text-black font-bold text-sm transition-all">
-                        <i class="fa-regular fa-file-lines mr-2"></i> Статьи
-                    </button>
-                    <button id="tab-models" onclick="switchTab('models')" class="px-4 py-2 rounded-xl text-gray-400 hover:text-white font-bold text-sm transition-all">
-                        <i class="fa-solid fa-cube mr-2"></i> 3D Модели
-                    </button>
-                </div>
-
-                <!-- Контейнер для очереди -->
-                <div id="queue-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-
-            </div>
+    <!-- ПРАВАЯ ЧАСТЬ (КОНТЕНТ) -->
+    <main class="flex-1 ml-64 min-h-screen relative">
+        
+        <div id="view-loading" class="absolute inset-0 flex items-center justify-center bg-brand-dark z-10">
+            <i class="fa-solid fa-spinner fa-spin text-3xl text-brand-teal"></i>
         </div>
+
+        <div id="view-denied" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-brand-dark z-10">
+            <i class="fa-solid fa-lock text-5xl text-red-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-white mb-2">Доступ запрещен</h2>
+            <p class="text-gray-400 text-sm">У вас нет прав администратора.</p>
+            <a href="index.html" class="mt-4 px-4 py-2 bg-brand-border text-white rounded-lg">На главную</a>
+        </div>
+
+        <div id="view-content" class="hidden p-8"></div>
+
     </main>
 
     <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
-    <div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
-            <div class="w-14 h-14 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center text-2xl mb-4 mx-auto border border-red-500/20">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3 id="confirm-title" class="text-xl font-bold text-center text-white mb-2">Вы уверены?</h3>
-            <p id="confirm-message" class="text-sm text-gray-400 text-center mb-6">Это действие нельзя отменить.</p>
+            <h3 id="conf-title" class="text-xl font-bold text-center text-white mb-2">Удалить?</h3>
+            <p id="conf-msg" class="text-sm text-gray-400 text-center mb-6">Это действие нельзя отменить.</p>
             <div class="flex gap-3">
-                <button id="confirm-cancel-btn" class="flex-1 py-2.5 rounded-xl bg-brand-border hover:bg-gray-700 text-white font-semibold text-sm transition-colors">Отмена</button>
-                <button id="confirm-ok-btn" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold text-sm transition-colors shadow-lg shadow-red-500/20">Удалить</button>
+                <button onclick="closeConfirm(false)" class="flex-1 py-2.5 rounded-xl bg-brand-border hover:bg-gray-700 text-white font-semibold text-sm">Отмена</button>
+                <button id="conf-ok" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold text-sm">Удалить</button>
             </div>
         </div>
     </div>
@@ -127,170 +114,282 @@
     <script type="module">
         import { supabase } from './js/config.js';
 
-        let currentTab = 'articles';
+        let currentUser = null;
+        let allData = { articles: [], models: [], feedback: [] };
 
-        // === ЛОГИКА КРАСИВОГО ОКНА ПОДТВЕРЖДЕНИЯ ===
-        let confirmResolve = null;
-
-        window.showConfirm = function(title, message, btnText = 'Удалить') {
-            return new Promise((resolve) => {
-                confirmResolve = resolve;
-                document.getElementById('confirm-title').textContent = title;
-                document.getElementById('confirm-message').textContent = message;
-                document.getElementById('confirm-ok-btn').textContent = btnText;
-                
-                const modal = document.getElementById('custom-confirm-modal');
-                modal.classList.remove('hidden');
-                
-                // Плавное появление
+        // === ОКНО ПОДТВЕРЖДЕНИЯ ===
+        let confirmResolve;
+        window.showConfirm = (title, msg) => {
+            return new Promise(res => {
+                confirmResolve = res;
+                document.getElementById('conf-title').textContent = title;
+                document.getElementById('conf-msg').textContent = msg;
+                document.getElementById('confirm-modal').classList.remove('hidden');
                 setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    modal.querySelector('div').classList.remove('scale-95');
+                    document.getElementById('confirm-modal').classList.remove('opacity-0');
+                    document.getElementById('confirm-modal').querySelector('div').classList.remove('scale-95');
                 }, 10);
             });
         };
-
-        function closeConfirm(result) {
-            const modal = document.getElementById('custom-confirm-modal');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            
+        window.closeConfirm = (res) => {
+            document.getElementById('confirm-modal').classList.add('opacity-0');
+            document.getElementById('confirm-modal').querySelector('div').classList.add('scale-95');
             setTimeout(() => {
-                modal.classList.add('hidden');
-                if (confirmResolve) confirmResolve(result);
-                confirmResolve = null;
+                document.getElementById('confirm-modal').classList.add('hidden');
+                if (confirmResolve) confirmResolve(res);
             }, 300);
-        }
-
-        document.getElementById('confirm-ok-btn').addEventListener('click', () => closeConfirm(true));
-        document.getElementById('confirm-cancel-btn').addEventListener('click', () => closeConfirm(false));
-        // ==============================================
+        };
+        document.getElementById('conf-ok').addEventListener('click', () => closeConfirm(true));
+        // ======================================
 
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
-            document.getElementById('loading').classList.add('hidden');
             if (!session) { window.location.href = 'login.html'; return; }
             
-            document.getElementById('user-email').textContent = session.user.email;
-            document.getElementById('denied-email').textContent = session.user.email;
+            currentUser = session.user;
+            document.getElementById('user-email').textContent = currentUser.email;
 
-            const { data: adminData } = await supabase.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
-            if (!adminData) { document.getElementById('access-denied').classList.remove('hidden'); return; }
+            const { data: adminData } = await supabase.from('admins').select('user_id').eq('user_id', currentUser.id).maybeSingle();
+            
+            document.getElementById('view-loading').classList.add('hidden');
+            if (!adminData) { 
+                document.getElementById('view-denied').classList.remove('hidden'); 
+                return; 
+            }
 
-            document.getElementById('admin-content').classList.remove('hidden');
-            await loadSettings();
-            await loadQueue();
+            document.getElementById('view-content').classList.remove('hidden');
+            await loadAllData();
+            switchView('dashboard');
         }
 
-        async function loadSettings() {
-            const { data } = await supabase.from('site_settings').select('value').eq('key', 'submission_mode').single();
-            if (data) {
-                const radio = document.querySelector(`input[name="publish_mode"][value="${data.value}"]`);
-                if (radio) radio.checked = true;
+        async function loadAllData() {
+            const [arts, mods, fb] = await Promise.all([
+                supabase.from('articles').select('*').order('created_at', { ascending: false }),
+                supabase.from('models_3d').select('*').order('created_at', { ascending: false }),
+                supabase.from('feedback').select('*').order('created_at', { ascending: false })
+            ]);
+            
+            allData.articles = arts.data || [];
+            allData.models = mods.data || [];
+            allData.feedback = fb.data || [];
+
+            const pendingMods = allData.articles.filter(a => a.status === 'pending').length + 
+                                allData.models.filter(m => m.status === 'pending').length;
+            const unreadFb = allData.feedback.filter(f => !f.is_read).length;
+
+            if (pendingMods > 0) {
+                document.getElementById('mod-badge').textContent = pendingMods;
+                document.getElementById('mod-badge').classList.remove('hidden');
+            } else {
+                document.getElementById('mod-badge').classList.add('hidden');
+            }
+            
+            if (unreadFb > 0) {
+                document.getElementById('fb-badge').textContent = unreadFb;
+                document.getElementById('fb-badge').classList.remove('hidden');
+            } else {
+                document.getElementById('fb-badge').classList.add('hidden');
             }
         }
 
-        window.saveSettings = async function() {
-            const selectedMode = document.querySelector('input[name="publish_mode"]:checked');
-            if (!selectedMode) return;
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Сохранение...';
-            btn.disabled = true;
-            
-            await supabase.from('site_settings').update({ value: selectedMode.value }).eq('key', 'submission_mode');
-            
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-            
-            // Красивое уведомление вместо alert
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-6 right-6 z-50 bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold shadow-2xl flex items-center gap-2 animate-bounce';
-            toast.innerHTML = '<i class="fa-solid fa-check-circle"></i> Настройки сохранены!';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
+        window.switchView = function(viewName) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const navId = 'nav-' + viewName;
+            if (document.getElementById(navId)) document.getElementById(navId).classList.add('active');
 
-        window.switchTab = function(tab) {
-            currentTab = tab;
-            document.getElementById('tab-articles').className = tab === 'articles' ? 'px-4 py-2 rounded-xl bg-brand-teal text-black font-bold text-sm transition-all' : 'px-4 py-2 rounded-xl text-gray-400 hover:text-white font-bold text-sm transition-all';
-            document.getElementById('tab-models').className = tab === 'models' ? 'px-4 py-2 rounded-xl bg-brand-teal text-black font-bold text-sm transition-all' : 'px-4 py-2 rounded-xl text-gray-400 hover:text-white font-bold text-sm transition-all';
-            loadQueue();
-        }
+            const container = document.getElementById('view-content');
+            container.innerHTML = '<div class="text-center py-20"><i class="fa-solid fa-spinner fa-spin text-brand-teal"></i></div>';
 
-        async function loadQueue() {
-            const container = document.getElementById('queue-container');
-            container.innerHTML = '<p class="text-gray-400 text-sm col-span-full text-center py-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка...</p>';
+            setTimeout(() => {
+                if (viewName === 'dashboard') renderDashboard(container);
+                if (viewName === 'moderation') renderModeration(container);
+                if (viewName === 'feedback') renderFeedback(container);
+                if (viewName === 'settings') renderSettings(container);
+            }, 100);
+        };
 
-            const table = currentTab === 'articles' ? 'articles' : 'models_3d';
-            const { data: items, error } = await supabase.from(table).select('*').eq('status', 'pending').order('created_at', { ascending: false });
-            
-            if (error) {
-                container.innerHTML = `<p class="text-red-400 text-sm col-span-full text-center">Ошибка: ${error.message}</p>`;
-                return;
-            }
+        // --- ДАШБОРД ---
+        function renderDashboard(container) {
+            const publishedArts = allData.articles.filter(a => a.status === 'published').length;
+            const pendingArts = allData.articles.filter(a => a.status === 'pending').length;
+            const publishedMods = allData.models.filter(m => m.status === 'published').length;
+            const unreadFb = allData.feedback.filter(f => !f.is_read).length;
 
-            if (!items || items.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-12 text-center border-2 border-dashed border-brand-border rounded-2xl bg-brand-dark/50">
-                    <i class="fa-regular fa-face-smile text-4xl mb-3 text-gray-500"></i>
-                    <h3 class="text-white font-semibold mb-1">Очередь пуста</h3>
-                    <p class="text-gray-500 text-xs">Все ${currentTab === 'articles' ? 'статьи' : 'модели'} проверены.</p>
-                </div>`;
-                return;
-            }
-
-            container.innerHTML = '';
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'card-glow border border-brand-border p-5 rounded-2xl bg-brand-dark flex flex-col justify-between';
+            container.innerHTML = `
+                <h1 class="text-3xl font-display font-bold text-white mb-8">Добро пожаловать в CMS</h1>
                 
-                const title = item.title;
-                const sub = currentTab === 'articles' ? item.summary : item.description;
-                const cat = item.category;
-
-                div.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-3">
-                            <span class="px-2.5 py-1 bg-brand-teal/10 text-brand-teal border border-brand-teal/20 rounded-md text-[10px] font-bold uppercase tracking-wider">${cat}</span>
-                            <span class="text-[10px] text-gray-500">${new Date(item.created_at).toLocaleDateString('ru-RU')}</span>
-                        </div>
-                        <h3 class="font-bold text-white text-base leading-tight mb-2 line-clamp-2">${title}</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">${sub}</p>
-                        <div class="flex items-center gap-2 text-xs text-gray-300 mb-4 bg-brand-card p-2 rounded-lg w-fit border border-brand-border/50">
-                            <i class="fa-solid fa-user text-brand-teal"></i> ${item.author}
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
+                        <div class="text-gray-400 text-xs font-bold uppercase mb-1">Статьи (Опубл.)</div>
+                        <div class="text-3xl font-bold text-white">${publishedArts}</div>
                     </div>
-                    <div class="flex gap-2 mt-auto pt-4 border-t border-brand-border/50">
-                        <button onclick="approveItem('${item.id}')" class="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold transition-colors"><i class="fa-solid fa-check"></i> Опубликовать</button>
-                        <button onclick="deleteItem('${item.id}')" class="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-xs font-semibold transition-colors"><i class="fa-solid fa-trash-can"></i> Удалить</button>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
+                        <div class="text-brand-pending text-xs font-bold uppercase mb-1">Статьи (На модерации)</div>
+                        <div class="text-3xl font-bold text-white">${pendingArts}</div>
+                    </div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
+                        <div class="text-gray-400 text-xs font-bold uppercase mb-1">3D Модели (Опубл.)</div>
+                        <div class="text-3xl font-bold text-white">${publishedMods}</div>
+                    </div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
+                        <div class="text-brand-teal text-xs font-bold uppercase mb-1">Новые сообщения</div>
+                        <div class="text-3xl font-bold text-white">${unreadFb}</div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-blue-900/40 to-brand-card p-8 rounded-3xl border border-blue-500/30">
+                    <h2 class="text-xl font-bold text-white mb-2">🚀 Инструменты разработчика</h2>
+                    <p class="text-gray-400 text-sm mb-6">Управляйте контентом сайта без единой строчки кода.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="edit-site.html" class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all shadow-lg"><i class="fa-solid fa-sliders mr-2"></i> Редактор главной</a>
+                        <a href="builder.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700 transition-all"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Конструктор страниц</a>
+                        <a href="edit-parts.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700 transition-all"><i class="fa-solid fa-list-check mr-2"></i> Каталог запчастей</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- МОДЕРАЦИЯ ---
+        function renderModeration(container) {
+            const pendingArts = allData.articles.filter(a => a.status === 'pending');
+            const pendingMods = allData.models.filter(m => m.status === 'pending');
+
+            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Модерация контента</h1>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">`;
+
+            // Статьи
+            html += `<div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">Статьи (${pendingArts.length})</h2>`;
+            if (pendingArts.length === 0) html += `<p class="text-gray-500 text-sm">Нет статей на проверке.</p>`;
+            pendingArts.forEach(a => {
+                html += `
+                    <div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3">
+                        <h3 class="font-bold text-white">${a.title}</h3>
+                        <p class="text-xs text-gray-400 mb-3">${a.summary}</p>
+                        <div class="flex gap-2">
+                            <button onclick="approveItem('articles', '${a.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg text-xs font-bold hover:bg-green-500/30">Одобрить</button>
+                            <button onclick="deleteItem('articles', '${a.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500/30">Удалить</button>
+                        </div>
                     </div>
                 `;
-                container.appendChild(div);
+            });
+            html += `</div>`;
+
+            // 3D Модели
+            html += `<div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">3D Модели (${pendingMods.length})</h2>`;
+            if (pendingMods.length === 0) html += `<p class="text-gray-500 text-sm">Нет моделей на проверке.</p>`;
+            pendingMods.forEach(m => {
+                html += `
+                    <div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3">
+                        <h3 class="font-bold text-white">${m.title}</h3>
+                        <p class="text-xs text-gray-400 mb-3">${m.description}</p>
+                        <div class="flex gap-2">
+                            <button onclick="approveItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg text-xs font-bold hover:bg-green-500/30">Одобрить</button>
+                            <button onclick="deleteItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500/30">Удалить</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+
+            container.innerHTML = html;
+        }
+
+        // --- СООБЩЕНИЯ ---
+        function renderFeedback(container) {
+            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Обратная связь</h1>`;
+            
+            if (allData.feedback.length === 0) {
+                html += `<p class="text-gray-500">Сообщений пока нет.</p>`;
+            }
+
+            allData.feedback.forEach(f => {
+                const isUnread = !f.is_read;
+                html += `
+                    <div class="bg-brand-card p-5 rounded-2xl border ${isUnread ? 'border-brand-teal/50' : 'border-brand-border'} mb-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="font-bold text-white">${f.name}</span>
+                            <span class="text-xs text-gray-500">${new Date(f.created_at).toLocaleString('ru-RU')}</span>
+                        </div>
+                        <p class="text-sm text-gray-300 mb-4">${f.message}</p>
+                        <div class="flex gap-2 items-center">
+                            ${isUnread ? `<button onclick="markRead('${f.id}')" class="text-xs text-brand-teal hover:underline">Отметить прочитанным</button>` : `<span class="text-xs text-green-500"><i class="fa-solid fa-check-double"></i> Прочитано</span>`}
+                            <button onclick="deleteItem('feedback', '${f.id}')" class="text-xs text-red-400 hover:underline ml-4">Удалить</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // --- НАСТРОЙКИ ---
+        function renderSettings(container) {
+            container.innerHTML = `
+                <h1 class="text-3xl font-display font-bold text-white mb-8">Настройки сайта</h1>
+                <div class="bg-brand-card p-6 md:p-8 rounded-3xl border border-brand-border relative overflow-hidden max-w-3xl">
+                    <h2 class="text-lg font-bold text-white mb-1 flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-teal"></i> Кто может предлагать контент?</h2>
+                    <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="publish_mode" value="everyone" class="peer sr-only">
+                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all">
+                                <span class="font-bold text-white text-sm">Разрешить всем</span>
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="publish_mode" value="registered" class="peer sr-only">
+                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all">
+                                <span class="font-bold text-white text-sm">Только для своих</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="saveSettings()" class="px-6 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all flex items-center gap-2"><i class="fa-solid fa-floppy-disk"></i> Сохранить</button>
+                    </div>
+                </div>
+            `;
+
+            supabase.from('site_settings').select('value').eq('key', 'submission_mode').single().then(({data}) => {
+                if (data) {
+                    const radio = document.querySelector(`input[name="publish_mode"][value="${data.value}"]`);
+                    if (radio) radio.checked = true;
+                }
             });
         }
 
-        window.approveItem = async function(id) {
-            const table = currentTab === 'articles' ? 'articles' : 'models_3d';
+        // === ГЛОБАЛЬНЫЕ ДЕЙСТВИЯ ===
+        window.approveItem = async function(table, id) {
             await supabase.from(table).update({ status: 'published' }).eq('id', id);
-            loadQueue();
-        }
+            await loadAllData();
+            switchView('moderation');
+        };
 
-        window.deleteItem = async function(id) {
-            // ИСПОЛЬЗУЕМ НАШЕ КРАСИВОЕ ОКНО
-            const isConfirmed = await window.showConfirm(
-                'Удалить навсегда?', 
-                'Эта запись будет удалена из базы данных без возможности восстановления.', 
-                'Да, удалить'
-            );
-
-            if (isConfirmed) {
-                const table = currentTab === 'articles' ? 'articles' : 'models_3d';
+        window.deleteItem = async function(table, id) {
+            const ok = await showConfirm('Удалить запись?', 'Это действие нельзя отменить.');
+            if (ok) {
                 await supabase.from(table).delete().eq('id', id);
-                loadQueue();
+                await loadAllData();
+                const activeNav = document.querySelector('.nav-item.active').id;
+                if (activeNav === 'nav-moderation') switchView('moderation');
+                if (activeNav === 'nav-feedback') switchView('feedback');
             }
-        }
+        };
 
-        window.logout = async function() { await supabase.auth.signOut(); window.location.href = 'index.html'; }
+        window.markRead = async function(id) {
+            await supabase.from('feedback').update({ is_read: true }).eq('id', id);
+            await loadAllData();
+            switchView('feedback');
+        };
+
+        window.saveSettings = async function() {
+            const mode = document.querySelector('input[name="publish_mode"]:checked').value;
+            await supabase.from('site_settings').update({ value: mode }).eq('key', 'submission_mode');
+            alert('Настройки сохранены!');
+        };
+
+        window.logout = async function() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        };
 
         checkAuth();
     </script>
