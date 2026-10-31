@@ -166,21 +166,31 @@
         let generatedBase64Image = null;
         let uploadedFileUrl = null;
 
-        // Универсальная функция центрирования и масштабирования
-        function centerAndScale(mesh, targetSize = 3) {
-            const box = new THREE.Box3().setFromObject(mesh);
+        // ИДЕАЛЬНАЯ ФУНКЦИЯ ЦЕНТРИРОВАНИЯ (Метод обертки)
+        function prepareModel(rawMesh, targetSize = 3) {
+            const wrapper = new THREE.Group();
+            wrapper.add(rawMesh);
+            
+            // Обновляем матрицы, чтобы Box3 точно рассчитал границы
+            wrapper.updateMatrixWorld(true);
+            
+            const box = new THREE.Box3().setFromObject(wrapper);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
             
-            mesh.position.x -= center.x;
-            mesh.position.y -= center.y;
-            mesh.position.z -= center.z;
+            // Сдвигаем обертку так, чтобы центр модели был в (0,0,0)
+            wrapper.position.x = -center.x;
+            wrapper.position.y = -center.y;
+            wrapper.position.z = -center.z;
             
+            // Вычисляем масштаб
             const maxDim = Math.max(size.x, size.y, size.z);
             if (maxDim > 0) {
                 const scale = targetSize / maxDim;
-                mesh.scale.set(scale, scale, scale);
+                wrapper.scale.set(scale, scale, scale);
             }
+            
+            return wrapper;
         }
 
         function showToast(message, type = 'success') {
@@ -297,14 +307,12 @@
                 const objectUrl = URL.createObjectURL(file);
 
                 loader.load(objectUrl, (geometry) => {
-                    let mesh;
-                    
-                    // ВАЖНО: side: THREE.DoubleSide решает проблему невидимых моделей!
+                    let rawMesh;
                     const material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3, side: THREE.DoubleSide });
 
                     if (fileExt === '3mf') {
-                        mesh = geometry;
-                        mesh.traverse(child => {
+                        rawMesh = geometry;
+                        rawMesh.traverse(child => {
                             if (child.isMesh) {
                                 if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
                                 child.material = material;
@@ -312,15 +320,15 @@
                         });
                     } else {
                         geometry.computeVertexNormals();
-                        mesh = new THREE.Mesh(geometry, material);
+                        rawMesh = new THREE.Mesh(geometry, material);
                     }
                     
                     // Применяем идеальное центрирование
-                    centerAndScale(mesh, 3);
+                    const model = prepareModel(rawMesh, 3);
                     
-                    scene.add(mesh);
-                    camera.position.set(3, 3, 4); // Отодвигаем камеру
-                    camera.lookAt(0, 0, 0); // Смотрим в центр
+                    scene.add(model);
+                    camera.position.set(4, 3, 5); // Отодвигаем камеру
+                    camera.lookAt(0, 0, 0); // Смотрим строго в центр
                     renderer.render(scene, camera);
 
                     generatedBase64Image = renderer.domElement.toDataURL('image/jpeg', 0.8);
@@ -466,13 +474,12 @@
             const loader = is3mf ? new ThreeMFLoader() : new STLLoader();
 
             loader.load(url, (geometry) => {
-                let mesh;
-                
+                let rawMesh;
                 const material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3, side: THREE.DoubleSide });
 
                 if (is3mf) {
-                    mesh = geometry;
-                    mesh.traverse(child => {
+                    rawMesh = geometry;
+                    rawMesh.traverse(child => {
                         if (child.isMesh) {
                             if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
                             child.material = material;
@@ -480,15 +487,15 @@
                     });
                 } else {
                     geometry.computeVertexNormals();
-                    mesh = new THREE.Mesh(geometry, material);
+                    rawMesh = new THREE.Mesh(geometry, material);
                 }
                 
-                // Применяем центрирование
-                centerAndScale(mesh, 3);
+                // Применяем идеальное центрирование
+                const model = prepareModel(rawMesh, 3);
                 
-                viewerScene.add(mesh);
+                viewerScene.add(model);
                 
-                viewerCamera.position.set(3, 3, 4);
+                viewerCamera.position.set(4, 3, 5);
                 viewerCamera.lookAt(0, 0, 0);
                 
                 if (loading) loading.style.display = 'none';
