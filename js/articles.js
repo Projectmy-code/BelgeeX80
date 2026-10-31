@@ -3,6 +3,27 @@ import { supabase } from './config.js';
 let quill = null;
 let loadedArticles = [];
 
+// --- ФУНКЦИЯ КРАСИВЫХ УВЕДОМЛЕНИЙ (TOAST) ---
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    const isSuccess = type === 'success';
+    const borderColor = isSuccess ? 'border-emerald-500' : 'border-red-500';
+    const iconColor = isSuccess ? 'text-emerald-400' : 'text-red-400';
+    const iconClass = isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation';
+
+    toast.className = `fixed bottom-6 right-6 z-[100] bg-brand-card border ${borderColor} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold text-white`;
+    toast.style.animation = 'slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+    
+    toast.innerHTML = `<i class="fa-solid ${iconClass} text-xl ${iconColor}"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+// ---------------------------------------------
+
 document.addEventListener('DOMContentLoaded', () => {
     loadArticlesFromDB();
 
@@ -97,17 +118,12 @@ export function openArticleModal(article) {
 export async function openSubmission() {
     const { data: { session } } = await supabase.auth.getSession();
     
-    const { data: settings } = await supabase
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'submission_mode')
-        .single();
-        
+    const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'submission_mode').single();
     const mode = settings ? settings.value : 'everyone';
 
     if (mode === 'registered' && !session) {
-        alert("Публиковать статьи могут только зарегистрированные пользователи. Пожалуйста, войдите в аккаунт.");
-        window.location.href = 'login.html';
+        showToast("Публиковать статьи могут только зарегистрированные пользователи.", "error");
+        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
         return;
     }
 
@@ -120,18 +136,27 @@ export async function handleAddArticleSubmit(e) {
     
     if (!quill) return;
     
-    const contentHTML = quill.root.innerHTML;
-    
     if (quill.getText().trim().length === 0) {
-        alert('Пожалуйста, напишите текст статьи.');
+        showToast('Пожалуйста, напишите текст статьи.', 'error');
         return;
     }
 
+    const contentHTML = quill.root.innerHTML;
     const btn = e.target.querySelector('button[type="submit"]');
+    
+    // Красивое подтверждение перед отправкой
+    const isConfirmed = await window.showConfirm(
+        'Отправить статью?', 
+        'Ваша статья будет отправлена на модерацию администратору. После проверки она появится на сайте.', 
+        'Отправить',
+        'bg-brand-teal', 'hover:bg-brand-teal/80', 'text-black' // Стили кнопки
+    );
+
+    if (!isConfirmed) return;
+
     btn.textContent = 'Отправка...';
     btn.disabled = true;
 
-    // ПОЛУЧАЕМ СЕССИЮ ПОЛЬЗОВАТЕЛЯ
     const { data: { session } } = await supabase.auth.getSession();
 
     const newArticle = {
@@ -142,20 +167,20 @@ export async function handleAddArticleSubmit(e) {
         content: contentHTML,
         author: document.getElementById('new-author').value,
         status: 'pending',
-        user_id: session ? session.user.id : null // ПРИВЯЗКА К ПОЛЬЗОВАТЕЛЮ
+        user_id: session ? session.user.id : null
     };
 
     try {
         const { error } = await supabase.from('articles').insert([newArticle]);
         if (error) throw error;
 
-        alert('Статья отправлена! Она появится на сайте после проверки администратором.');
+        showToast('Статья успешно отправлена на модерацию!');
         e.target.reset();
         quill.root.innerHTML = ''; 
         document.getElementById('add-article-modal').classList.add('hidden');
     } catch (error) {
         console.error(error);
-        alert('Ошибка: ' + error.message);
+        showToast('Ошибка: ' + error.message, 'error');
     } finally {
         btn.textContent = 'Отправить на модерацию';
         btn.disabled = false;
