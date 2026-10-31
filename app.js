@@ -7,7 +7,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const viewport = document.getElementById('viewport');
 const scene = new THREE.Scene();
 
-// Убираем сплошной черный фон, чтобы использовать красивый CSS-градиент
+// Убираем сплошной черный фон
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -22,7 +22,7 @@ const pmremGenerator = new THREE.PMREMGenerator(renderer);
 scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
 // === 2. ОСВЕЩЕНИЕ ===
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
 const mainLight = new THREE.DirectionalLight(0xffffff, 2);
@@ -39,23 +39,38 @@ mainLight.shadow.camera.bottom = -10;
 mainLight.shadow.bias = -0.0005;
 scene.add(mainLight);
 
+// Добавляем прожектор (SpotLight), который светит на пол прямо под машиной
+const spotLight = new THREE.SpotLight(0xffffff, 2000, 30, Math.PI / 4, 0.5, 1);
+spotLight.position.set(0, 10, 0);
+spotLight.target.position.set(0, 0, 0);
+spotLight.castShadow = true;
+scene.add(spotLight);
+scene.add(spotLight.target);
+
 const frontLight = new THREE.DirectionalLight(0xffffff, 1.5);
 frontLight.position.set(0, 2, 10);
 scene.add(frontLight);
 
-// === 3. СТИЛЬНЫЙ ПОЛ (БЕЗ СЕТКИ) ===
+// === 3. СТИЛЬНЫЙ ПОЛ (МАТОВЫЙ, НЕ ЧЕРНЫЙ) ===
 const floorGeometry = new THREE.CircleGeometry(50, 64);
 const floorMaterial = new THREE.MeshStandardMaterial({ 
-    color: 0x1e293b, 
-    metalness: 0.9, 
-    roughness: 0.15,
-    envMapIntensity: 1.5 
+    color: 0x1e2532,    // Светло-графитовый цвет
+    metalness: 0.2,     // Уменьшили металличность (убрали эффект черного зеркала)
+    roughness: 0.4,     // Сделали более матовым, чтобы свет рассеивался
+    envMapIntensity: 0.8 
 });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.05;
 floor.receiveShadow = true;
 scene.add(floor);
+
+// Тонкая сетка для красоты (едва заметная)
+const gridHelper = new THREE.GridHelper(100, 100, 0x00f0ff, 0x00f0ff);
+gridHelper.material.opacity = 0.03;
+gridHelper.material.transparent = true;
+gridHelper.position.y = -0.04;
+scene.add(gridHelper);
 
 // === 4. УПРАВЛЕНИЕ (МЫШЬ) ===
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -94,7 +109,7 @@ loader.load(
         const center = box.getCenter(new THREE.Vector3());
         
         carModel.position.x = -center.x;
-        carModel.position.y = -center.y + (size.y / 2);
+        carModel.position.y = -center.y + (size.y / 2) + 0.01;
         carModel.position.z = -center.z;
         
         const maxDim = Math.max(size.x, size.y, size.z);
