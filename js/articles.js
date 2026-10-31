@@ -48,10 +48,15 @@ function renderArticles(articles) {
     const grid = document.getElementById('articles-grid');
     if (!grid) return;
     if (articles.length === 0) { grid.innerHTML = '<p class="text-gray-400 col-span-3">Пока нет статей.</p>'; return; }
+    
     grid.innerHTML = '';
-    articles.forEach((article) => {
+    
+    // БЕРЕМ ТОЛЬКО ПЕРВЫЕ 3 СТАТЬИ ДЛЯ ГЛАВНОЙ
+    const articlesToShow = articles.slice(0, 3); 
+
+    articlesToShow.forEach((article) => {
         const div = document.createElement('div');
-        div.className = 'bg-brand-card p-6 rounded-2xl border border-brand-border card-glow cursor-pointer';
+        div.className = 'bg-brand-card p-6 rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full';
         div.onclick = () => openArticleModal(article);
         div.innerHTML = `
             <div class="flex justify-between items-start mb-3">
@@ -59,9 +64,10 @@ function renderArticles(articles) {
                 <span class="text-xs text-gray-500"><i class="fa-regular fa-clock"></i> ${article.readtime}</span>
             </div>
             <h3 class="font-bold text-lg text-white mb-2 line-clamp-2">${article.title}</h3>
-            <p class="text-sm text-gray-400 line-clamp-3 mb-4">${article.summary}</p>
+            <p class="text-sm text-gray-400 line-clamp-3 mb-4 flex-1">${article.summary}</p>
             <div class="flex items-center justify-between border-t border-brand-border/60 pt-4 mt-auto">
                 <span class="text-xs text-gray-300"><i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}</span>
+                <span class="text-xs text-brand-teal">Читать <i class="fa-solid fa-arrow-right ml-1"></i></span>
             </div>
         `;
         grid.appendChild(div);
