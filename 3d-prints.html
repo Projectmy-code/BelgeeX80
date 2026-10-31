@@ -1,17 +1,27 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark">
+<html lang="ru" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMS — BELGEE X80</title>
+    <title>3D-печать для BELGEE X80 — Клубные модели</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
-    
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-    <!-- Подключаем Three.js для генерации превью 3D-моделей -->
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
+    </script>
+    <style>
+        body { background-color: #0c1017; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .card-glow { transition: all 0.3s ease; }
+        .card-glow:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15); transform: translateY(-2px); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c1017; }
+        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
+        #stl-viewer-container { width: 100%; height: 60vh; min-height: 400px; }
+    </style>
     <script type="importmap">
     {
         "imports": {
@@ -20,615 +30,482 @@
         }
     }
     </script>
-
-    <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb', pending: '#f59e0b' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
-    </script>
-    <style>
-        body { background-color: #0c1017; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .font-display { font-family: 'Montserrat', sans-serif; }
-        .glass-panel { background: rgba(22, 30, 43, 0.95); backdrop-filter: blur(12px); border-right: 1px solid #253142; }
-        .nav-item { transition: all 0.2s; border-left: 3px solid transparent; }
-        .nav-item:hover { background: rgba(255,255,255,0.05); }
-        .nav-item.active { background: rgba(0, 240, 255, 0.1); border-left-color: #00f0ff; color: #00f0ff; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0c1017; }
-        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
-        
-        .ql-toolbar.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 12px 12px 0 0; }
-        .ql-container.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 0 0 12px 12px; font-family: 'Inter', sans-serif; font-size: 14px; color: #e2e8f0; }
-        .ql-editor { min-height: 200px; color: #e2e8f0; }
-        .ql-editor.ql-blank::before { color: #6b7891 !important; }
-        .ql-snow .ql-stroke { stroke: #6b7891; }
-        .ql-snow .ql-fill { fill: #6b7891; }
-        .ql-snow .ql-picker { color: #6b7891; }
-        .ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: #00f0ff !important; }
-        .ql-snow.ql-toolbar button:hover .ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-fill { fill: #00f0ff !important; }
-        .ql-snow.ql-toolbar button:hover, .ql-snow.ql-toolbar button.ql-active { color: #00f0ff !important; }
-    </style>
 </head>
-<body class="min-h-screen flex antialiased">
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
-    <!-- SIDEBAR -->
-    <aside class="w-64 glass-panel fixed h-full flex flex-col z-20">
-        <div class="h-20 flex items-center px-6 border-b border-brand-border">
-            <a href="index.html" class="flex items-center gap-3 group">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center">
-                    <span class="font-display font-black text-black text-sm">X</span>
+    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-3 group shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
+                    <span class="font-display font-black text-black text-xl">X</span>
                 </div>
                 <div>
-                    <div class="font-display font-black text-sm text-white group-hover:text-brand-teal transition-colors">CMS PANEL</div>
-                    <div class="text-[10px] text-gray-400 uppercase">BELGEE X80</div>
+                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">BELGEE <span class="text-brand-teal">X80</span></div>
+                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">3D Модели</div>
                 </div>
             </a>
+            <nav class="hidden xl:flex items-center gap-4 2xl:gap-6 text-sm font-medium text-gray-300 whitespace-nowrap">
+                <a href="index.html#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
+                <a href="index.html#catalog" class="hover:text-brand-teal transition-colors">Каталог запчастей</a>
+                <a href="3d-prints.html" class="text-brand-teal font-semibold transition-colors">3D Печать</a>
+                <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка авто</a>
+            </nav>
+            <a href="index.html" class="hidden sm:block text-cyan-400 text-sm font-semibold hover:text-white transition-colors"><i class="fa-solid fa-arrow-left mr-1"></i> На главную</a>
         </div>
+    </header>
 
-        <nav class="flex-1 py-6 flex flex-col gap-1 overflow-y-auto">
-            <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-chart-pie w-5 text-center"></i> Дашборд
-            </a>
-            
-            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-2">Контент</div>
-            <a href="#" onclick="switchView('all_articles')" id="nav-all_articles" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-regular fa-file-lines w-5 text-center"></i> Статьи
-            </a>
-            <a href="builder.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-file-code w-5 text-center"></i> Страницы
-            </a>
-            <a href="#" onclick="switchView('media')" id="nav-media" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-regular fa-images w-5 text-center"></i> Медиафайлы
-            </a>
-            <a href="#" onclick="switchView('all_models')" id="nav-all_models" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-cube w-5 text-center"></i> 3D Модели
-            </a>
-
-            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-2">Система</div>
-            <a href="#" onclick="switchView('menus')" id="nav-menus" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-bars-staggered w-5 text-center"></i> Меню сайта
-            </a>
-            <a href="edit-parts.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-list-check w-5 text-center"></i> Каталог запчастей
-            </a>
-            <a href="edit-site.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-sliders w-5 text-center"></i> Редактор главной
-            </a>
-            <a href="#" onclick="switchView('3d_tools')" id="nav-3d_tools" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-screwdriver-wrench w-5 text-center"></i> 3D Инструменты
-            </a>
-            <a href="#" onclick="switchView('settings')" id="nav-settings" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-gear w-5 text-center"></i> Настройки
-            </a>
-            
-            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-2">Модерация</div>
-            <a href="#" onclick="switchView('moderation')" id="nav-moderation" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-shield-halved w-5 text-center"></i> Очередь
-                <span id="mod-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-            </a>
-            <a href="#" onclick="switchView('feedback')" id="nav-feedback" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-envelope w-5 text-center"></i> Сообщения
-                <span id="fb-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-            </a>
-        </nav>
-
-        <div class="p-4 border-t border-brand-border">
-            <div class="bg-brand-dark rounded-xl p-3 flex items-center gap-3 border border-brand-border">
-                <div class="w-8 h-8 rounded-full bg-brand-teal/20 text-brand-teal flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-user"></i>
+    <main class="flex-1 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-4">
+                        <i class="fa-solid fa-cube"></i> 3D-Модели клуба
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl font-display font-black text-white tracking-tight leading-tight mb-4">3D-печать для BELGEE X80</h1>
+                    <p class="text-gray-400 text-sm sm:text-base leading-relaxed">Полезные модели для вашего автомобиля. Держатели, заглушки и крепления.</p>
                 </div>
-                <div class="flex-1 overflow-hidden">
-                    <div id="user-email" class="text-xs text-white truncate font-semibold">Загрузка...</div>
-                    <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300">Выйти</button>
+                <button onclick="openSubmission()" class="px-6 py-3 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-sm rounded-xl shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i> Предложить модель
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="models-grid">
+                <div class="col-span-full py-20 text-center text-gray-500">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-brand-teal"></i>
+                    <p>Загрузка моделей...</p>
                 </div>
             </div>
-            <div id="live-status" class="mt-3 text-[10px] flex items-center justify-center gap-2 bg-brand-border/30 py-1.5 rounded-lg text-gray-400 transition-colors">
-                <span id="live-dot" class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span id="live-text">Только вы онлайн</span>
-            </div>
         </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 ml-64 min-h-screen relative">
-        <div id="view-loading" class="absolute inset-0 flex items-center justify-center bg-brand-dark z-10">
-            <i class="fa-solid fa-spinner fa-spin text-3xl text-brand-teal"></i>
-        </div>
-        <div id="view-denied" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-brand-dark z-10">
-            <i class="fa-solid fa-lock text-5xl text-red-500 mb-4"></i>
-            <h2 class="text-2xl font-bold text-white mb-2">Доступ запрещен</h2>
-            <p class="text-gray-400 text-sm">У вас нет прав администратора.</p>
-        </div>
-        <div id="view-content" class="hidden p-8"></div>
     </main>
 
-    <!-- CONFIRM MODAL -->
-    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-        <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
-            <h3 id="conf-title" class="text-xl font-bold text-center text-white mb-2">Удалить?</h3>
-            <p id="conf-msg" class="text-sm text-gray-400 text-center mb-6">Это действие нельзя отменить.</p>
-            <div class="flex gap-3">
-                <button onclick="closeConfirm(false)" class="flex-1 py-2.5 rounded-xl bg-brand-border hover:bg-gray-700 text-white font-semibold text-sm">Отмена</button>
-                <button id="conf-ok" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold text-sm">Удалить</button>
+    <!-- MODAL: 3D ПРОСМОТР -->
+    <div id="stl-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-brand-card w-full max-w-4xl rounded-3xl border border-brand-border p-4 shadow-2xl relative">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 id="stl-modal-title" class="text-xl font-bold font-display text-white">Просмотр 3D-модели</h3>
+                <button onclick="closeSTLModal()" class="text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            <div id="stl-viewer-container" class="w-full rounded-xl overflow-hidden bg-[#0c1017] relative">
+                <div id="viewer-loading" class="absolute inset-0 flex items-center justify-center text-brand-teal text-sm">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка 3D...
+                </div>
+            </div>
+            <div class="mt-4 text-center text-xs text-gray-500"><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i> Вращайте модель, зажав левую кнопку мыши.</div>
         </div>
     </div>
 
-    <!-- EDIT ARTICLE MODAL -->
-    <div id="edit-article-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleModal('edit-article-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h3 class="text-xl font-bold font-display text-white mb-4">Редактировать статью</h3>
-            <form id="edit-article-form" onsubmit="saveEditedArticle(event)" class="space-y-4">
-                <input type="hidden" id="edit-art-id">
+    <!-- MODAL: ДОБАВИТЬ МОДЕЛЬ -->
+    <div id="add-model-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-brand-card w-full max-w-xl rounded-3xl border border-brand-border p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="toggleModal('add-model-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-xl font-bold font-display text-white mb-2">Предложить 3D-модель</h3>
+            <p class="text-xs text-gray-400 mb-6">Загрузите файл .STL или .3MF. Сайт сам сделает картинку и сохранит файл.</p>
+
+            <form id="add-model-form" onsubmit="handleAddModelSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Заголовок</label>
-                    <input type="text" id="edit-art-title" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Название модели</label>
+                    <input type="text" id="model-title" required placeholder="Например: Гайка подкрылка" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
                 </div>
+                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-300 mb-1">Категория</label>
-                        <select id="edit-art-category" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
-                            <option value="Тюнинг & Защита">Тюнинг & Защита</option>
-                            <option value="Мультимедиа">Мультимедиа</option>
-                            <option value="Комфорт">Комфорт</option>
-                            <option value="Электрика">Электрика</option>
-                            <option value="Обслуживание">Обслуживание</option>
+                        <select id="model-category" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                            <option value="Салон">Салон</option>
+                            <option value="Кузов">Кузов</option>
+                            <option value="Багажник">Багажник</option>
+                            <option value="Под капотом">Под капотом</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-300 mb-1">Время чтения</label>
-                        <input type="text" id="edit-art-readtime" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Ваш никнейм</label>
+                        <input type="text" id="model-author" required placeholder="Club_Member" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
                     </div>
                 </div>
+
+                <div class="p-4 border border-brand-teal/30 rounded-xl bg-brand-teal/5">
+                    <label class="block text-xs font-semibold text-brand-teal mb-1">Файл модели (.stl, .3mf)</label>
+                    <input type="file" id="model-file" accept=".stl,.3mf" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-brand-teal file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-teal file:text-black hover:file:bg-brand-teal/80 mb-2">
+                    
+                    <button type="button" onclick="processUpload()" id="gen-preview-btn" class="w-full py-2 bg-brand-card border border-brand-border hover:border-brand-teal text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Загрузить и сделать превью
+                    </button>
+
+                    <div id="upload-status" class="text-xs text-brand-teal mt-2 hidden text-center font-semibold"></div>
+
+                    <div id="preview-container" class="hidden mt-4">
+                        <span class="block text-xs text-gray-400 mb-2 text-center">Сгенерированное превью:</span>
+                        <img id="preview-image" class="w-full h-48 object-cover rounded-lg border border-brand-border bg-black/50" alt="Превью">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1">Краткое описание</label>
-                    <textarea id="edit-art-summary" rows="2" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
+                    <textarea id="model-desc" rows="2" required placeholder="Для чего эта модель..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-2">Текст статьи</label>
-                    <div id="edit-editor-container"></div>
-                </div>
-                <button type="submit" id="edit-art-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl shadow-lg hover:opacity-90 mt-4">Сохранить</button>
+                
+                <button type="submit" id="submit-model-btn" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity mt-2">
+                    Отправить на проверку
+                </button>
             </form>
         </div>
     </div>
 
+    <footer class="bg-brand-dark py-8 text-gray-400 text-xs border-t border-brand-border text-center">
+        <p>© 2026 BELGEE X80 Club Portal. Все права защищены.</p>
+    </footer>
+
     <script type="module">
         import { supabase } from './js/config.js';
-        
         import * as THREE from 'three';
         import { STLLoader } from 'three/addons/loaders/STLLoader.js';
         import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        let currentUser = null;
-        let allData = { articles: [], models: [], feedback: [], media: [], menus: {} };
-        let globalPresenceChannel = null;
-        let editQuill = null;
+        const grid = document.getElementById('models-grid');
+        let generatedBase64Image = null;
+        let uploadedFileUrl = null;
 
-        // === UTILS & MODALS ===
-        let confirmResolve;
-        window.showConfirm = (title, msg) => new Promise(res => { confirmResolve = res; document.getElementById('conf-title').textContent = title; document.getElementById('conf-msg').textContent = msg; document.getElementById('confirm-modal').classList.remove('hidden'); setTimeout(() => { document.getElementById('confirm-modal').classList.remove('opacity-0'); document.getElementById('confirm-modal').querySelector('div').classList.remove('scale-95'); }, 10); });
-        window.closeConfirm = (res) => { document.getElementById('confirm-modal').classList.add('opacity-0'); document.getElementById('confirm-modal').querySelector('div').classList.add('scale-95'); setTimeout(() => { document.getElementById('confirm-modal').classList.add('hidden'); if (confirmResolve) confirmResolve(res); }, 300); };
-        document.getElementById('conf-ok').addEventListener('click', () => closeConfirm(true));
-        window.toggleModal = (id) => document.getElementById(id).classList.toggle('hidden');
-
-        function showToast(msg, type = 'success') {
-            const t = document.createElement('div');
-            t.className = `fixed bottom-6 right-6 z-[100] bg-brand-card border ${type === 'success' ? 'border-emerald-500 text-emerald-400' : 'border-red-500 text-red-400'} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold`;
-            t.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${msg}`;
-            document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
-        }
-
-        // === LIVE PRESENCE ===
-        window.updateMyStatus = async function(view, itemId = null) {
-            if (!globalPresenceChannel || !currentUser) return;
-            await globalPresenceChannel.track({ email: currentUser.email, view: view, itemId: itemId, onlineAt: new Date().getTime() });
-        }
-        async function initPresence() {
-            globalPresenceChannel = supabase.channel('admin-live', { config: { presence: { key: currentUser.id } } });
-            globalPresenceChannel.on('presence', { event: 'sync' }, () => {
-                const users = Object.values(globalPresenceChannel.presenceState()).flat();
-                const dot = document.getElementById('live-dot'), txt = document.getElementById('live-text');
-                if (users.length > 1) { dot.className = 'w-2 h-2 rounded-full bg-red-500 animate-ping'; txt.textContent = `Онлайн админов: ${users.length}`; txt.parentElement.classList.add('text-red-400'); }
-                else { dot.className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse'; txt.textContent = `Только вы онлайн`; txt.parentElement.classList.remove('text-red-400'); }
-            }).subscribe((status) => { if (status === 'SUBSCRIBED') updateMyStatus('dashboard'); });
-        }
-
-        // === AUTH & INIT ===
-        async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
-            document.getElementById('user-email').textContent = currentUser.email;
-            const { data: adminData } = await supabase.from('admins').select('user_id').eq('user_id', currentUser.id).maybeSingle();
-            document.getElementById('view-loading').classList.add('hidden');
-            if (!adminData) { document.getElementById('view-denied').classList.remove('hidden'); return; }
-            document.getElementById('view-content').classList.remove('hidden');
-            await loadAllData();
-            switchView('dashboard');
-            initPresence();
-        }
-
-        async function loadAllData() {
-            const [arts, mods, fb, md, mn] = await Promise.all([
-                supabase.from('articles').select('*').order('created_at', { ascending: false }),
-                supabase.from('models_3d').select('*').order('created_at', { ascending: false }),
-                supabase.from('feedback').select('*').order('created_at', { ascending: false }),
-                supabase.from('media').select('*').order('created_at', { ascending: false }),
-                supabase.from('menus').select('*')
-            ]);
-            allData.articles = arts.data || [];
-            allData.models = mods.data || [];
-            allData.feedback = fb.data || [];
-            allData.media = md.data || [];
+        // Универсальная функция центрирования и масштабирования
+        function centerAndScale(mesh, targetSize = 3) {
+            const box = new THREE.Box3().setFromObject(mesh);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
             
-            allData.menus = {};
-            (mn.data || []).forEach(m => { allData.menus[m.id] = m.items; });
-
-            const pendingMods = allData.articles.filter(a => a.status === 'pending').length + allData.models.filter(m => m.status === 'pending').length;
-            const unreadFb = allData.feedback.filter(f => !f.is_read).length;
-            if (pendingMods > 0) { document.getElementById('mod-badge').textContent = pendingMods; document.getElementById('mod-badge').classList.remove('hidden'); } else { document.getElementById('mod-badge').classList.add('hidden'); }
-            if (unreadFb > 0) { document.getElementById('fb-badge').textContent = unreadFb; document.getElementById('fb-badge').classList.remove('hidden'); } else { document.getElementById('fb-badge').classList.add('hidden'); }
+            mesh.position.x -= center.x;
+            mesh.position.y -= center.y;
+            mesh.position.z -= center.z;
+            
+            const maxDim = Math.max(size.x, size.y, size.z);
+            if (maxDim > 0) {
+                const scale = targetSize / maxDim;
+                mesh.scale.set(scale, scale, scale);
+            }
         }
 
-        window.switchView = function(viewName) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            const nav = document.getElementById('nav-' + viewName); if (nav) nav.classList.add('active');
-            if (window.updateMyStatus) window.updateMyStatus(viewName);
-            const c = document.getElementById('view-content');
-            c.innerHTML = '<div class="text-center py-20"><i class="fa-solid fa-spinner fa-spin text-brand-teal"></i></div>';
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const isSuccess = type === 'success';
+            const borderColor = isSuccess ? 'border-emerald-500' : 'border-red-500';
+            const iconColor = isSuccess ? 'text-emerald-400' : 'text-red-400';
+            const iconClass = isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation';
+
+            toast.className = `fixed bottom-6 right-6 z-[100] bg-brand-card border ${borderColor} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold text-white`;
+            toast.style.animation = 'slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+            
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-xl ${iconColor}"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+
             setTimeout(() => {
-                if (viewName === 'dashboard') renderDashboard(c);
-                if (viewName === 'moderation') renderModeration(c);
-                if (viewName === 'all_articles') renderAllArticles(c);
-                if (viewName === 'all_models') renderAllModels(c);
-                if (viewName === 'feedback') renderFeedback(c);
-                if (viewName === 'settings') renderSettings(c);
-                if (viewName === 'media') renderMedia(c);
-                if (viewName === 'menus') renderMenus(c);
-                if (viewName === '3d_tools') render3DTools(c);
-            }, 100);
-        };
-
-        // === RENDERERS ===
-        function renderDashboard(c) {
-            const pArts = allData.articles.filter(a => a.status === 'published').length;
-            const pendArts = allData.articles.filter(a => a.status === 'pending').length;
-            const pMods = allData.models.filter(m => m.status === 'published').length;
-            const unreadFb = allData.feedback.filter(f => !f.is_read).length;
-            const totalMedia = allData.media.length;
-
-            c.innerHTML = `
-                <h1 class="text-3xl font-display font-bold text-white mb-8">Дашборд</h1>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">Статьи (Опубл.)</div><div class="text-3xl font-bold text-white">${pArts}</div></div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-pending text-xs font-bold uppercase mb-1">Статьи (Модерация)</div><div class="text-3xl font-bold text-white">${pendArts}</div></div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">3D Модели</div><div class="text-3xl font-bold text-white">${pMods}</div></div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-teal text-xs font-bold uppercase mb-1">Медиафайлы</div><div class="text-3xl font-bold text-white">${totalMedia}</div></div>
-                </div>
-                <div class="bg-gradient-to-r from-blue-900/40 to-brand-card p-8 rounded-3xl border border-blue-500/30">
-                    <h2 class="text-xl font-bold text-white mb-2">Добро пожаловать в CMS</h2>
-                    <p class="text-gray-400 text-sm mb-6">Теперь вы можете управлять не только текстом, но и структурой сайта и медиафайлами.</p>
-                    <div class="flex gap-4">
-                        <button onclick="switchView('media')" class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Загрузить медиа</button>
-                        <button onclick="switchView('menus')" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700 transition-all"><i class="fa-solid fa-bars-staggered mr-2"></i> Настроить меню</button>
-                    </div>
-                </div>
-            `;
+                toast.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
         }
 
-        function renderAllArticles(c) {
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Все статьи</h1><div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden"><table class="w-full text-left text-sm"><thead class="bg-brand-dark text-gray-400 text-xs uppercase border-b border-brand-border"><tr><th class="p-4">Название</th><th class="p-4">Статус</th><th class="p-4 text-center">Действия</th></tr></thead><tbody class="divide-y divide-brand-border/40">`;
-            if (allData.articles.length === 0) html += `<tr><td colspan="3" class="p-6 text-center text-gray-500">Нет записей</td></tr>`;
-            allData.articles.forEach(a => {
-                const st = a.status === 'published' ? `<span class="text-green-400 text-[10px] font-bold">ОПУБЛИКОВАНО</span>` : `<span class="text-brand-pending text-[10px] font-bold">НА ПРОВЕРКЕ</span>`;
-                html += `<tr><td class="p-4 font-semibold text-white">${a.title}</td><td class="p-4">${st}</td><td class="p-4 text-center"><button onclick="openEditArticle('${a.id}')" class="p-2 text-brand-teal hover:text-white"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('articles', '${a.id}')" class="p-2 text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-            });
-            html += `</tbody></table></div>`; c.innerHTML = html;
-        }
+        async function loadModels() {
+            const { data: models, error } = await supabase
+                .from('models_3d')
+                .select('*')
+                .eq('status', 'published')
+                .order('created_at', { ascending: false });
 
-        function renderAllModels(c) {
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Все 3D-модели</h1><div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden"><table class="w-full text-left text-sm"><thead class="bg-brand-dark text-gray-400 text-xs uppercase border-b border-brand-border"><tr><th class="p-4">Название</th><th class="p-4">Статус</th><th class="p-4 text-center">Действия</th></tr></thead><tbody class="divide-y divide-brand-border/40">`;
-            if (allData.models.length === 0) html += `<tr><td colspan="3" class="p-6 text-center text-gray-500">Нет записей</td></tr>`;
-            allData.models.forEach(m => {
-                const st = m.status === 'published' ? `<span class="text-green-400 text-[10px] font-bold">ОПУБЛИКОВАНО</span>` : `<span class="text-brand-pending text-[10px] font-bold">НА ПРОВЕРКЕ</span>`;
-                html += `<tr><td class="p-4 font-semibold text-white">${m.title}</td><td class="p-4">${st}</td><td class="p-4 text-center"><button onclick="deleteItem('models_3d', '${m.id}')" class="p-2 text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-            });
-            html += `</tbody></table></div>`; c.innerHTML = html;
-        }
+            if (error || !models) return;
 
-        function renderModeration(c) {
-            const pArts = allData.articles.filter(a => a.status === 'pending');
-            const pMods = allData.models.filter(m => m.status === 'pending');
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Очередь модерации</h1><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">Статьи (${pArts.length})</h2>`;
-            if (pArts.length === 0) html += `<p class="text-gray-500 text-sm">Пусто.</p>`;
-            pArts.forEach(a => { html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${a.title}</h3><div class="flex gap-2 mt-2"><button onclick="approveItem('articles', '${a.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded text-xs font-bold">Одобрить</button><button onclick="deleteItem('articles', '${a.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded text-xs font-bold">Удалить</button></div></div>`; });
-            html += `</div><div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">3D Модели (${pMods.length})</h2>`;
-            if (pMods.length === 0) html += `<p class="text-gray-500 text-sm">Пусто.</p>`;
-            pMods.forEach(m => { html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${m.title}</h3><div class="flex gap-2 mt-2"><button onclick="approveItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded text-xs font-bold">Одобрить</button><button onclick="deleteItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded text-xs font-bold">Удалить</button></div></div>`; });
-            html += `</div></div>`; c.innerHTML = html;
-        }
-
-        function renderFeedback(c) {
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Сообщения</h1>`;
-            if (allData.feedback.length === 0) html += `<p class="text-gray-500">Нет сообщений.</p>`;
-            allData.feedback.forEach(f => {
-                html += `<div class="bg-brand-card p-5 rounded-2xl border ${!f.is_read ? 'border-brand-teal/50' : 'border-brand-border'} mb-4"><div class="flex justify-between mb-2"><span class="font-bold text-white">${f.name}</span><span class="text-xs text-gray-500">${new Date(f.created_at).toLocaleString('ru-RU')}</span></div><p class="text-sm text-gray-300 mb-4">${f.message}</p><div class="flex gap-2">${!f.is_read ? `<button onclick="markRead('${f.id}')" class="text-xs text-brand-teal hover:underline">Прочитано</button>` : ''}<button onclick="deleteItem('feedback', '${f.id}')" class="text-xs text-red-400 hover:underline ml-4">Удалить</button></div></div>`;
-            });
-            c.innerHTML = html;
-        }
-
-        function renderSettings(c) {
-            c.innerHTML = `<h1 class="text-3xl font-display font-bold text-white mb-8">Настройки</h1><div class="bg-brand-card p-6 rounded-3xl border border-brand-border max-w-3xl"><h2 class="text-lg font-bold text-white mb-4">Кто может предлагать контент?</h2><div class="flex gap-4"><label class="flex-1"><input type="radio" name="publish_mode" value="everyone" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Всем</span></div></label><label class="flex-1"><input type="radio" name="publish_mode" value="registered" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Только своим</span></div></label></div><div class="mt-6 flex justify-end"><button onclick="saveSettings()" class="px-6 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl">Сохранить</button></div></div>`;
-            supabase.from('site_settings').select('value').eq('key', 'submission_mode').single().then(({data}) => { if (data) document.querySelector(`input[name="publish_mode"][value="${data.value}"]`).checked = true; });
-        }
-
-        // === МЕДИАБИБЛИОТЕКА ===
-        function renderMedia(c) {
-            let html = `
-                <div class="flex justify-between items-center mb-8">
-                    <h1 class="text-3xl font-display font-bold text-white">Медиафайлы</h1>
-                    <label class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl cursor-pointer hover:scale-105 transition-all shadow-lg">
-                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Загрузить файл
-                        <input type="file" id="media-upload" accept="image/*" class="hidden" onchange="uploadMedia(event)">
-                    </label>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            `;
-            if (allData.media.length === 0) html += `<div class="col-span-full py-10 text-center text-gray-500">Библиотека пуста.</div>`;
-            allData.media.forEach(m => {
-                html += `
-                    <div class="bg-brand-card border border-brand-border rounded-xl overflow-hidden group relative">
-                        <img src="${m.url}" class="w-full h-32 object-cover">
-                        <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                            <button onclick="navigator.clipboard.writeText('${m.url}'); showToast('Ссылка скопирована!')" class="px-3 py-1 bg-brand-teal text-black text-xs font-bold rounded w-11/12">Копировать URL</button>
-                            <button onclick="deleteItem('media', '${m.id}')" class="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded w-11/12">Удалить</button>
-                        </div>
-                    </div>
-                `;
-            });
-            html += `</div>`; c.innerHTML = html;
-        }
-
-        window.uploadMedia = async function(e) {
-            const file = e.target.files[0]; if(!file) return;
-            showToast('Загрузка...', 'success');
-            const fileName = `media_${Date.now()}_${Math.random().toString(36).substring(2)}.webp`;
-            const { error: upErr } = await supabase.storage.from('images').upload(fileName, file);
-            if (upErr) { showToast('Ошибка загрузки', 'error'); return; }
-            const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
-            await supabase.from('media').insert([{ name: file.name, url: urlData.publicUrl }]);
-            await loadAllData(); switchView('media');
-        }
-
-        // === МЕНЕДЖЕР МЕНЮ ===
-        function renderMenus(c) {
-            c.innerHTML = `
-                <h1 class="text-3xl font-display font-bold text-white mb-8">Меню сайта</h1>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
-                        <h2 class="text-xl font-bold text-brand-teal mb-4">Шапка (Header)</h2>
-                        <div id="menu-header-list" class="space-y-2 mb-4"></div>
-                        <button onclick="addMenuItem('header')" class="px-4 py-2 bg-brand-dark border border-brand-border hover:border-brand-teal rounded-lg text-sm w-full transition-colors">+ Добавить пункт</button>
-                        <button onclick="saveMenu('header')" class="mt-4 px-4 py-2 bg-brand-teal text-black font-bold rounded-lg text-sm w-full transition-transform hover:scale-[1.02]">Сохранить меню</button>
-                    </div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
-                        <h2 class="text-xl font-bold text-brand-teal mb-4">Подвал (Footer)</h2>
-                        <div id="menu-footer-list" class="space-y-2 mb-4"></div>
-                        <button onclick="addMenuItem('footer')" class="px-4 py-2 bg-brand-dark border border-brand-border hover:border-brand-teal rounded-lg text-sm w-full transition-colors">+ Добавить пункт</button>
-                        <button onclick="saveMenu('footer')" class="mt-4 px-4 py-2 bg-brand-teal text-black font-bold rounded-lg text-sm w-full transition-transform hover:scale-[1.02]">Сохранить меню</button>
-                    </div>
-                </div>
-            `;
-            renderMenuList('header');
-            renderMenuList('footer');
-        }
-
-        function renderMenuList(id) {
-            const list = document.getElementById(`menu-${id}-list`);
-            const items = allData.menus[id] || [];
-            list.innerHTML = items.map((item, index) => `
-                <div class="flex gap-2 items-center bg-brand-dark p-2 rounded border border-brand-border">
-                    <input type="text" value="${item.title}" placeholder="Название" onchange="updateMenuItem('${id}', ${index}, 'title', this.value)" class="w-1/2 bg-transparent text-sm text-white focus:outline-none">
-                    <input type="text" value="${item.url}" placeholder="URL" onchange="updateMenuItem('${id}', ${index}, 'url', this.value)" class="w-1/2 bg-transparent text-sm text-gray-400 focus:outline-none">
-                    <button onclick="removeMenuItem('${id}', ${index})" class="text-red-400 p-1 hover:text-red-300 transition-colors"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        window.addMenuItem = function(id) {
-            if (!allData.menus[id]) allData.menus[id] = [];
-            allData.menus[id].push({ title: 'Новая ссылка', url: '#' });
-            renderMenuList(id);
-        }
-        window.removeMenuItem = function(id, index) {
-            allData.menus[id].splice(index, 1);
-            renderMenuList(id);
-        }
-        window.updateMenuItem = function(id, index, field, val) {
-            allData.menus[id][index][field] = val;
-        }
-        window.saveMenu = async function(id) {
-            await supabase.from('menus').update({ items: allData.menus[id] }).eq('id', id);
-            showToast('Меню сохранено!');
-        }
-
-        // === 3D ИНСТРУМЕНТЫ ===
-        function render3DTools(c) {
-            c.innerHTML = `
-                <h1 class="text-3xl font-display font-bold text-white mb-8">3D Инструменты</h1>
-                <div class="bg-brand-card p-8 rounded-3xl border border-brand-border max-w-3xl">
-                    <h2 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-images text-brand-teal mr-2"></i> Перегенерация превью</h2>
-                    <p class="text-sm text-gray-400 mb-6">
-                        Если модели на сайте выглядят как плоские пятна или не влезают в кадр, нажмите кнопку ниже. 
-                        Скрипт скачает все STL и 3MF файлы, заново отрендерит их с правильным светом, центровкой и сохранит новые красивые картинки в базу.
-                    </p>
-                    
-                    <div id="3d-tools-progress" class="hidden mb-4 p-4 rounded-xl bg-brand-dark border border-brand-border">
-                        <div class="flex justify-between text-xs text-brand-teal font-semibold mb-2">
-                            <span id="3d-tools-status">Обработка...</span>
-                            <span id="3d-tools-count">0 / 0</span>
-                        </div>
-                        <div class="w-full bg-brand-border rounded-full h-2 overflow-hidden">
-                            <div id="3d-tools-bar" class="bg-brand-teal h-full rounded-full transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                    </div>
-
-                    <button onclick="regenerateAllPreviews()" id="regen-btn" class="px-6 py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold text-sm rounded-xl hover:scale-105 transition-all shadow-lg flex items-center gap-2">
-                        <i class="fa-solid fa-rotate"></i> Запустить обновление
-                    </button>
-                </div>
-            `;
-        }
-
-        window.regenerateAllPreviews = async function() {
-            const btn = document.getElementById('regen-btn');
-            const progressContainer = document.getElementById('3d-tools-progress');
-            const statusText = document.getElementById('3d-tools-status');
-            const countText = document.getElementById('3d-tools-count');
-            const bar = document.getElementById('3d-tools-bar');
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Загрузка данных...';
-            progressContainer.classList.remove('hidden');
-
-            const { data: models, error } = await supabase.from('models_3d').select('*');
-            if (error || !models || models.length === 0) {
-                showToast('Модели не найдены или ошибка загрузки', 'error');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Запустить обновление';
+            if (models.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-20 text-center text-gray-500"><i class="fa-solid fa-cube text-5xl mb-4 opacity-50"></i><p>Пока нет добавленных моделей. Станьте первым!</p></div>`;
                 return;
             }
 
-            let total = models.length;
+            grid.innerHTML = '';
+            models.forEach(model => {
+                const imgUrl = model.image_url || 'https://images.unsplash.com/photo-1615845865313-24558a105113?auto=format&fit=crop&w=600&q=80';
+                
+                const div = document.createElement('div');
+                div.className = 'bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col';
+                div.innerHTML = `
+                    <div class="relative h-48 bg-slate-800 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" style="background-image: url('${imgUrl}');"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-medium">3D MODEL</div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[11px] text-brand-teal font-semibold uppercase tracking-wider">${model.category}</span>
+                            <h3 class="font-bold text-white text-base mt-1">${model.title}</h3>
+                            <p class="text-xs text-gray-400 mt-2 line-clamp-2">${model.description}</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-brand-border/60 flex items-center justify-between gap-2">
+                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user mr-1"></i> ${model.author}</span>
+                            <div class="flex gap-2">
+                                ${model.stl_url ? `<button onclick="openSTLModal('${model.stl_url}', '${model.title}')" class="px-3 py-1.5 bg-brand-teal/20 text-brand-teal font-bold text-xs rounded-lg hover:bg-brand-teal/30 transition-colors border border-brand-teal/30"><i class="fa-solid fa-cube mr-1"></i> 3D</button>` : ''}
+                                ${model.stl_url ? `<a href="${model.stl_url}" download class="px-3 py-1.5 bg-brand-teal text-black font-bold text-xs rounded-lg hover:bg-brand-teal/80 transition-colors"><i class="fa-solid fa-download"></i></a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
 
-            const width = 600, height = 400;
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x161e2b);
+        window.processUpload = async function() {
+            const fileInput = document.getElementById('model-file');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showToast('Пожалуйста, выберите файл .stl или .3mf', 'error');
+                return;
+            }
 
-            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-            renderer.setSize(width, height);
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-            const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
-            dirLight1.position.set(5, 10, 7);
-            scene.add(dirLight1);
-            const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5);
-            dirLight2.position.set(-5, -5, -5);
-            scene.add(dirLight2);
+            const btn = document.getElementById('gen-preview-btn');
+            const status = document.getElementById('upload-status');
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Загрузка...';
+            btn.disabled = true;
+            status.classList.remove('hidden');
+            status.textContent = 'Шаг 1: Загрузка файла в облако...';
 
-            for (let i = 0; i < models.length; i++) {
-                const model = models[i];
-                if (!model.stl_url) continue;
+            try {
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('models')
+                    .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
-                statusText.textContent = `Обработка: ${model.title}`;
-                countText.textContent = `${i + 1} / ${total}`;
-                bar.style.width = `${((i + 1) / total) * 100}%`;
+                if (uploadError) throw uploadError;
 
-                try {
-                    const fileExt = model.stl_url.split('.').pop().toLowerCase();
-                    const loader = fileExt === '3mf' ? new ThreeMFLoader() : new STLLoader();
+                const { data: urlData } = supabase.storage.from('models').getPublicUrl(fileName);
+                uploadedFileUrl = urlData.publicUrl;
+                
+                status.textContent = 'Шаг 2: Генерация 3D-превью...';
 
-                    const geometry = await new Promise((resolve, reject) => {
-                        loader.load(model.stl_url, resolve, undefined, reject);
-                    });
+                const width = 600, height = 400;
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x161e2b);
 
-                    while(scene.children.length > 3) { scene.remove(scene.children[3]); }
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+                renderer.setSize(width, height);
 
+                scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+                dirLight1.position.set(5, 10, 7);
+                scene.add(dirLight1);
+                const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.6);
+                dirLight2.position.set(-5, -5, -5);
+                scene.add(dirLight2);
+
+                const loader = fileExt === '3mf' ? new ThreeMFLoader() : new STLLoader();
+                const objectUrl = URL.createObjectURL(file);
+
+                loader.load(objectUrl, (geometry) => {
                     let mesh;
+                    
+                    // ВАЖНО: side: THREE.DoubleSide решает проблему невидимых моделей!
+                    const material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3, side: THREE.DoubleSide });
+
                     if (fileExt === '3mf') {
                         mesh = geometry;
                         mesh.traverse(child => {
                             if (child.isMesh) {
                                 if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
-                                child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
+                                child.material = material;
                             }
                         });
                     } else {
                         geometry.computeVertexNormals();
-                        mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 }));
+                        mesh = new THREE.Mesh(geometry, material);
                     }
-
-                    const box = new THREE.Box3().setFromObject(mesh);
-                    const center = box.getCenter(new THREE.Vector3());
-                    const size = box.getSize(new THREE.Vector3()).length();
                     
-                    mesh.position.sub(center);
-                    const scale = 3 / size;
-                    mesh.scale.set(scale, scale, scale);
+                    // Применяем идеальное центрирование
+                    centerAndScale(mesh, 3);
                     
                     scene.add(mesh);
-                    camera.position.set(2, 2, 4);
-                    camera.lookAt(scene.position);
+                    camera.position.set(3, 3, 4); // Отодвигаем камеру
+                    camera.lookAt(0, 0, 0); // Смотрим в центр
                     renderer.render(scene, camera);
 
-                    const base64Image = renderer.domElement.toDataURL('image/jpeg', 0.8);
-                    await supabase.from('models_3d').update({ image_url: base64Image }).eq('id', model.id);
+                    generatedBase64Image = renderer.domElement.toDataURL('image/jpeg', 0.8);
 
-                } catch (err) {
-                    console.error(`Ошибка с моделью ${model.title}:`, err);
-                }
+                    document.getElementById('preview-image').src = generatedBase64Image;
+                    document.getElementById('preview-container').classList.remove('hidden');
+                    
+                    status.textContent = 'Файл загружен, превью готово! Можно отправлять.';
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Готово';
+                    renderer.dispose();
+                    URL.revokeObjectURL(objectUrl);
+                }, undefined, (err) => {
+                    console.error(err);
+                    showToast('Ошибка чтения 3D файла. Возможно, он поврежден.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Попробовать снова';
+                    status.textContent = 'Ошибка рендера.';
+                });
+
+            } catch (error) {
+                console.error(error);
+                showToast('Ошибка загрузки: ' + error.message, 'error');
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Загрузить и сделать превью';
+                btn.disabled = false;
+                status.textContent = 'Ошибка.';
             }
-
-            renderer.dispose();
-            statusText.textContent = 'Все превью успешно обновлены!';
-            countText.textContent = `${total} / ${total}`;
-            bar.className = 'bg-green-500 h-full rounded-full transition-all duration-300';
-            
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Готово';
-            btn.classList.replace('from-brand-teal', 'from-green-500');
-            btn.classList.replace('to-blue-600', 'to-emerald-600');
-            
-            showToast('Все превью обновлены!');
-            await loadAllData();
         };
 
-        // === ARTICLE EDITING ===
-        window.openEditArticle = function(id) {
-            const a = allData.articles.find(x => x.id === id); if (!a) return;
-            document.getElementById('edit-art-id').value = a.id;
-            document.getElementById('edit-art-title').value = a.title;
-            document.getElementById('edit-art-category').value = a.category;
-            document.getElementById('edit-art-readtime').value = a.readtime;
-            document.getElementById('edit-art-summary').value = a.summary;
-            if (!editQuill) editQuill = new Quill('#edit-editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], [{ 'header': [2, 3, false] }], ['link', 'image', 'clean']] } });
-            editQuill.root.innerHTML = a.content;
-            document.getElementById('edit-article-modal').classList.remove('hidden');
-        }
-
-        window.saveEditedArticle = async function(e) {
+        window.handleAddModelSubmit = async function(e) {
             e.preventDefault();
-            const id = document.getElementById('edit-art-id').value;
-            const updated = {
-                title: document.getElementById('edit-art-title').value,
-                category: document.getElementById('edit-art-category').value,
-                readtime: document.getElementById('edit-art-readtime').value,
-                summary: document.getElementById('edit-art-summary').value,
-                content: editQuill.root.innerHTML
-            };
-            await supabase.from('articles').update(updated).eq('id', id);
-            document.getElementById('edit-article-modal').classList.add('hidden');
-            await loadAllData(); switchView('all_articles');
-            showToast('Статья обновлена!');
-        }
-
-        // === GLOBAL ACTIONS ===
-        window.approveItem = async function(t, id) { await supabase.from(t).update({ status: 'published' }).eq('id', id); await loadAllData(); switchView('moderation'); }
-        window.deleteItem = async function(t, id) {
-            if (await showConfirm('Удалить запись?', 'Это действие нельзя отменить.')) {
-                await supabase.from(t).delete().eq('id', id); await loadAllData();
-                const active = document.querySelector('.nav-item.active').id.replace('nav-', '');
-                switchView(active);
+            const btn = document.getElementById('submit-model-btn');
+            
+            if (!generatedBase64Image || !uploadedFileUrl) {
+                showToast('Пожалуйста, сначала нажмите "Загрузить и сделать превью".', 'error');
+                return;
             }
-        }
-        window.markRead = async function(id) { await supabase.from('feedback').update({ is_read: true }).eq('id', id); await loadAllData(); switchView('feedback'); }
-        window.saveSettings = async function() { const mode = document.querySelector('input[name="publish_mode"]:checked').value; await supabase.from('site_settings').update({ value: mode }).eq('key', 'submission_mode'); showToast('Настройки сохранены!'); }
-        window.logout = async function() { await supabase.auth.signOut(); window.location.href = 'index.html'; };
 
-        checkAuth();
+            btn.textContent = 'Отправка...';
+            btn.disabled = true;
+
+            const { data: { session } } = await supabase.auth.getSession();
+
+            const newModel = {
+                title: document.getElementById('model-title').value,
+                category: document.getElementById('model-category').value,
+                author: document.getElementById('model-author').value,
+                description: document.getElementById('model-desc').value,
+                link: uploadedFileUrl,
+                stl_url: uploadedFileUrl,
+                image_url: generatedBase64Image,
+                status: 'pending',
+                user_id: session ? session.user.id : null
+            };
+
+            const { error } = await supabase.from('models_3d').insert([newModel]);
+
+            btn.textContent = 'Отправить на проверку';
+            btn.disabled = false;
+
+            if (error) {
+                showToast('Ошибка при отправке: ' + error.message, 'error');
+            } else {
+                showToast('Спасибо! Ваша модель отправлена на проверку.');
+                
+                e.target.reset();
+                document.getElementById('preview-container').classList.add('hidden');
+                document.getElementById('upload-status').classList.add('hidden');
+                document.getElementById('gen-preview-btn').disabled = false;
+                document.getElementById('gen-preview-btn').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Загрузить и сделать превью';
+                generatedBase64Image = null;
+                uploadedFileUrl = null;
+                
+                setTimeout(() => {
+                    document.getElementById('add-model-modal').classList.add('hidden');
+                }, 500);
+            }
+        };
+
+        window.openSubmission = async function() {
+            const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'submission_mode').single();
+            const mode = settings ? settings.value : 'everyone';
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (mode === 'registered' && !session) {
+                showToast('Предлагать модели могут только авторизованные пользователи.', 'error');
+                setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+                return;
+            }
+            document.getElementById('add-model-modal').classList.remove('hidden');
+        }
+
+        window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        let viewerScene, viewerCamera, viewerRenderer, viewerControls, animId;
+        
+        window.openSTLModal = (url, title) => {
+            document.getElementById('stl-modal-title').textContent = title;
+            document.getElementById('stl-modal').classList.remove('hidden');
+            setTimeout(() => { init3DViewer(url); }, 100);
+        };
+
+        window.closeSTLModal = () => {
+            document.getElementById('stl-modal').classList.add('hidden');
+            if(animId) cancelAnimationFrame(animId);
+            document.getElementById('stl-viewer-container').innerHTML = '<div id="viewer-loading" class="absolute inset-0 flex items-center justify-center text-brand-teal text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка 3D...</div>';
+        };
+
+        function init3DViewer(url) {
+            const container = document.getElementById('stl-viewer-container');
+            const loading = document.getElementById('viewer-loading');
+            
+            viewerScene = new THREE.Scene();
+            viewerScene.background = new THREE.Color(0x0c1017);
+            
+            let width = container.clientWidth;
+            let height = container.clientHeight;
+            if (width === 0) width = 800;
+            if (height === 0) height = 600;
+
+            viewerCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            
+            viewerRenderer = new THREE.WebGLRenderer({ antialias: true });
+            viewerRenderer.setSize(width, height);
+            container.innerHTML = '';
+            container.appendChild(viewerRenderer.domElement);
+
+            viewerScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const dLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+            dLight1.position.set(5, 10, 7.5);
+            viewerScene.add(dLight1);
+            const dLight2 = new THREE.DirectionalLight(0x00f0ff, 0.6);
+            dLight2.position.set(-5, -5, -5);
+            viewerScene.add(dLight2);
+
+            viewerControls = new OrbitControls(viewerCamera, viewerRenderer.domElement);
+            viewerControls.enableDamping = true;
+            viewerControls.dampingFactor = 0.05;
+            viewerControls.autoRotate = true;
+            viewerControls.autoRotateSpeed = 1.5;
+            viewerControls.addEventListener('start', () => { viewerControls.autoRotate = false; });
+
+            const is3mf = url.toLowerCase().endsWith('.3mf');
+            const loader = is3mf ? new ThreeMFLoader() : new STLLoader();
+
+            loader.load(url, (geometry) => {
+                let mesh;
+                
+                const material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3, side: THREE.DoubleSide });
+
+                if (is3mf) {
+                    mesh = geometry;
+                    mesh.traverse(child => {
+                        if (child.isMesh) {
+                            if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                            child.material = material;
+                        }
+                    });
+                } else {
+                    geometry.computeVertexNormals();
+                    mesh = new THREE.Mesh(geometry, material);
+                }
+                
+                // Применяем центрирование
+                centerAndScale(mesh, 3);
+                
+                viewerScene.add(mesh);
+                
+                viewerCamera.position.set(3, 3, 4);
+                viewerCamera.lookAt(0, 0, 0);
+                
+                if (loading) loading.style.display = 'none';
+            }, undefined, (err) => {
+                console.error(err);
+                container.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-red-400 text-sm">Ошибка загрузки 3D-модели</div>';
+            });
+
+            function animate() {
+                animId = requestAnimationFrame(animate);
+                viewerControls.update();
+                viewerRenderer.render(viewerScene, viewerCamera);
+            }
+            animate();
+        }
+
+        loadModels();
     </script>
 </body>
 </html>
