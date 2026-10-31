@@ -11,6 +11,7 @@
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
+    <!-- Подключаем Three.js для генерации превью 3D-моделей -->
     <script type="importmap">
     {
         "imports": {
@@ -205,7 +206,7 @@
         let globalPresenceChannel = null;
         let editQuill = null;
 
-        // === UTILS & MODALS ===
+        // === УТИЛИТЫ И МОДАЛЬНЫЕ ОКНА ===
         let confirmResolve;
         window.showConfirm = (title, msg) => new Promise(res => { confirmResolve = res; document.getElementById('conf-title').textContent = title; document.getElementById('conf-msg').textContent = msg; document.getElementById('confirm-modal').classList.remove('hidden'); setTimeout(() => { document.getElementById('confirm-modal').classList.remove('opacity-0'); document.getElementById('confirm-modal').querySelector('div').classList.remove('scale-95'); }, 10); });
         window.closeConfirm = (res) => { document.getElementById('confirm-modal').classList.add('opacity-0'); document.getElementById('confirm-modal').querySelector('div').classList.add('scale-95'); setTimeout(() => { document.getElementById('confirm-modal').classList.add('hidden'); if (confirmResolve) confirmResolve(res); }, 300); };
@@ -219,7 +220,7 @@
             document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
         }
 
-        // === LIVE PRESENCE ===
+        // === LIVE-РЕЖИМ ===
         window.updateMyStatus = async function(view, itemId = null) {
             if (!globalPresenceChannel || !currentUser) return;
             await globalPresenceChannel.track({ email: currentUser.email, view: view, itemId: itemId, onlineAt: new Date().getTime() });
@@ -234,7 +235,7 @@
             }).subscribe((status) => { if (status === 'SUBSCRIBED') updateMyStatus('dashboard'); });
         }
 
-        // === AUTH & INIT ===
+        // === АВТОРИЗАЦИЯ И ИНИЦИАЛИЗАЦИЯ ===
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'login.html'; return; }
@@ -290,7 +291,7 @@
             }, 100);
         };
 
-        // === RENDERERS ===
+        // === РЕНДЕРЫ ===
         function renderDashboard(c) {
             const pArts = allData.articles.filter(a => a.status === 'published').length;
             const pendArts = allData.articles.filter(a => a.status === 'pending').length;
@@ -460,7 +461,7 @@
                 <div class="bg-brand-card p-8 rounded-3xl border border-brand-border max-w-3xl">
                     <h2 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-images text-brand-teal mr-2"></i> Перегенерация превью</h2>
                     <p class="text-sm text-gray-400 mb-6">
-                        Если модели на сайте выглядят как плоские пятна, пустые квадраты или не влезают в кадр, нажмите кнопку ниже. 
+                        Если модели на сайте выглядят как плоские пятна или не влезают в кадр, нажмите кнопку ниже. 
                         Скрипт скачает все STL и 3MF файлы, заново отрендерит их с правильным светом, центровкой и сохранит новые красивые картинки в базу.
                     </p>
                     
@@ -481,21 +482,26 @@
             `;
         }
 
-        // Универсальная функция центрирования
-        function centerAndScale(mesh, targetSize = 3) {
-            const box = new THREE.Box3().setFromObject(mesh);
+        // Универсальная функция надежного центрирования
+        function prepareModel(rawMesh, targetSize = 3) {
+            const wrapper = new THREE.Group();
+            wrapper.add(rawMesh);
+            wrapper.updateMatrixWorld(true);
+            
+            const box = new THREE.Box3().setFromObject(wrapper);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
             
-            mesh.position.x -= center.x;
-            mesh.position.y -= center.y;
-            mesh.position.z -= center.z;
+            wrapper.position.x = -center.x;
+            wrapper.position.y = -center.y;
+            wrapper.position.z = -center.z;
             
             const maxDim = Math.max(size.x, size.y, size.z);
             if (maxDim > 0) {
                 const scale = targetSize / maxDim;
-                mesh.scale.set(scale, scale, scale);
+                wrapper.scale.set(scale, scale, scale);
             }
+            return wrapper;
         }
 
         window.regenerateAllPreviews = async function() {
@@ -535,7 +541,6 @@
             dirLight2.position.set(-5, -5, -5);
             scene.add(dirLight2);
 
-            // Материал с DoubleSide для видимости со всех сторон
             const material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3, side: THREE.DoubleSide });
 
             for (let i = 0; i < models.length; i++) {
@@ -556,10 +561,10 @@
 
                     while(scene.children.length > 3) { scene.remove(scene.children[3]); }
 
-                    let mesh;
+                    let rawMesh;
                     if (fileExt === '3mf') {
-                        mesh = geometry;
-                        mesh.traverse(child => {
+                        rawMesh = geometry;
+                        rawMesh.traverse(child => {
                             if (child.isMesh) {
                                 if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
                                 child.material = material;
@@ -567,13 +572,14 @@
                         });
                     } else {
                         geometry.computeVertexNormals();
-                        mesh = new THREE.Mesh(geometry, material);
+                        rawMesh = new THREE.Mesh(geometry, material);
                     }
 
-                    centerAndScale(mesh, 3);
+                    // ИСПОЛЬЗУЕМ НАДЕЖНУЮ ОБЕРТКУ
+                    const modelMesh = prepareModel(rawMesh, 3);
                     
-                    scene.add(mesh);
-                    camera.position.set(3, 3, 4);
+                    scene.add(modelMesh);
+                    camera.position.set(4, 3, 5);
                     camera.lookAt(0, 0, 0);
                     renderer.render(scene, camera);
 
@@ -599,7 +605,7 @@
             await loadAllData();
         };
 
-        // === ARTICLE EDITING ===
+        // === РЕДАКТИРОВАНИЕ СТАТЕЙ ===
         window.openEditArticle = function(id) {
             const a = allData.articles.find(x => x.id === id); if (!a) return;
             document.getElementById('edit-art-id').value = a.id;
@@ -628,7 +634,7 @@
             showToast('Статья обновлена!');
         }
 
-        // === GLOBAL ACTIONS ===
+        // === ГЛОБАЛЬНЫЕ ДЕЙСТВИЯ ===
         window.approveItem = async function(t, id) { await supabase.from(t).update({ status: 'published' }).eq('id', id); await loadAllData(); switchView('moderation'); }
         window.deleteItem = async function(t, id) {
             if (await showConfirm('Удалить запись?', 'Это действие нельзя отменить.')) {
