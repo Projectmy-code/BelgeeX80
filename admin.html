@@ -11,7 +11,6 @@
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-    <!-- Подключаем Three.js для генерации превью 3D-моделей -->
     <script type="importmap">
     {
         "imports": {
@@ -197,7 +196,6 @@
     <script type="module">
         import { supabase } from './js/config.js';
         
-        // Импорты для 3D-рендера
         import * as THREE from 'three';
         import { STLLoader } from 'three/addons/loaders/STLLoader.js';
         import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
@@ -462,8 +460,8 @@
                 <div class="bg-brand-card p-8 rounded-3xl border border-brand-border max-w-3xl">
                     <h2 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-images text-brand-teal mr-2"></i> Перегенерация превью</h2>
                     <p class="text-sm text-gray-400 mb-6">
-                        Если модели на сайте выглядят как плоские пятна или не влезают в кадр, нажмите кнопку ниже. 
-                        Скрипт скачает все STL-файлы, заново отрендерит их с правильным светом, центровкой и сохранит новые красивые картинки в базу.
+                        Если модели на сайте выглядят как плоские пятна, пустые квадраты или не влезают в кадр, нажмите кнопку ниже. 
+                        Скрипт скачает все STL и 3MF файлы, заново отрендерит их с правильным светом, центровкой и сохранит новые красивые картинки в базу.
                     </p>
                     
                     <div id="3d-tools-progress" class="hidden mb-4 p-4 rounded-xl bg-brand-dark border border-brand-border">
@@ -483,6 +481,23 @@
             `;
         }
 
+        // Универсальная функция центрирования
+        function centerAndScale(mesh, targetSize = 3) {
+            const box = new THREE.Box3().setFromObject(mesh);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            
+            mesh.position.x -= center.x;
+            mesh.position.y -= center.y;
+            mesh.position.z -= center.z;
+            
+            const maxDim = Math.max(size.x, size.y, size.z);
+            if (maxDim > 0) {
+                const scale = targetSize / maxDim;
+                mesh.scale.set(scale, scale, scale);
+            }
+        }
+
         window.regenerateAllPreviews = async function() {
             const btn = document.getElementById('regen-btn');
             const progressContainer = document.getElementById('3d-tools-progress');
@@ -494,7 +509,6 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Загрузка данных...';
             progressContainer.classList.remove('hidden');
 
-            // 1. Получаем все модели
             const { data: models, error } = await supabase.from('models_3d').select('*');
             if (error || !models || models.length === 0) {
                 showToast('Модели не найдены или ошибка загрузки', 'error');
@@ -503,11 +517,8 @@
                 return;
             }
 
-            let processed = 0;
             let total = models.length;
-            countText.textContent = `0 / ${total}`;
 
-            // 2. Настраиваем невидимую 3D-сцену
             const width = 600, height = 400;
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x161e2b);
@@ -516,15 +527,17 @@
             const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(width, height);
 
-            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
             dirLight1.position.set(5, 10, 7);
             scene.add(dirLight1);
-            const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.5);
+            const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.6);
             dirLight2.position.set(-5, -5, -5);
             scene.add(dirLight2);
 
-            // 3. Проходимся по каждой модели
+            // Материал с DoubleSide для видимости со всех сторон
+            const material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3, side: THREE.DoubleSide });
+
             for (let i = 0; i < models.length; i++) {
                 const model = models[i];
                 if (!model.stl_url) continue;
@@ -547,25 +560,21 @@
                     if (fileExt === '3mf') {
                         mesh = geometry;
                         mesh.traverse(child => {
-                            if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
+                            if (child.isMesh) {
+                                if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                                child.material = material;
+                            }
                         });
                     } else {
                         geometry.computeVertexNormals();
-                        mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 }));
+                        mesh = new THREE.Mesh(geometry, material);
                     }
 
-                    // Центровка и масштаб
-                    const box = new THREE.Box3().setFromObject(mesh);
-                    const center = box.getCenter(new THREE.Vector3());
-                    const size = box.getSize(new THREE.Vector3()).length();
-                    
-                    mesh.position.sub(center);
-                    const scale = 3 / size;
-                    mesh.scale.set(scale, scale, scale);
+                    centerAndScale(mesh, 3);
                     
                     scene.add(mesh);
-                    camera.position.set(2, 2, 4);
-                    camera.lookAt(scene.position);
+                    camera.position.set(3, 3, 4);
+                    camera.lookAt(0, 0, 0);
                     renderer.render(scene, camera);
 
                     const base64Image = renderer.domElement.toDataURL('image/jpeg', 0.8);
