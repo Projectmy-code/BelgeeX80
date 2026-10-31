@@ -19,12 +19,66 @@ function showToast(message, type = 'success') {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadArticlesFromDB();
+    
     const editorContainer = document.getElementById('editor-container');
     if (editorContainer) {
         quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Напишите здесь вашу статью...',
-            modules: { toolbar: [[{ 'header': [2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link', 'image', 'clean']] } // Добавлена кнопка картинки
+            modules: { 
+                toolbar: [
+                    [{ 'header': [2, 3, false] }], 
+                    ['bold', 'italic', 'underline'], 
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }], 
+                    ['link', 'image', 'clean']
+                ] 
+            }
+        });
+
+        // === ЗАГРУЗКА КАРТИНОК ВНУТРЬ ТЕКСТА СТАТЬИ ===
+        const toolbar = quill.getModule('toolbar');
+        toolbar.addHandler('image', () => {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = async () => {
+                const file = input.files[0];
+                if (file) {
+                    // Показываем, что идет загрузка
+                    const range = quill.getSelection(true);
+                    quill.insertText(range.index, ' [Загрузка фото...] ');
+                    
+                    const fileName = `inline_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+                    const { error } = await supabase.storage.from('images').upload(fileName, file);
+
+                    if (error) {
+                        showToast('Ошибка загрузки фото: ' + error.message, 'error');
+                    } else {
+                        const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
+                        // Удаляем текст загрузки и вставляем картинку
+                        quill.deleteText(range.index, 21);
+                        quill.insertEmbed(range.index, 'image', urlData.publicUrl);
+                    }
+                }
+            };
+        });
+    }
+
+    // Предпросмотр обложки при выборе файла
+    const imageInput = document.getElementById('new-image-file');
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('cover-preview-img').src = e.target.result;
+                    document.getElementById('cover-preview-container').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
         });
     }
 });
@@ -53,7 +107,6 @@ function renderArticles(articles) {
     const articlesToShow = articles.slice(0, 3); 
 
     articlesToShow.forEach((article) => {
-        // Заглушка, если нет картинки
         const imgUrl = article.image_url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80';
 
         const div = document.createElement('div');
@@ -93,7 +146,6 @@ export function openArticleModal(article) {
     document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
     document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readtime}`;
     
-    // Вставляем картинку в начало статьи (если она есть)
     let content = article.content;
     if (article.image_url) {
         content = `<img src="${article.image_url}" class="w-full h-64 object-cover rounded-xl mb-6 shadow-lg" alt="${article.title}">` + content;
@@ -120,37 +172,60 @@ export async function handleAddArticleSubmit(e) {
     if (!quill) return;
     if (quill.getText().trim().length === 0) { showToast('Пожалуйста, напишите текст статьи.', 'error'); return; }
 
-    const contentHTML = quill.root.innerHTML;
     const btn = e.target.querySelector('button[type="submit"]');
     
+    // Подтверждение
     const isConfirmed = await window.showConfirm('Отправить статью?', 'Ваша статья будет отправлена на модерацию.', 'Отправить', 'bg-brand-teal', 'hover:bg-brand-teal/80', 'text-black');
     if (!isConfirmed) return;
 
     btn.textContent = 'Отправка...'; btn.disabled = true;
+    
     const { data: { session } } = await supabase.auth.getSession();
-
-    const newArticle = {
-        title: document.getElementById('new-title').value,
-        category: document.getElementById('new-category').value,
-        readtime: document.getElementById('new-readtime').value,
-        summary: document.getElementById('new-summary').value,
-        image_url: document.getElementById('new-image-url').value || null, // <-- ДОБАВЛЕНО
-        content: contentHTML,
-        author: document.getElementById('new-author').value,
-        status: 'pending',
-        user_id: session ? session.user.id : null
-    };
+    let imageUrl = null;
 
     try {
-        const { error } = await supabase.from('articles').insert([newArticle]);
-        if (error) throw error;
+        // 1. ЗАГРУЖАЕМ ОБЛОЖКУ (если выбрана)
+        const fileInput = document.getElementById('new-image-file');
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileName = `cover_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+            
+            const { error: uploadError } = await supabase.storage.from('images').upload(fileName, file);
+            if (uploadError) throw new Error('Ошибка загрузки обложки: ' + uploadError.message);
+            
+            const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
+            imageUrl = urlData.publicUrl;
+        }
+
+        // 2. СОХРАНЯЕМ СТАТЬЮ В БАЗУ
+        const newArticle = {
+            title: document.getElementById('new-title').value,
+            category: document.getElementById('new-category').value,
+            readtime: document.getElementById('new-readtime').value,
+            summary: document.getElementById('new-summary').value,
+            image_url: imageUrl, // Ссылка на загруженную обложку
+            content: quill.root.innerHTML,
+            author: document.getElementById('new-author').value,
+            status: 'pending',
+            user_id: session ? session.user.id : null
+        };
+
+        const { error: dbError } = await supabase.from('articles').insert([newArticle]);
+        if (dbError) throw dbError;
+
         showToast('Статья успешно отправлена на модерацию!');
-        e.target.reset(); quill.root.innerHTML = ''; 
+        
+        // Очищаем форму
+        e.target.reset(); 
+        quill.root.innerHTML = ''; 
+        document.getElementById('cover-preview-container').classList.add('hidden');
         document.getElementById('add-article-modal').classList.add('hidden');
+
     } catch (error) {
-        showToast('Ошибка: ' + error.message, 'error');
+        showToast(error.message, 'error');
     } finally {
-        btn.textContent = 'Отправить на модерацию'; btn.disabled = false;
+        btn.textContent = 'Отправить на модерацию'; 
+        btn.disabled = false;
     }
 }
 
