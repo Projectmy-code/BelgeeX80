@@ -661,7 +661,7 @@
             
             if (session) {
                 authContainer.innerHTML = `
-                    <span class="text-gray-400 text-xs hidden 2xl:block">${session.user.email}</span>
+                    <a href="profile.html" class="text-gray-400 text-xs hidden 2xl:block hover:text-white transition-colors">Мой профиль</a>
                     <a href="admin.html" class="text-brand-teal text-sm font-semibold hover:underline">Админка</a>
                     <button onclick="logout()" class="text-red-400 text-sm font-semibold hover:text-red-300">Выйти</button>
                 `;
