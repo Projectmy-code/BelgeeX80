@@ -24,11 +24,15 @@
                 <input type="email" id="email" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none">
             </div>
             <div>
-                <label class="block text-xs text-gray-400 mb-1">Пароль</label>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block text-xs text-gray-400">Пароль</label>
+                    <button type="button" id="forgot-password-btn" class="text-xs text-brand-teal hover:underline focus:outline-none">Забыли пароль?</button>
+                </div>
                 <input type="password" id="password" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none">
             </div>
             
             <div id="error-msg" class="text-red-400 text-xs hidden"></div>
+            <div id="success-msg" class="text-emerald-400 text-xs hidden"></div>
 
             <button type="submit" id="submit-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl hover:opacity-90 transition-all">Войти</button>
         </form>
@@ -49,6 +53,7 @@
         let isLoginMode = true;
         const form = document.getElementById('auth-form');
         const errorMsg = document.getElementById('error-msg');
+        const successMsg = document.getElementById('success-msg');
 
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session) window.location.href = 'index.html';
@@ -61,34 +66,74 @@
             document.getElementById('toggle-text').textContent = isLoginMode ? 'Нет аккаунта?' : 'Уже есть аккаунт?';
             document.getElementById('toggle-btn').textContent = isLoginMode ? 'Зарегистрироваться' : 'Войти';
             errorMsg.classList.add('hidden');
+            successMsg.classList.add('hidden');
         });
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const btn = document.getElementById('submit-btn');
             
             btn.disabled = true;
             btn.textContent = 'Загрузка...';
             errorMsg.classList.add('hidden');
+            successMsg.classList.add('hidden');
 
             try {
                 if (isLoginMode) {
                     const { error } = await supabase.auth.signInWithPassword({ email, password });
                     if (error) throw error;
+                    window.location.href = 'index.html';
                 } else {
                     const { error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
-                    alert('Регистрация успешна! Теперь вы можете войти.');
+                    successMsg.textContent = 'Регистрация успешна! Теперь вы можете войти.';
+                    successMsg.classList.remove('hidden');
                     document.getElementById('toggle-btn').click();
                 }
-                if (isLoginMode) window.location.href = 'index.html';
             } catch (error) {
+                errorMsg.textContent = "Ошибка: " + (error.message || "Не удалось выполнить вход");
+                errorMsg.classList.remove('hidden');
+            } finally {
                 btn.disabled = false;
                 btn.textContent = isLoginMode ? 'Войти' : 'Зарегистрироваться';
-                errorMsg.textContent = "Ошибка: " + error.message;
+            }
+        });
+
+        // Логика сброса пароля
+        document.getElementById('forgot-password-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!email) {
+                errorMsg.textContent = 'Пожалуйста, введите ваш Email в поле выше, чтобы мы отправили ссылку.';
                 errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            const btn = e.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Отправка...';
+            btn.disabled = true;
+
+            // Ссылка для возврата после смены пароля
+            const redirectTo = window.location.origin + window.location.pathname.replace('login.html', 'update-password.html');
+
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: redirectTo
+            });
+
+            btn.textContent = originalText;
+            btn.disabled = false;
+            errorMsg.classList.add('hidden');
+
+            if (error) {
+                errorMsg.textContent = 'Ошибка: ' + error.message;
+                errorMsg.classList.remove('hidden');
+            } else {
+                successMsg.textContent = 'Ссылка для сброса пароля отправлена на вашу почту! Проверьте папку «Спам».';
+                successMsg.classList.remove('hidden');
             }
         });
     </script>
