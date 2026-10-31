@@ -21,9 +21,6 @@
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         #stl-viewer-container { width: 100%; height: 60vh; min-height: 400px; }
-
-        @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
     </style>
     <script type="importmap">
     {
@@ -263,7 +260,6 @@
                 
                 status.textContent = 'Шаг 2: Генерация 3D-превью...';
 
-                // Рендер
                 const width = 600, height = 400;
                 const scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x161e2b);
@@ -284,25 +280,28 @@
                 const objectUrl = URL.createObjectURL(file);
 
                 loader.load(objectUrl, (geometry) => {
-                    if (fileExt !== '3mf') geometry.computeVertexNormals();
-                    
                     let mesh;
+                    
                     if (fileExt === '3mf') {
-                        mesh = geometry;
+                        mesh = geometry; // 3MF возвращает группу (Group)
                         mesh.traverse(child => {
-                            if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.2 });
+                            if (child.isMesh) {
+                                // ВАЖНО: Для 3MF тоже рассчитываем нормали, если их нет
+                                if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                                child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
+                            }
                         });
                     } else {
-                        geometry.center();
+                        geometry.computeVertexNormals(); // Для STL рассчитываем нормали
                         mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.4, metalness: 0.3 }));
                     }
                     
-                    // АВТОМАТИЧЕСКАЯ ЦЕНТРОВКА И МАСШТАБ
+                    // АВТОМАТИЧЕСКАЯ ЦЕНТРОВКА И МАСШТАБ (работает для групп и одиночных мешей)
                     const box = new THREE.Box3().setFromObject(mesh);
                     const center = box.getCenter(new THREE.Vector3());
                     const size = box.getSize(new THREE.Vector3()).length();
                     
-                    mesh.position.sub(center); // Сдвигаем в 0,0,0
+                    mesh.position.sub(center);
                     const scale = 3 / size;
                     mesh.scale.set(scale, scale, scale);
                     
@@ -431,56 +430,52 @@
             container.innerHTML = '';
             container.appendChild(viewerRenderer.domElement);
 
-            // Свет
             viewerScene.add(new THREE.AmbientLight(0xffffff, 0.5));
-            
             const dLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
             dLight1.position.set(5, 10, 7.5);
             viewerScene.add(dLight1);
-
             const dLight2 = new THREE.DirectionalLight(0x00f0ff, 0.6);
             dLight2.position.set(-5, -5, -5);
             viewerScene.add(dLight2);
 
-            // Контролы
             viewerControls = new OrbitControls(viewerCamera, viewerRenderer.domElement);
             viewerControls.enableDamping = true;
             viewerControls.dampingFactor = 0.05;
-            viewerControls.autoRotate = true; // Включаем авто-вращение
+            viewerControls.autoRotate = true;
             viewerControls.autoRotateSpeed = 1.5;
-
             viewerControls.addEventListener('start', () => { viewerControls.autoRotate = false; });
 
             const is3mf = url.toLowerCase().endsWith('.3mf');
             const loader = is3mf ? new ThreeMFLoader() : new STLLoader();
 
             loader.load(url, (geometry) => {
-                if (!is3mf) geometry.computeVertexNormals();
-
                 let mesh;
+                
                 if (is3mf) {
                     mesh = geometry;
                     mesh.traverse(child => {
-                        if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
+                        if (child.isMesh) {
+                            if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                            child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 });
+                        }
                     });
                 } else {
+                    geometry.computeVertexNormals();
                     mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3, metalness: 0.3 }));
                 }
                 
-                // АВТОМАТИЧЕСКАЯ ЦЕНТРОВКА
                 const box = new THREE.Box3().setFromObject(mesh);
                 const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3()).length();
                 
-                mesh.position.sub(center); // Центрируем
-                const scale = 3 / size; // Масштабируем под камеру
+                mesh.position.sub(center);
+                const scale = 3 / size;
                 mesh.scale.set(scale, scale, scale);
                 
                 viewerScene.add(mesh);
                 
-                // Ставим камеру так, чтобы видеть всё
                 viewerCamera.position.set(2, 2, 4);
-                viewerCamera.lookAt(0, 0, 0); // Смотрим в центр
+                viewerCamera.lookAt(0, 0, 0);
                 
                 if (loading) loading.style.display = 'none';
             }, undefined, (err) => {
