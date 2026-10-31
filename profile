@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет — BELGEE X80</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb', pending: '#f59e0b', published: '#10b981' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
+    </script>
+    <style>
+        body { background-color: #0c1017; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .card-glow { transition: all 0.3s ease; }
+        .card-glow:hover { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 4px 20px -5px rgba(0, 240, 255, 0.1); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c1017; }
+        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-black">
+
+    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-3 group shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
+                    <span class="font-display font-black text-black text-xl">X</span>
+                </div>
+                <div>
+                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">BELGEE <span class="text-brand-teal">X80</span></div>
+                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Личный кабинет</div>
+                </div>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-sm font-medium text-gray-400 hover:text-white hidden sm:block"><i class="fa-solid fa-arrow-left mr-1"></i> На сайт</a>
+                <button onclick="logout()" class="px-4 py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-sm font-semibold transition-colors">Выйти</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="mb-10 flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-brand-teal/20 border border-brand-teal/30 flex items-center justify-center text-2xl text-brand-teal">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-display font-bold text-white">Мои материалы</h1>
+                    <p class="text-gray-400 text-sm" id="user-email">Загрузка...</p>
+                </div>
+            </div>
+
+            <!-- Вкладки -->
+            <div class="flex gap-2 border-b border-brand-border pb-4 mb-8">
+                <button id="tab-articles" onclick="switchTab('articles')" class="px-5 py-2.5 rounded-xl bg-brand-teal text-black font-bold text-sm transition-all">
+                    <i class="fa-regular fa-file-lines mr-2"></i> Мои статьи
+                </button>
+                <button id="tab-models" onclick="switchTab('models')" class="px-5 py-2.5 rounded-xl text-gray-400 hover:text-white font-bold text-sm transition-all">
+                    <i class="fa-solid fa-cube mr-2"></i> Мои 3D-модели
+                </button>
+            </div>
+
+            <!-- Контейнер для контента -->
+            <div id="content-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Сюда будут загружаться карточки -->
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        let currentTab = 'articles';
+        let currentUser = null;
+
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { window.location.href = 'login.html'; return; }
+            
+            currentUser = session.user;
+            document.getElementById('user-email').textContent = currentUser.email;
+            await loadContent();
+        }
+
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            document.getElementById('tab-articles').className = tab === 'articles' ? 'px-5 py-2.5 rounded-xl bg-brand-teal text-black font-bold text-sm transition-all' : 'px-5 py-2.5 rounded-xl text-gray-400 hover:text-white font-bold text-sm transition-all';
+            document.getElementById('tab-models').className = tab === 'models' ? 'px-5 py-2.5 rounded-xl bg-brand-teal text-black font-bold text-sm transition-all' : 'px-5 py-2.5 rounded-xl text-gray-400 hover:text-white font-bold text-sm transition-all';
+            loadContent();
+        }
+
+        async function loadContent() {
+            const container = document.getElementById('content-container');
+            container.innerHTML = '<div class="col-span-full text-center py-10"><i class="fa-solid fa-spinner fa-spin text-2xl text-brand-teal"></i></div>';
+
+            const table = currentTab === 'articles' ? 'articles' : 'models_3d';
+            
+            // Запрашиваем записи, где user_id совпадает с текущим пользователем
+            const { data: items, error } = await supabase
+                .from(table)
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<p class="text-red-400 col-span-full text-center">Ошибка загрузки: ${error.message}</p>`;
+                return;
+            }
+
+            if (!items || items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center border-2 border-dashed border-brand-border rounded-3xl bg-brand-card/50">
+                        <i class="fa-regular fa-folder-open text-5xl text-gray-500 mb-4"></i>
+                        <h3 class="text-lg font-bold text-white mb-1">Здесь пока пусто</h3>
+                        <p class="text-sm text-gray-400 mb-6">Вы еще не отправляли ${currentTab === 'articles' ? 'статьи' : '3D-модели'}.</p>
+                        <a href="index.html${currentTab === 'models' ? '#videos' : '#articles'}" class="px-6 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all inline-block">Создать</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            items.forEach(item => {
+                // Определяем статус
+                let statusBadge = '';
+                if (item.status === 'published') {
+                    statusBadge = `<span class="px-2.5 py-1 bg-brand-published/10 text-brand-published border border-brand-published/20 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-check mr-1"></i> Опубликовано</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-1 bg-brand-pending/10 text-brand-pending border border-brand-pending/20 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-regular fa-clock mr-1"></i> На проверке</span>`;
+                }
+
+                const imgUrl = item.image_url || (currentTab === 'articles' ? null : 'https://images.unsplash.com/photo-1615845865313-24558a105113?auto=format&fit=crop&w=600&q=80');
+
+                const div = document.createElement('div');
+                div.className = 'bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow flex flex-col';
+                div.innerHTML = `
+                    ${currentTab === 'models' ? `
+                        <div class="h-40 bg-slate-800 relative">
+                            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${imgUrl}');"></div>
+                        </div>
+                    ` : ''}
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                            ${statusBadge}
+                            <span class="text-[10px] text-gray-500">${new Date(item.created_at).toLocaleDateString('ru-RU')}</span>
+                        </div>
+                        <h3 class="font-bold text-white text-base mb-2 line-clamp-2">${item.title}</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">${currentTab === 'articles' ? item.summary : item.description}</p>
+                        
+                        <div class="mt-auto pt-4 border-t border-brand-border/50 flex justify-between items-center">
+                            <span class="text-[10px] text-brand-teal font-semibold uppercase tracking-wider">${item.category}</span>
+                            ${item.status === 'published' && currentTab === 'articles' ? `<button onclick="window.location.href='index.html#articles'" class="text-xs text-gray-400 hover:text-white">На главной</button>` : ''}
+                            ${item.status === 'published' && currentTab === 'models' ? `<a href="3d-prints.html" class="text-xs text-brand-teal hover:underline">К модели</a>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.logout = async function() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>
