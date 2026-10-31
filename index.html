@@ -97,6 +97,10 @@
                 <a href="#videos" class="hover:text-brand-teal transition-colors">Видео</a>
                 <a href="3d-prints.html" class="hover:text-brand-teal transition-colors">3D Печать</a>
                 <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка</a>
+                
+                <!-- СЮДА ДОБАВЛЯЮТСЯ СТРАНИЦЫ ИЗ КОНСТРУКТОРА -->
+                <div id="dynamic-pages-nav" class="flex items-center gap-3 2xl:gap-5"></div>
+
                 <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
             </nav>
 
@@ -119,6 +123,10 @@
             <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
             <a href="3d-prints.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">3D Печать</a>
             <a href="checklist.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Приёмка авто</a>
+            
+            <!-- СЮДА ДОБАВЛЯЮТСЯ СТРАНИЦЫ НА МОБИЛЬНЫХ -->
+            <div id="dynamic-pages-mobile" class="space-y-3"></div>
+
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
                 <a href="login.html" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
@@ -425,7 +433,6 @@
                     <p class="text-gray-400 leading-relaxed">Неофициальный клубный портал и база знаний владельцев автомобиля BELGEE X80.</p>
                 </div>
                 
-                <!-- ОБНОВЛЕННЫЙ БЛОК "РАЗДЕЛЫ" В ФУТЕРЕ -->
                 <div>
                     <h4 class="font-bold text-white mb-3">Разделы</h4>
                     <ul class="space-y-2">
@@ -689,6 +696,35 @@
             });
         }
 
+        // === АВТОМАТИЧЕСКОЕ МЕНЮ ИЗ КОНСТРУКТОРА ===
+        async function loadDynamicMenu() {
+            const { data: pages } = await supabase.from('custom_pages').select('title, slug').eq('status', 'published');
+            if (!pages || pages.length === 0) return;
+
+            const navContainer = document.getElementById('dynamic-pages-nav');
+            const mobileContainer = document.getElementById('dynamic-pages-mobile');
+
+            // Очищаем контейнеры перед заполнением
+            navContainer.innerHTML = '';
+            mobileContainer.innerHTML = '';
+
+            pages.forEach(page => {
+                // Ссылка для ПК
+                const linkDesktop = document.createElement('a');
+                linkDesktop.href = `page.html?p=${page.slug}`;
+                linkDesktop.className = 'hover:text-brand-teal transition-colors';
+                linkDesktop.textContent = page.title;
+                navContainer.appendChild(linkDesktop);
+
+                // Ссылка для мобилки
+                const linkMobile = document.createElement('a');
+                linkMobile.href = `page.html?p=${page.slug}`;
+                linkMobile.className = 'block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800';
+                linkMobile.textContent = page.title;
+                mobileContainer.appendChild(linkMobile);
+            });
+        }
+
         // === ОБРАТНАЯ СВЯЗЬ ===
         window.handleFeedbackSubmit = async function(e) {
             e.preventDefault();
@@ -748,6 +784,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadPartsFromDB();
             loadSiteContent();
+            loadDynamicMenu(); // Запускаем авто-меню
             updateAuthUI();
         });
     </script>
