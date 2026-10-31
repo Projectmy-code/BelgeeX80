@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Quill для редактирования статей -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
@@ -41,56 +40,61 @@
 </head>
 <body class="min-h-screen flex antialiased">
 
-    <!-- ЛЕВОЕ МЕНЮ (SIDEBAR) -->
+    <!-- SIDEBAR -->
     <aside class="w-64 glass-panel fixed h-full flex flex-col z-20">
         <div class="h-20 flex items-center px-6 border-b border-brand-border">
-            <div class="flex items-center gap-3">
+            <a href="index.html" class="flex items-center gap-3 group">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center">
                     <span class="font-display font-black text-black text-sm">X</span>
                 </div>
                 <div>
-                    <div class="font-display font-black text-sm text-white">CMS</div>
+                    <div class="font-display font-black text-sm text-white group-hover:text-brand-teal transition-colors">CMS PANEL</div>
                     <div class="text-[10px] text-gray-400 uppercase">BELGEE X80</div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <nav class="flex-1 py-6 flex flex-col gap-1 overflow-y-auto">
             <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
                 <i class="fa-solid fa-chart-pie w-5 text-center"></i> Дашборд
             </a>
-            <a href="#" onclick="switchView('moderation')" id="nav-moderation" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-shield-halved w-5 text-center"></i> Модерация
-                <span id="mod-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-            </a>
             
-            <!-- НОВЫЕ ВКЛАДКИ УПРАВЛЕНИЯ -->
+            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-2">Контент</div>
             <a href="#" onclick="switchView('all_articles')" id="nav-all_articles" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-regular fa-file-lines w-5 text-center"></i> Все статьи
+                <i class="fa-regular fa-file-lines w-5 text-center"></i> Статьи
+            </a>
+            <a href="builder.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-file-code w-5 text-center"></i> Страницы
+            </a>
+            <a href="#" onclick="switchView('media')" id="nav-media" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-regular fa-images w-5 text-center"></i> Медиафайлы
             </a>
             <a href="#" onclick="switchView('all_models')" id="nav-all_models" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-cube w-5 text-center"></i> Все 3D-модели
+                <i class="fa-solid fa-cube w-5 text-center"></i> 3D Модели
             </a>
 
-            <a href="#" onclick="switchView('feedback')" id="nav-feedback" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-envelope w-5 text-center"></i> Сообщения
-                <span id="fb-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-2">Система</div>
+            <a href="#" onclick="switchView('menus')" id="nav-menus" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-bars-staggered w-5 text-center"></i> Меню сайта
             </a>
-            <a href="#" onclick="switchView('settings')" id="nav-settings" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-gear w-5 text-center"></i> Настройки
-            </a>
-            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-4">Инструменты</div>
             <a href="edit-parts.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
                 <i class="fa-solid fa-list-check w-5 text-center"></i> Каталог запчастей
             </a>
             <a href="edit-site.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
                 <i class="fa-solid fa-sliders w-5 text-center"></i> Редактор главной
             </a>
-            <a href="builder.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-wand-magic-sparkles w-5 text-center"></i> Конструктор страниц
+            <a href="#" onclick="switchView('settings')" id="nav-settings" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Настройки
             </a>
-            <a href="index.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
-                <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i> Открыть сайт
+            
+            <div class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-2">Модерация</div>
+            <a href="#" onclick="switchView('moderation')" id="nav-moderation" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-shield-halved w-5 text-center"></i> Очередь
+                <span id="mod-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+            <a href="#" onclick="switchView('feedback')" id="nav-feedback" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-envelope w-5 text-center"></i> Сообщения
+                <span id="fb-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
             </a>
         </nav>
 
@@ -104,8 +108,6 @@
                     <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300">Выйти</button>
                 </div>
             </div>
-            
-            <!-- ИНДИКАТОР LIVE-РЕЖИМА -->
             <div id="live-status" class="mt-3 text-[10px] flex items-center justify-center gap-2 bg-brand-border/30 py-1.5 rounded-lg text-gray-400 transition-colors">
                 <span id="live-dot" class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                 <span id="live-text">Только вы онлайн</span>
@@ -113,25 +115,20 @@
         </div>
     </aside>
 
-    <!-- ПРАВАЯ ЧАСТЬ (КОНТЕНТ) -->
+    <!-- MAIN CONTENT -->
     <main class="flex-1 ml-64 min-h-screen relative">
-        
         <div id="view-loading" class="absolute inset-0 flex items-center justify-center bg-brand-dark z-10">
             <i class="fa-solid fa-spinner fa-spin text-3xl text-brand-teal"></i>
         </div>
-
         <div id="view-denied" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-brand-dark z-10">
             <i class="fa-solid fa-lock text-5xl text-red-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-white mb-2">Доступ запрещен</h2>
             <p class="text-gray-400 text-sm">У вас нет прав администратора.</p>
-            <a href="index.html" class="mt-4 px-4 py-2 bg-brand-border text-white rounded-lg">На главную</a>
         </div>
-
         <div id="view-content" class="hidden p-8"></div>
-
     </main>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
+    <!-- CONFIRM MODAL -->
     <div id="confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
             <h3 id="conf-title" class="text-xl font-bold text-center text-white mb-2">Удалить?</h3>
@@ -143,14 +140,13 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ СТАТЬИ -->
+    <!-- EDIT ARTICLE MODAL -->
     <div id="edit-article-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="toggleModal('edit-article-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="text-xl font-bold font-display text-white mb-4">Редактировать статью</h3>
-
             <form id="edit-article-form" onsubmit="saveEditedArticle(event)" class="space-y-4">
                 <input type="hidden" id="edit-art-id">
                 <div>
@@ -181,9 +177,7 @@
                     <label class="block text-xs font-semibold text-gray-300 mb-2">Текст статьи</label>
                     <div id="edit-editor-container"></div>
                 </div>
-                <button type="submit" id="edit-art-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity mt-4">
-                    Сохранить изменения
-                </button>
+                <button type="submit" id="edit-art-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl shadow-lg hover:opacity-90 mt-4">Сохранить</button>
             </form>
         </div>
     </div>
@@ -192,84 +186,48 @@
         import { supabase } from './js/config.js';
 
         let currentUser = null;
-        let allData = { articles: [], models: [], feedback: [] };
+        let allData = { articles: [], models: [], feedback: [], media: [], menus: {} };
         let globalPresenceChannel = null;
         let editQuill = null;
 
-        // === ОКНО ПОДТВЕРЖДЕНИЯ ===
+        // === UTILS & MODALS ===
         let confirmResolve;
-        window.showConfirm = (title, msg) => {
-            return new Promise(res => {
-                confirmResolve = res;
-                document.getElementById('conf-title').textContent = title;
-                document.getElementById('conf-msg').textContent = msg;
-                document.getElementById('confirm-modal').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('confirm-modal').classList.remove('opacity-0');
-                    document.getElementById('confirm-modal').querySelector('div').classList.remove('scale-95');
-                }, 10);
-            });
-        };
-        window.closeConfirm = (res) => {
-            document.getElementById('confirm-modal').classList.add('opacity-0');
-            document.getElementById('confirm-modal').querySelector('div').classList.add('scale-95');
-            setTimeout(() => {
-                document.getElementById('confirm-modal').classList.add('hidden');
-                if (confirmResolve) confirmResolve(res);
-            }, 300);
-        };
+        window.showConfirm = (title, msg) => new Promise(res => { confirmResolve = res; document.getElementById('conf-title').textContent = title; document.getElementById('conf-msg').textContent = msg; document.getElementById('confirm-modal').classList.remove('hidden'); setTimeout(() => { document.getElementById('confirm-modal').classList.remove('opacity-0'); document.getElementById('confirm-modal').querySelector('div').classList.remove('scale-95'); }, 10); });
+        window.closeConfirm = (res) => { document.getElementById('confirm-modal').classList.add('opacity-0'); document.getElementById('confirm-modal').querySelector('div').classList.add('scale-95'); setTimeout(() => { document.getElementById('confirm-modal').classList.add('hidden'); if (confirmResolve) confirmResolve(res); }, 300); };
         document.getElementById('conf-ok').addEventListener('click', () => closeConfirm(true));
+        window.toggleModal = (id) => document.getElementById(id).classList.toggle('hidden');
 
-        // === LIVE-РЕЖИМ ===
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = `fixed bottom-6 right-6 z-[100] bg-brand-card border ${type === 'success' ? 'border-emerald-500 text-emerald-400' : 'border-red-500 text-red-400'} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold`;
+            t.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${msg}`;
+            document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+        }
+
+        // === LIVE PRESENCE ===
         window.updateMyStatus = async function(view, itemId = null) {
             if (!globalPresenceChannel || !currentUser) return;
-            await globalPresenceChannel.track({
-                email: currentUser.email,
-                view: view,
-                itemId: itemId,
-                onlineAt: new Date().getTime()
-            });
+            await globalPresenceChannel.track({ email: currentUser.email, view: view, itemId: itemId, onlineAt: new Date().getTime() });
         }
-
         async function initPresence() {
-            if (!currentUser) return;
-            globalPresenceChannel = supabase.channel('admin-live', {
-                config: { presence: { key: currentUser.id } }
-            });
+            globalPresenceChannel = supabase.channel('admin-live', { config: { presence: { key: currentUser.id } } });
             globalPresenceChannel.on('presence', { event: 'sync' }, () => {
-                const state = globalPresenceChannel.presenceState();
-                const users = Object.values(state).flat();
-                const liveDot = document.getElementById('live-dot');
-                const liveText = document.getElementById('live-text');
-                if (users.length > 1) {
-                    liveDot.className = 'w-2 h-2 rounded-full bg-red-500 animate-ping';
-                    liveText.textContent = `Онлайн админов: ${users.length}`;
-                    liveText.parentElement.classList.add('text-red-400');
-                } else {
-                    liveDot.className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse';
-                    liveText.textContent = `Только вы онлайн`;
-                    liveText.parentElement.classList.remove('text-red-400');
-                }
-            }).subscribe(async (status) => {
-                if (status === 'SUBSCRIBED') await updateMyStatus('dashboard'); 
-            });
+                const users = Object.values(globalPresenceChannel.presenceState()).flat();
+                const dot = document.getElementById('live-dot'), txt = document.getElementById('live-text');
+                if (users.length > 1) { dot.className = 'w-2 h-2 rounded-full bg-red-500 animate-ping'; txt.textContent = `Онлайн админов: ${users.length}`; txt.parentElement.classList.add('text-red-400'); }
+                else { dot.className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse'; txt.textContent = `Только вы онлайн`; txt.parentElement.classList.remove('text-red-400'); }
+            }).subscribe((status) => { if (status === 'SUBSCRIBED') updateMyStatus('dashboard'); });
         }
 
+        // === AUTH & INIT ===
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'login.html'; return; }
-            
             currentUser = session.user;
             document.getElementById('user-email').textContent = currentUser.email;
-
             const { data: adminData } = await supabase.from('admins').select('user_id').eq('user_id', currentUser.id).maybeSingle();
-            
             document.getElementById('view-loading').classList.add('hidden');
-            if (!adminData) { 
-                document.getElementById('view-denied').classList.remove('hidden'); 
-                return; 
-            }
-
+            if (!adminData) { document.getElementById('view-denied').classList.remove('hidden'); return; }
             document.getElementById('view-content').classList.remove('hidden');
             await loadAllData();
             switchView('dashboard');
@@ -277,259 +235,248 @@
         }
 
         async function loadAllData() {
-            const [arts, mods, fb] = await Promise.all([
+            const [arts, mods, fb, md, mn] = await Promise.all([
                 supabase.from('articles').select('*').order('created_at', { ascending: false }),
                 supabase.from('models_3d').select('*').order('created_at', { ascending: false }),
-                supabase.from('feedback').select('*').order('created_at', { ascending: false })
+                supabase.from('feedback').select('*').order('created_at', { ascending: false }),
+                supabase.from('media').select('*').order('created_at', { ascending: false }),
+                supabase.from('menus').select('*')
             ]);
-            
             allData.articles = arts.data || [];
             allData.models = mods.data || [];
             allData.feedback = fb.data || [];
-
-            const pendingMods = allData.articles.filter(a => a.status === 'pending').length + 
-                                allData.models.filter(m => m.status === 'pending').length;
-            const unreadFb = allData.feedback.filter(f => !f.is_read).length;
-
-            if (pendingMods > 0) {
-                document.getElementById('mod-badge').textContent = pendingMods;
-                document.getElementById('mod-badge').classList.remove('hidden');
-            } else {
-                document.getElementById('mod-badge').classList.add('hidden');
-            }
+            allData.media = md.data || [];
             
-            if (unreadFb > 0) {
-                document.getElementById('fb-badge').textContent = unreadFb;
-                document.getElementById('fb-badge').classList.remove('hidden');
-            } else {
-                document.getElementById('fb-badge').classList.add('hidden');
-            }
+            allData.menus = {};
+            (mn.data || []).forEach(m => { allData.menus[m.id] = m.items; });
+
+            const pendingMods = allData.articles.filter(a => a.status === 'pending').length + allData.models.filter(m => m.status === 'pending').length;
+            const unreadFb = allData.feedback.filter(f => !f.is_read).length;
+            if (pendingMods > 0) { document.getElementById('mod-badge').textContent = pendingMods; document.getElementById('mod-badge').classList.remove('hidden'); } else { document.getElementById('mod-badge').classList.add('hidden'); }
+            if (unreadFb > 0) { document.getElementById('fb-badge').textContent = unreadFb; document.getElementById('fb-badge').classList.remove('hidden'); } else { document.getElementById('fb-badge').classList.add('hidden'); }
         }
 
         window.switchView = function(viewName) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            const navId = 'nav-' + viewName;
-            if (document.getElementById(navId)) document.getElementById(navId).classList.add('active');
-
+            const nav = document.getElementById('nav-' + viewName); if (nav) nav.classList.add('active');
             if (window.updateMyStatus) window.updateMyStatus(viewName);
-
-            const container = document.getElementById('view-content');
-            container.innerHTML = '<div class="text-center py-20"><i class="fa-solid fa-spinner fa-spin text-brand-teal"></i></div>';
-
+            const c = document.getElementById('view-content');
+            c.innerHTML = '<div class="text-center py-20"><i class="fa-solid fa-spinner fa-spin text-brand-teal"></i></div>';
             setTimeout(() => {
-                if (viewName === 'dashboard') renderDashboard(container);
-                if (viewName === 'moderation') renderModeration(container);
-                if (viewName === 'all_articles') renderAllContent(container, 'articles');
-                if (viewName === 'all_models') renderAllContent(container, 'models_3d');
-                if (viewName === 'feedback') renderFeedback(container);
-                if (viewName === 'settings') renderSettings(container);
+                if (viewName === 'dashboard') renderDashboard(c);
+                if (viewName === 'moderation') renderModeration(c);
+                if (viewName === 'all_articles') renderAllArticles(c);
+                if (viewName === 'all_models') renderAllModels(c);
+                if (viewName === 'feedback') renderFeedback(c);
+                if (viewName === 'settings') renderSettings(c);
+                if (viewName === 'media') renderMedia(c);
+                if (viewName === 'menus') renderMenus(c);
             }, 100);
         };
 
-        // --- ДАШБОРД ---
-        function renderDashboard(container) {
-            const publishedArts = allData.articles.filter(a => a.status === 'published').length;
-            const pendingArts = allData.articles.filter(a => a.status === 'pending').length;
-            const publishedMods = allData.models.filter(m => m.status === 'published').length;
+        // === RENDERERS ===
+        function renderDashboard(c) {
+            const pArts = allData.articles.filter(a => a.status === 'published').length;
+            const pendArts = allData.articles.filter(a => a.status === 'pending').length;
+            const pMods = allData.models.filter(m => m.status === 'published').length;
             const unreadFb = allData.feedback.filter(f => !f.is_read).length;
+            const totalMedia = allData.media.length;
 
-            container.innerHTML = `
-                <h1 class="text-3xl font-display font-bold text-white mb-8">Добро пожаловать в CMS</h1>
+            c.innerHTML = `
+                <h1 class="text-3xl font-display font-bold text-white mb-8">Дашборд</h1>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">Статьи (Опубл.)</div><div class="text-3xl font-bold text-white">${publishedArts}</div></div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-pending text-xs font-bold uppercase mb-1">Статьи (На модерации)</div><div class="text-3xl font-bold text-white">${pendingArts}</div></div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">3D Модели (Опубл.)</div><div class="text-3xl font-bold text-white">${publishedMods}</div></div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-teal text-xs font-bold uppercase mb-1">Новые сообщения</div><div class="text-3xl font-bold text-white">${unreadFb}</div></div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">Статьи (Опубл.)</div><div class="text-3xl font-bold text-white">${pArts}</div></div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-pending text-xs font-bold uppercase mb-1">Статьи (Модерация)</div><div class="text-3xl font-bold text-white">${pendArts}</div></div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">3D Модели</div><div class="text-3xl font-bold text-white">${pMods}</div></div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-teal text-xs font-bold uppercase mb-1">Медиафайлы</div><div class="text-3xl font-bold text-white">${totalMedia}</div></div>
                 </div>
                 <div class="bg-gradient-to-r from-blue-900/40 to-brand-card p-8 rounded-3xl border border-blue-500/30">
-                    <h2 class="text-xl font-bold text-white mb-2">🚀 Инструменты</h2>
-                    <div class="flex flex-wrap gap-4 mt-4">
-                        <a href="edit-site.html" class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all"><i class="fa-solid fa-sliders mr-2"></i> Редактор главной</a>
-                        <a href="builder.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Конструктор</a>
-                        <a href="edit-parts.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700"><i class="fa-solid fa-list-check mr-2"></i> Запчасти</a>
+                    <h2 class="text-xl font-bold text-white mb-2">Добро пожаловать в CMS</h2>
+                    <p class="text-gray-400 text-sm mb-6">Теперь вы можете управлять не только текстом, но и структурой сайта и медиафайлами.</p>
+                    <div class="flex gap-4">
+                        <button onclick="switchView('media')" class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Загрузить медиа</button>
+                        <button onclick="switchView('menus')" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700 transition-all"><i class="fa-solid fa-bars-staggered mr-2"></i> Настроить меню</button>
                     </div>
                 </div>
             `;
         }
 
-        // --- МОДЕРАЦИЯ (ТОЛЬКО PENDING) ---
-        function renderModeration(container) {
-            const pendingArts = allData.articles.filter(a => a.status === 'pending');
-            const pendingMods = allData.models.filter(m => m.status === 'pending');
-
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Очередь на модерацию</h1>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">`;
-            html += `<div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">Статьи (${pendingArts.length})</h2>`;
-            if (pendingArts.length === 0) html += `<p class="text-gray-500 text-sm">Нет статей на проверке.</p>`;
-            pendingArts.forEach(a => {
-                html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${a.title}</h3><p class="text-xs text-gray-400 mb-3 line-clamp-2">${a.summary}</p><div class="flex gap-2"><button onclick="approveItem('articles', '${a.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs font-bold">Одобрить</button><button onclick="deleteItem('articles', '${a.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs font-bold">Удалить</button></div></div>`;
+        function renderAllArticles(c) {
+            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Все статьи</h1><div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden"><table class="w-full text-left text-sm"><thead class="bg-brand-dark text-gray-400 text-xs uppercase border-b border-brand-border"><tr><th class="p-4">Название</th><th class="p-4">Статус</th><th class="p-4 text-center">Действия</th></tr></thead><tbody class="divide-y divide-brand-border/40">`;
+            if (allData.articles.length === 0) html += `<tr><td colspan="3" class="p-6 text-center text-gray-500">Нет записей</td></tr>`;
+            allData.articles.forEach(a => {
+                const st = a.status === 'published' ? `<span class="text-green-400 text-[10px] font-bold">ОПУБЛИКОВАНО</span>` : `<span class="text-brand-pending text-[10px] font-bold">НА ПРОВЕРКЕ</span>`;
+                html += `<tr><td class="p-4 font-semibold text-white">${a.title}</td><td class="p-4">${st}</td><td class="p-4 text-center"><button onclick="openEditArticle('${a.id}')" class="p-2 text-brand-teal hover:text-white"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('articles', '${a.id}')" class="p-2 text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
-            html += `</div><div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">3D Модели (${pendingMods.length})</h2>`;
-            if (pendingMods.length === 0) html += `<p class="text-gray-500 text-sm">Нет моделей на проверке.</p>`;
-            pendingMods.forEach(m => {
-                html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${m.title}</h3><p class="text-xs text-gray-400 mb-3 line-clamp-2">${m.description}</p><div class="flex gap-2"><button onclick="approveItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs font-bold">Одобрить</button><button onclick="deleteItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs font-bold">Удалить</button></div></div>`;
-            });
-            html += `</div></div>`;
-            container.innerHTML = html;
+            html += `</tbody></table></div>`; c.innerHTML = html;
         }
 
-        // --- УПРАВЛЕНИЕ ВСЕМ КОНТЕНТОМ (ВСЕ СТАТЬИ/МОДЕЛИ) ---
-        function renderAllContent(container, type) {
-            const isArticles = type === 'articles';
-            const data = isArticles ? allData.articles : allData.models;
-            const title = isArticles ? 'Все статьи' : 'Все 3D-модели';
-
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">${title}</h1>`;
-            html += `<div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-brand-dark text-gray-400 text-xs uppercase border-b border-brand-border">
-                                <tr><th class="p-4">Название</th><th class="p-4">Статус</th><th class="p-4">Дата</th><th class="p-4 text-center">Действия</th></tr>
-                            </thead><tbody class="divide-y divide-brand-border/40">`;
-            
-            if (data.length === 0) {
-                html += `<tr><td colspan="4" class="p-6 text-center text-gray-500">Нет записей</td></tr>`;
-            } else {
-                data.forEach(item => {
-                    const statusBadge = item.status === 'published' 
-                        ? `<span class="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[10px] font-bold">ОПУБЛИКОВАНО</span>` 
-                        : `<span class="px-2 py-0.5 bg-brand-pending/20 text-brand-pending rounded text-[10px] font-bold">НА ПРОВЕРКЕ</span>`;
-                    
-                    const date = new Date(item.created_at).toLocaleDateString('ru-RU');
-                    
-                    // Если это статья, добавляем кнопку редактирования
-                    const editBtn = isArticles 
-                        ? `<button onclick="openEditArticle('${item.id}')" class="p-2 text-brand-teal hover:text-white transition-colors" title="Редактировать"><i class="fa-solid fa-pen"></i></button>`
-                        : '';
-
-                    html += `<tr class="hover:bg-brand-border/30">
-                        <td class="p-4 font-semibold text-white">${item.title}</td>
-                        <td class="p-4">${statusBadge}</td>
-                        <td class="p-4 text-gray-400 text-xs">${date}</td>
-                        <td class="p-4 text-center">
-                            ${editBtn}
-                            <button onclick="deleteItem('${type}', '${item.id}')" class="p-2 text-red-400 hover:text-red-300 transition-colors" title="Удалить"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-                });
-            }
-            html += `</tbody></table></div>`;
-            container.innerHTML = html;
+        function renderAllModels(c) {
+            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Все 3D-модели</h1><div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden"><table class="w-full text-left text-sm"><thead class="bg-brand-dark text-gray-400 text-xs uppercase border-b border-brand-border"><tr><th class="p-4">Название</th><th class="p-4">Статус</th><th class="p-4 text-center">Действия</th></tr></thead><tbody class="divide-y divide-brand-border/40">`;
+            if (allData.models.length === 0) html += `<tr><td colspan="3" class="p-6 text-center text-gray-500">Нет записей</td></tr>`;
+            allData.models.forEach(m => {
+                const st = m.status === 'published' ? `<span class="text-green-400 text-[10px] font-bold">ОПУБЛИКОВАНО</span>` : `<span class="text-brand-pending text-[10px] font-bold">НА ПРОВЕРКЕ</span>`;
+                html += `<tr><td class="p-4 font-semibold text-white">${m.title}</td><td class="p-4">${st}</td><td class="p-4 text-center"><button onclick="deleteItem('models_3d', '${m.id}')" class="p-2 text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+            html += `</tbody></table></div>`; c.innerHTML = html;
         }
 
-        // --- СООБЩЕНИЯ ---
-        function renderFeedback(container) {
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Обратная связь</h1>`;
-            if (allData.feedback.length === 0) html += `<p class="text-gray-500">Сообщений пока нет.</p>`;
+        function renderModeration(c) {
+            const pArts = allData.articles.filter(a => a.status === 'pending');
+            const pMods = allData.models.filter(m => m.status === 'pending');
+            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Очередь модерации</h1><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">Статьи (${pArts.length})</h2>`;
+            if (pArts.length === 0) html += `<p class="text-gray-500 text-sm">Пусто.</p>`;
+            pArts.forEach(a => { html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${a.title}</h3><div class="flex gap-2 mt-2"><button onclick="approveItem('articles', '${a.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded text-xs font-bold">Одобрить</button><button onclick="deleteItem('articles', '${a.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded text-xs font-bold">Удалить</button></div></div>`; });
+            html += `</div><div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">3D Модели (${pMods.length})</h2>`;
+            if (pMods.length === 0) html += `<p class="text-gray-500 text-sm">Пусто.</p>`;
+            pMods.forEach(m => { html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${m.title}</h3><div class="flex gap-2 mt-2"><button onclick="approveItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded text-xs font-bold">Одобрить</button><button onclick="deleteItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded text-xs font-bold">Удалить</button></div></div>`; });
+            html += `</div></div>`; c.innerHTML = html;
+        }
+
+        function renderFeedback(c) {
+            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Сообщения</h1>`;
+            if (allData.feedback.length === 0) html += `<p class="text-gray-500">Нет сообщений.</p>`;
             allData.feedback.forEach(f => {
-                const isUnread = !f.is_read;
-                html += `<div class="bg-brand-card p-5 rounded-2xl border ${isUnread ? 'border-brand-teal/50' : 'border-brand-border'} mb-4"><div class="flex justify-between items-start mb-2"><span class="font-bold text-white">${f.name}</span><span class="text-xs text-gray-500">${new Date(f.created_at).toLocaleString('ru-RU')}</span></div><p class="text-sm text-gray-300 mb-4">${f.message}</p><div class="flex gap-2 items-center">${isUnread ? `<button onclick="markRead('${f.id}')" class="text-xs text-brand-teal hover:underline">Отметить прочитанным</button>` : `<span class="text-xs text-green-500">Прочитано</span>`}<button onclick="deleteItem('feedback', '${f.id}')" class="text-xs text-red-400 hover:underline ml-4">Удалить</button></div></div>`;
+                html += `<div class="bg-brand-card p-5 rounded-2xl border ${!f.is_read ? 'border-brand-teal/50' : 'border-brand-border'} mb-4"><div class="flex justify-between mb-2"><span class="font-bold text-white">${f.name}</span><span class="text-xs text-gray-500">${new Date(f.created_at).toLocaleString('ru-RU')}</span></div><p class="text-sm text-gray-300 mb-4">${f.message}</p><div class="flex gap-2">${!f.is_read ? `<button onclick="markRead('${f.id}')" class="text-xs text-brand-teal hover:underline">Прочитано</button>` : ''}<button onclick="deleteItem('feedback', '${f.id}')" class="text-xs text-red-400 hover:underline ml-4">Удалить</button></div></div>`;
             });
-            container.innerHTML = html;
+            c.innerHTML = html;
         }
 
-        // --- НАСТРОЙКИ ---
-        function renderSettings(container) {
-            container.innerHTML = `
-                <h1 class="text-3xl font-display font-bold text-white mb-8">Настройки сайта</h1>
-                <div class="bg-brand-card p-6 rounded-3xl border border-brand-border max-w-3xl">
-                    <h2 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-sliders text-brand-teal"></i> Кто может предлагать контент?</h2>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <label class="flex-1 cursor-pointer"><input type="radio" name="publish_mode" value="everyone" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Разрешить всем</span></div></label>
-                        <label class="flex-1 cursor-pointer"><input type="radio" name="publish_mode" value="registered" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Только для своих</span></div></label>
+        function renderSettings(c) {
+            c.innerHTML = `<h1 class="text-3xl font-display font-bold text-white mb-8">Настройки</h1><div class="bg-brand-card p-6 rounded-3xl border border-brand-border max-w-3xl"><h2 class="text-lg font-bold text-white mb-4">Кто может предлагать контент?</h2><div class="flex gap-4"><label class="flex-1"><input type="radio" name="publish_mode" value="everyone" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Всем</span></div></label><label class="flex-1"><input type="radio" name="publish_mode" value="registered" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Только своим</span></div></label></div><div class="mt-6 flex justify-end"><button onclick="saveSettings()" class="px-6 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl">Сохранить</button></div></div>`;
+            supabase.from('site_settings').select('value').eq('key', 'submission_mode').single().then(({data}) => { if (data) document.querySelector(`input[name="publish_mode"][value="${data.value}"]`).checked = true; });
+        }
+
+        // === МЕДИАБИБЛИОТЕКА ===
+        function renderMedia(c) {
+            let html = `
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-display font-bold text-white">Медиафайлы</h1>
+                    <label class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl cursor-pointer hover:scale-105 transition-all shadow-lg">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Загрузить файл
+                        <input type="file" id="media-upload" accept="image/*" class="hidden" onchange="uploadMedia(event)">
+                    </label>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            `;
+            if (allData.media.length === 0) html += `<div class="col-span-full py-10 text-center text-gray-500">Библиотека пуста.</div>`;
+            allData.media.forEach(m => {
+                html += `
+                    <div class="bg-brand-card border border-brand-border rounded-xl overflow-hidden group relative">
+                        <img src="${m.url}" class="w-full h-32 object-cover">
+                        <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                            <button onclick="navigator.clipboard.writeText('${m.url}'); showToast('Ссылка скопирована!')" class="px-3 py-1 bg-brand-teal text-black text-xs font-bold rounded w-11/12">Копировать URL</button>
+                            <button onclick="deleteItem('media', '${m.id}')" class="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded w-11/12">Удалить</button>
+                        </div>
                     </div>
-                    <div class="mt-6 flex justify-end"><button onclick="saveSettings()" class="px-6 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl"><i class="fa-solid fa-floppy-disk"></i> Сохранить</button></div>
+                `;
+            });
+            html += `</div>`; c.innerHTML = html;
+        }
+
+        window.uploadMedia = async function(e) {
+            const file = e.target.files[0]; if(!file) return;
+            showToast('Загрузка...', 'success');
+            const fileName = `media_${Date.now()}_${Math.random().toString(36).substring(2)}.webp`;
+            const { error: upErr } = await supabase.storage.from('images').upload(fileName, file);
+            if (upErr) { showToast('Ошибка загрузки', 'error'); return; }
+            const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
+            await supabase.from('media').insert([{ name: file.name, url: urlData.publicUrl }]);
+            await loadAllData(); switchView('media');
+        }
+
+        // === МЕНЕДЖЕР МЕНЮ ===
+        function renderMenus(c) {
+            c.innerHTML = `
+                <h1 class="text-3xl font-display font-bold text-white mb-8">Меню сайта</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
+                        <h2 class="text-xl font-bold text-brand-teal mb-4">Шапка (Header)</h2>
+                        <div id="menu-header-list" class="space-y-2 mb-4"></div>
+                        <button onclick="addMenuItem('header')" class="px-4 py-2 bg-brand-dark border border-brand-border hover:border-brand-teal rounded-lg text-sm w-full transition-colors">+ Добавить пункт</button>
+                        <button onclick="saveMenu('header')" class="mt-4 px-4 py-2 bg-brand-teal text-black font-bold rounded-lg text-sm w-full transition-transform hover:scale-[1.02]">Сохранить меню</button>
+                    </div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
+                        <h2 class="text-xl font-bold text-brand-teal mb-4">Подвал (Footer)</h2>
+                        <div id="menu-footer-list" class="space-y-2 mb-4"></div>
+                        <button onclick="addMenuItem('footer')" class="px-4 py-2 bg-brand-dark border border-brand-border hover:border-brand-teal rounded-lg text-sm w-full transition-colors">+ Добавить пункт</button>
+                        <button onclick="saveMenu('footer')" class="mt-4 px-4 py-2 bg-brand-teal text-black font-bold rounded-lg text-sm w-full transition-transform hover:scale-[1.02]">Сохранить меню</button>
+                    </div>
                 </div>
             `;
-            supabase.from('site_settings').select('value').eq('key', 'submission_mode').single().then(({data}) => {
-                if (data) { const radio = document.querySelector(`input[name="publish_mode"][value="${data.value}"]`); if (radio) radio.checked = true; }
-            });
+            renderMenuList('header');
+            renderMenuList('footer');
         }
 
-        // === РЕДАКТИРОВАНИЕ СТАТЬИ ===
+        function renderMenuList(id) {
+            const list = document.getElementById(`menu-${id}-list`);
+            const items = allData.menus[id] || [];
+            list.innerHTML = items.map((item, index) => `
+                <div class="flex gap-2 items-center bg-brand-dark p-2 rounded border border-brand-border">
+                    <input type="text" value="${item.title}" placeholder="Название" onchange="updateMenuItem('${id}', ${index}, 'title', this.value)" class="w-1/2 bg-transparent text-sm text-white focus:outline-none">
+                    <input type="text" value="${item.url}" placeholder="URL" onchange="updateMenuItem('${id}', ${index}, 'url', this.value)" class="w-1/2 bg-transparent text-sm text-gray-400 focus:outline-none">
+                    <button onclick="removeMenuItem('${id}', ${index})" class="text-red-400 p-1 hover:text-red-300 transition-colors"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        window.addMenuItem = function(id) {
+            if (!allData.menus[id]) allData.menus[id] = [];
+            allData.menus[id].push({ title: 'Новая ссылка', url: '#' });
+            renderMenuList(id);
+        }
+        window.removeMenuItem = function(id, index) {
+            allData.menus[id].splice(index, 1);
+            renderMenuList(id);
+        }
+        window.updateMenuItem = function(id, index, field, val) {
+            allData.menus[id][index][field] = val;
+        }
+        window.saveMenu = async function(id) {
+            await supabase.from('menus').update({ items: allData.menus[id] }).eq('id', id);
+            showToast('Меню сохранено!');
+        }
+
+        // === ARTICLE EDITING ===
         window.openEditArticle = function(id) {
-            const article = allData.articles.find(a => a.id === id);
-            if (!article) return;
-
-            document.getElementById('edit-art-id').value = article.id;
-            document.getElementById('edit-art-title').value = article.title;
-            document.getElementById('edit-art-category').value = article.category;
-            document.getElementById('edit-art-readtime').value = article.readtime;
-            document.getElementById('edit-art-summary').value = article.summary;
-
-            // Инициализация Quill
-            if (!editQuill) {
-                editQuill = new Quill('#edit-editor-container', {
-                    theme: 'snow',
-                    modules: { toolbar: [[{ 'header': [2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link', 'image', 'clean']] }
-                });
-            }
-            editQuill.root.innerHTML = article.content;
-
+            const a = allData.articles.find(x => x.id === id); if (!a) return;
+            document.getElementById('edit-art-id').value = a.id;
+            document.getElementById('edit-art-title').value = a.title;
+            document.getElementById('edit-art-category').value = a.category;
+            document.getElementById('edit-art-readtime').value = a.readtime;
+            document.getElementById('edit-art-summary').value = a.summary;
+            if (!editQuill) editQuill = new Quill('#edit-editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], [{ 'header': [2, 3, false] }], ['link', 'image', 'clean']] } });
+            editQuill.root.innerHTML = a.content;
             document.getElementById('edit-article-modal').classList.remove('hidden');
         }
 
         window.saveEditedArticle = async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('edit-art-btn');
-            btn.textContent = 'Сохранение...';
-            btn.disabled = true;
-
             const id = document.getElementById('edit-art-id').value;
-            const updatedData = {
+            const updated = {
                 title: document.getElementById('edit-art-title').value,
                 category: document.getElementById('edit-art-category').value,
                 readtime: document.getElementById('edit-art-readtime').value,
                 summary: document.getElementById('edit-art-summary').value,
                 content: editQuill.root.innerHTML
             };
+            await supabase.from('articles').update(updated).eq('id', id);
+            document.getElementById('edit-article-modal').classList.add('hidden');
+            await loadAllData(); switchView('all_articles');
+            showToast('Статья обновлена!');
+        }
 
-            const { error } = await supabase.from('articles').update(updatedData).eq('id', id);
-
-            btn.textContent = 'Сохранить изменения';
-            btn.disabled = false;
-
-            if (error) {
-                alert('Ошибка: ' + error.message);
-            } else {
-                document.getElementById('edit-article-modal').classList.add('hidden');
-                await loadAllData(); // Обновляем данные в памяти
-                switchView('all_articles'); // Перерисовываем таблицу
+        // === GLOBAL ACTIONS ===
+        window.approveItem = async function(t, id) { await supabase.from(t).update({ status: 'published' }).eq('id', id); await loadAllData(); switchView('moderation'); }
+        window.deleteItem = async function(t, id) {
+            if (await showConfirm('Удалить запись?', 'Это действие нельзя отменить.')) {
+                await supabase.from(t).delete().eq('id', id); await loadAllData();
+                const active = document.querySelector('.nav-item.active').id.replace('nav-', '');
+                switchView(active);
             }
-        };
-
-        // === ГЛОБАЛЬНЫЕ ДЕЙСТВИЯ ===
-        window.approveItem = async function(table, id) {
-            await supabase.from(table).update({ status: 'published' }).eq('id', id);
-            await loadAllData();
-            switchView('moderation');
-        };
-
-        window.deleteItem = async function(table, id) {
-            const ok = await showConfirm('Удалить запись?', 'Это действие нельзя отменить.');
-            if (ok) {
-                await supabase.from(table).delete().eq('id', id);
-                await loadAllData();
-                const activeNav = document.querySelector('.nav-item.active').id;
-                if (activeNav === 'nav-moderation') switchView('moderation');
-                if (activeNav === 'nav-feedback') switchView('feedback');
-                if (activeNav === 'nav-all_articles') switchView('all_articles');
-                if (activeNav === 'nav-all_models') switchView('all_models');
-            }
-        };
-
-        window.markRead = async function(id) {
-            await supabase.from('feedback').update({ is_read: true }).eq('id', id);
-            await loadAllData();
-            switchView('feedback');
-        };
-
-        window.saveSettings = async function() {
-            const mode = document.querySelector('input[name="publish_mode"]:checked').value;
-            await supabase.from('site_settings').update({ value: mode }).eq('key', 'submission_mode');
-            alert('Настройки сохранены!');
-        };
-
-        window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); };
+        }
+        window.markRead = async function(id) { await supabase.from('feedback').update({ is_read: true }).eq('id', id); await loadAllData(); switchView('feedback'); }
+        window.saveSettings = async function() { const mode = document.querySelector('input[name="publish_mode"]:checked').value; await supabase.from('site_settings').update({ value: mode }).eq('key', 'submission_mode'); showToast('Настройки сохранены!'); }
         window.logout = async function() { await supabase.auth.signOut(); window.location.href = 'index.html'; };
 
         checkAuth();
