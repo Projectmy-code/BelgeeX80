@@ -22,11 +22,9 @@ const pmremGenerator = new THREE.PMREMGenerator(renderer);
 scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
 // === 2. ОСВЕЩЕНИЕ ===
-// Мягкий общий свет
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-// Основной направленный свет (сверху справа)
 const mainLight = new THREE.DirectionalLight(0xffffff, 2);
 mainLight.position.set(5, 10, 5);
 mainLight.castShadow = true;
@@ -41,7 +39,6 @@ mainLight.shadow.camera.bottom = -10;
 mainLight.shadow.bias = -0.0005;
 scene.add(mainLight);
 
-// Подсветка спереди (чтобы выделить решетку и фары)
 const frontLight = new THREE.DirectionalLight(0xffffff, 1.5);
 frontLight.position.set(0, 2, 10);
 scene.add(frontLight);
@@ -87,7 +84,7 @@ loader.load(
                 child.castShadow = true;
                 child.receiveShadow = true;
                 if (child.material && child.material.isMeshStandardMaterial) {
-                    child.material.envMapIntensity = 2.0; // Усиливаем отражения
+                    child.material.envMapIntensity = 2.0;
                 }
             }
         });
@@ -106,7 +103,6 @@ loader.load(
         
         scene.add(carModel);
 
-        // Инициализируем цвет по умолчанию
         changeColor(colors[0]);
 
         document.getElementById('loader').classList.add('hidden');
@@ -125,13 +121,14 @@ loader.load(
     }
 );
 
-// === 6. ЦВЕТА КУЗОВА ===
+// === 6. ЦВЕТА КУЗОВА (Палитра Geely EX5) ===
 const colors = [
-    { name: 'A08 · Crystal White', hex: '#ffffff', metal: 0.4, rough: 0.1 },
-    { name: 'A12 · Obsidian Black', hex: '#050505', metal: 0.9, rough: 0.1 },
-    { name: 'A05 · Metallic Grey', hex: '#6b7280', metal: 0.8, rough: 0.2 },
-    { name: 'A22 · Sport Red', hex: '#991b1b', metal: 0.7, rough: 0.15 },
-    { name: 'A30 · Ocean Blue', hex: '#1e3a8a', metal: 0.7, rough: 0.15 }
+    { name: 'A08 · Crystal White', hex: '#f2f4f8', metal: 0.2, rough: 0.15 },
+    { name: 'A12 · Ink Black', hex: '#0a0b0e', metal: 0.9, rough: 0.08 },
+    { name: 'A05 · Magnetic Grey', hex: '#4a4f57', metal: 0.8, rough: 0.25 },
+    { name: 'A22 · Moon Silver', hex: '#a8adb4', metal: 0.9, rough: 0.2 },
+    { name: 'A30 · Water Reflection Blue', hex: '#1b3b5c', metal: 0.7, rough: 0.2 },
+    { name: 'A33 · Jungle Green', hex: '#2d4a3e', metal: 0.75, rough: 0.2 }
 ];
 
 const swatchesContainer = document.getElementById('color-swatches');
@@ -142,7 +139,7 @@ colors.forEach((color, index) => {
     swatch.className = 'swatch' + (index === 0 ? ' active' : '');
     swatch.style.backgroundColor = color.hex;
     
-    if (color.hex === '#ffffff') {
+    if (color.hex === '#ffffff' || color.hex === '#f2f4f8') {
         swatch.style.border = '1px solid #ccc';
     }
     
@@ -163,7 +160,6 @@ function changeColor(colorObj) {
         if (child.isMesh) {
             const mat = child.material;
             if (mat) {
-                // Более надежный поиск кузова
                 const isBody = mat.name.toLowerCase().includes('body') || 
                                mat.name.toLowerCase().includes('paint') || 
                                child.name.toLowerCase().includes('body') || 
