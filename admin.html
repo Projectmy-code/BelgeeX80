@@ -24,7 +24,6 @@
 </head>
 <body class="min-h-screen flex antialiased">
 
-    <!-- ЛЕВОЕ МЕНЮ (SIDEBAR) -->
     <aside class="w-64 glass-panel fixed h-full flex flex-col z-20">
         <div class="h-20 flex items-center px-6 border-b border-brand-border">
             <div class="flex items-center gap-3">
@@ -81,25 +80,18 @@
         </div>
     </aside>
 
-    <!-- ПРАВАЯ ЧАСТЬ (КОНТЕНТ) -->
     <main class="flex-1 ml-64 min-h-screen relative">
-        
         <div id="view-loading" class="absolute inset-0 flex items-center justify-center bg-brand-dark z-10">
             <i class="fa-solid fa-spinner fa-spin text-3xl text-brand-teal"></i>
         </div>
-
         <div id="view-denied" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-brand-dark z-10">
             <i class="fa-solid fa-lock text-5xl text-red-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-white mb-2">Доступ запрещен</h2>
             <p class="text-gray-400 text-sm">У вас нет прав администратора.</p>
-            <a href="index.html" class="mt-4 px-4 py-2 bg-brand-border text-white rounded-lg">На главную</a>
         </div>
-
         <div id="view-content" class="hidden p-8"></div>
-
     </main>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
     <div id="confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
             <h3 id="conf-title" class="text-xl font-bold text-center text-white mb-2">Удалить?</h3>
@@ -113,11 +105,9 @@
 
     <script type="module">
         import { supabase } from './js/config.js';
-
         let currentUser = null;
         let allData = { articles: [], models: [], feedback: [] };
 
-        // === ОКНО ПОДТВЕРЖДЕНИЯ ===
         let confirmResolve;
         window.showConfirm = (title, msg) => {
             return new Promise(res => {
@@ -140,7 +130,6 @@
             }, 300);
         };
         document.getElementById('conf-ok').addEventListener('click', () => closeConfirm(true));
-        // ======================================
 
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -148,14 +137,10 @@
             
             currentUser = session.user;
             document.getElementById('user-email').textContent = currentUser.email;
-
             const { data: adminData } = await supabase.from('admins').select('user_id').eq('user_id', currentUser.id).maybeSingle();
             
             document.getElementById('view-loading').classList.add('hidden');
-            if (!adminData) { 
-                document.getElementById('view-denied').classList.remove('hidden'); 
-                return; 
-            }
+            if (!adminData) { document.getElementById('view-denied').classList.remove('hidden'); return; }
 
             document.getElementById('view-content').classList.remove('hidden');
             await loadAllData();
@@ -173,23 +158,11 @@
             allData.models = mods.data || [];
             allData.feedback = fb.data || [];
 
-            const pendingMods = allData.articles.filter(a => a.status === 'pending').length + 
-                                allData.models.filter(m => m.status === 'pending').length;
+            const pendingMods = allData.articles.filter(a => a.status === 'pending').length + allData.models.filter(m => m.status === 'pending').length;
             const unreadFb = allData.feedback.filter(f => !f.is_read).length;
 
-            if (pendingMods > 0) {
-                document.getElementById('mod-badge').textContent = pendingMods;
-                document.getElementById('mod-badge').classList.remove('hidden');
-            } else {
-                document.getElementById('mod-badge').classList.add('hidden');
-            }
-            
-            if (unreadFb > 0) {
-                document.getElementById('fb-badge').textContent = unreadFb;
-                document.getElementById('fb-badge').classList.remove('hidden');
-            } else {
-                document.getElementById('fb-badge').classList.add('hidden');
-            }
+            if (pendingMods > 0) { document.getElementById('mod-badge').textContent = pendingMods; document.getElementById('mod-badge').classList.remove('hidden'); } else { document.getElementById('mod-badge').classList.add('hidden'); }
+            if (unreadFb > 0) { document.getElementById('fb-badge').textContent = unreadFb; document.getElementById('fb-badge').classList.remove('hidden'); } else { document.getElementById('fb-badge').classList.add('hidden'); }
         }
 
         window.switchView = function(viewName) {
@@ -208,7 +181,6 @@
             }, 100);
         };
 
-        // --- ДАШБОРД ---
         function renderDashboard(container) {
             const publishedArts = allData.articles.filter(a => a.status === 'published').length;
             const pendingArts = allData.articles.filter(a => a.status === 'pending').length;
@@ -217,179 +189,67 @@
 
             container.innerHTML = `
                 <h1 class="text-3xl font-display font-bold text-white mb-8">Добро пожаловать в CMS</h1>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
-                        <div class="text-gray-400 text-xs font-bold uppercase mb-1">Статьи (Опубл.)</div>
-                        <div class="text-3xl font-bold text-white">${publishedArts}</div>
-                    </div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
-                        <div class="text-brand-pending text-xs font-bold uppercase mb-1">Статьи (На модерации)</div>
-                        <div class="text-3xl font-bold text-white">${pendingArts}</div>
-                    </div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
-                        <div class="text-gray-400 text-xs font-bold uppercase mb-1">3D Модели (Опубл.)</div>
-                        <div class="text-3xl font-bold text-white">${publishedMods}</div>
-                    </div>
-                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border">
-                        <div class="text-brand-teal text-xs font-bold uppercase mb-1">Новые сообщения</div>
-                        <div class="text-3xl font-bold text-white">${unreadFb}</div>
-                    </div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">Статьи (Опубл.)</div><div class="text-3xl font-bold text-white">${publishedArts}</div></div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-pending text-xs font-bold uppercase mb-1">Статьи (На модерации)</div><div class="text-3xl font-bold text-white">${pendingArts}</div></div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-gray-400 text-xs font-bold uppercase mb-1">3D Модели (Опубл.)</div><div class="text-3xl font-bold text-white">${publishedMods}</div></div>
+                    <div class="bg-brand-card p-6 rounded-2xl border border-brand-border"><div class="text-brand-teal text-xs font-bold uppercase mb-1">Новые сообщения</div><div class="text-3xl font-bold text-white">${unreadFb}</div></div>
                 </div>
-
                 <div class="bg-gradient-to-r from-blue-900/40 to-brand-card p-8 rounded-3xl border border-blue-500/30">
-                    <h2 class="text-xl font-bold text-white mb-2">🚀 Инструменты разработчика</h2>
-                    <p class="text-gray-400 text-sm mb-6">Управляйте контентом сайта без единой строчки кода.</p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="edit-site.html" class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all shadow-lg"><i class="fa-solid fa-sliders mr-2"></i> Редактор главной</a>
-                        <a href="builder.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700 transition-all"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Конструктор страниц</a>
-                        <a href="edit-parts.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700 transition-all"><i class="fa-solid fa-list-check mr-2"></i> Каталог запчастей</a>
+                    <h2 class="text-xl font-bold text-white mb-2">🚀 Инструменты</h2>
+                    <div class="flex flex-wrap gap-4 mt-4">
+                        <a href="edit-site.html" class="px-5 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all"><i class="fa-solid fa-sliders mr-2"></i> Редактор главной</a>
+                        <a href="builder.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Конструктор</a>
+                        <a href="edit-parts.html" class="px-5 py-2.5 bg-brand-border text-white font-bold text-sm rounded-xl hover:bg-gray-700"><i class="fa-solid fa-list-check mr-2"></i> Запчасти</a>
                     </div>
                 </div>
             `;
         }
 
-        // --- МОДЕРАЦИЯ ---
         function renderModeration(container) {
             const pendingArts = allData.articles.filter(a => a.status === 'pending');
             const pendingMods = allData.models.filter(m => m.status === 'pending');
-
-            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Модерация контента</h1>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">`;
-
-            // Статьи
+            let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Модерация</h1><div class="grid grid-cols-1 lg:grid-cols-2 gap-8">`;
             html += `<div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">Статьи (${pendingArts.length})</h2>`;
-            if (pendingArts.length === 0) html += `<p class="text-gray-500 text-sm">Нет статей на проверке.</p>`;
-            pendingArts.forEach(a => {
-                html += `
-                    <div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3">
-                        <h3 class="font-bold text-white">${a.title}</h3>
-                        <p class="text-xs text-gray-400 mb-3">${a.summary}</p>
-                        <div class="flex gap-2">
-                            <button onclick="approveItem('articles', '${a.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg text-xs font-bold hover:bg-green-500/30">Одобрить</button>
-                            <button onclick="deleteItem('articles', '${a.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500/30">Удалить</button>
-                        </div>
-                    </div>
-                `;
-            });
-            html += `</div>`;
-
-            // 3D Модели
-            html += `<div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">3D Модели (${pendingMods.length})</h2>`;
-            if (pendingMods.length === 0) html += `<p class="text-gray-500 text-sm">Нет моделей на проверке.</p>`;
-            pendingMods.forEach(m => {
-                html += `
-                    <div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3">
-                        <h3 class="font-bold text-white">${m.title}</h3>
-                        <p class="text-xs text-gray-400 mb-3">${m.description}</p>
-                        <div class="flex gap-2">
-                            <button onclick="approveItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg text-xs font-bold hover:bg-green-500/30">Одобрить</button>
-                            <button onclick="deleteItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500/30">Удалить</button>
-                        </div>
-                    </div>
-                `;
-            });
+            pendingArts.forEach(a => html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${a.title}</h3><p class="text-xs text-gray-400 mb-3">${a.summary}</p><div class="flex gap-2"><button onclick="approveItem('articles', '${a.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs font-bold">Одобрить</button><button onclick="deleteItem('articles', '${a.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs font-bold">Удалить</button></div></div>`);
+            html += `</div><div><h2 class="text-xl font-bold text-brand-teal mb-4 border-b border-brand-border pb-2">3D Модели (${pendingMods.length})</h2>`;
+            pendingMods.forEach(m => html += `<div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-3"><h3 class="font-bold text-white">${m.title}</h3><p class="text-xs text-gray-400 mb-3">${m.description}</p><div class="flex gap-2"><button onclick="approveItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs font-bold">Одобрить</button><button onclick="deleteItem('models_3d', '${m.id}')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs font-bold">Удалить</button></div></div>`);
             html += `</div></div>`;
-
             container.innerHTML = html;
         }
 
-        // --- СООБЩЕНИЯ ---
         function renderFeedback(container) {
             let html = `<h1 class="text-3xl font-display font-bold text-white mb-8">Обратная связь</h1>`;
-            
-            if (allData.feedback.length === 0) {
-                html += `<p class="text-gray-500">Сообщений пока нет.</p>`;
-            }
-
+            if (allData.feedback.length === 0) html += `<p class="text-gray-500">Сообщений пока нет.</p>`;
             allData.feedback.forEach(f => {
                 const isUnread = !f.is_read;
-                html += `
-                    <div class="bg-brand-card p-5 rounded-2xl border ${isUnread ? 'border-brand-teal/50' : 'border-brand-border'} mb-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="font-bold text-white">${f.name}</span>
-                            <span class="text-xs text-gray-500">${new Date(f.created_at).toLocaleString('ru-RU')}</span>
-                        </div>
-                        <p class="text-sm text-gray-300 mb-4">${f.message}</p>
-                        <div class="flex gap-2 items-center">
-                            ${isUnread ? `<button onclick="markRead('${f.id}')" class="text-xs text-brand-teal hover:underline">Отметить прочитанным</button>` : `<span class="text-xs text-green-500"><i class="fa-solid fa-check-double"></i> Прочитано</span>`}
-                            <button onclick="deleteItem('feedback', '${f.id}')" class="text-xs text-red-400 hover:underline ml-4">Удалить</button>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="bg-brand-card p-5 rounded-2xl border ${isUnread ? 'border-brand-teal/50' : 'border-brand-border'} mb-4"><div class="flex justify-between items-start mb-2"><span class="font-bold text-white">${f.name}</span><span class="text-xs text-gray-500">${new Date(f.created_at).toLocaleString('ru-RU')}</span></div><p class="text-sm text-gray-300 mb-4">${f.message}</p><div class="flex gap-2 items-center">${isUnread ? `<button onclick="markRead('${f.id}')" class="text-xs text-brand-teal hover:underline">Отметить прочитанным</button>` : `<span class="text-xs text-green-500">Прочитано</span>`}<button onclick="deleteItem('feedback', '${f.id}')" class="text-xs text-red-400 hover:underline ml-4">Удалить</button></div></div>`;
             });
-
             container.innerHTML = html;
         }
 
-        // --- НАСТРОЙКИ ---
         function renderSettings(container) {
             container.innerHTML = `
                 <h1 class="text-3xl font-display font-bold text-white mb-8">Настройки сайта</h1>
-                <div class="bg-brand-card p-6 md:p-8 rounded-3xl border border-brand-border relative overflow-hidden max-w-3xl">
-                    <h2 class="text-lg font-bold text-white mb-1 flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-teal"></i> Кто может предлагать контент?</h2>
-                    <div class="flex flex-col sm:flex-row gap-4 mt-4">
-                        <label class="flex-1 cursor-pointer">
-                            <input type="radio" name="publish_mode" value="everyone" class="peer sr-only">
-                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all">
-                                <span class="font-bold text-white text-sm">Разрешить всем</span>
-                            </div>
-                        </label>
-                        <label class="flex-1 cursor-pointer">
-                            <input type="radio" name="publish_mode" value="registered" class="peer sr-only">
-                            <div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5 transition-all">
-                                <span class="font-bold text-white text-sm">Только для своих</span>
-                            </div>
-                        </label>
+                <div class="bg-brand-card p-6 rounded-3xl border border-brand-border max-w-3xl">
+                    <h2 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-sliders text-brand-teal"></i> Кто может предлагать контент?</h2>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <label class="flex-1 cursor-pointer"><input type="radio" name="publish_mode" value="everyone" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Разрешить всем</span></div></label>
+                        <label class="flex-1 cursor-pointer"><input type="radio" name="publish_mode" value="registered" class="peer sr-only"><div class="p-4 rounded-2xl border border-brand-border bg-brand-dark peer-checked:border-brand-teal peer-checked:bg-brand-teal/5"><span class="font-bold text-white text-sm">Только для своих</span></div></label>
                     </div>
-                    <div class="mt-6 flex justify-end">
-                        <button onclick="saveSettings()" class="px-6 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl hover:scale-105 transition-all flex items-center gap-2"><i class="fa-solid fa-floppy-disk"></i> Сохранить</button>
-                    </div>
+                    <div class="mt-6 flex justify-end"><button onclick="saveSettings()" class="px-6 py-2.5 bg-brand-teal text-black font-bold text-sm rounded-xl"><i class="fa-solid fa-floppy-disk"></i> Сохранить</button></div>
                 </div>
             `;
-
             supabase.from('site_settings').select('value').eq('key', 'submission_mode').single().then(({data}) => {
-                if (data) {
-                    const radio = document.querySelector(`input[name="publish_mode"][value="${data.value}"]`);
-                    if (radio) radio.checked = true;
-                }
+                if (data) { const radio = document.querySelector(`input[name="publish_mode"][value="${data.value}"]`); if (radio) radio.checked = true; }
             });
         }
 
-        // === ГЛОБАЛЬНЫЕ ДЕЙСТВИЯ ===
-        window.approveItem = async function(table, id) {
-            await supabase.from(table).update({ status: 'published' }).eq('id', id);
-            await loadAllData();
-            switchView('moderation');
-        };
-
-        window.deleteItem = async function(table, id) {
-            const ok = await showConfirm('Удалить запись?', 'Это действие нельзя отменить.');
-            if (ok) {
-                await supabase.from(table).delete().eq('id', id);
-                await loadAllData();
-                const activeNav = document.querySelector('.nav-item.active').id;
-                if (activeNav === 'nav-moderation') switchView('moderation');
-                if (activeNav === 'nav-feedback') switchView('feedback');
-            }
-        };
-
-        window.markRead = async function(id) {
-            await supabase.from('feedback').update({ is_read: true }).eq('id', id);
-            await loadAllData();
-            switchView('feedback');
-        };
-
-        window.saveSettings = async function() {
-            const mode = document.querySelector('input[name="publish_mode"]:checked').value;
-            await supabase.from('site_settings').update({ value: mode }).eq('key', 'submission_mode');
-            alert('Настройки сохранены!');
-        };
-
-        window.logout = async function() {
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
-        };
+        window.approveItem = async function(table, id) { await supabase.from(table).update({ status: 'published' }).eq('id', id); await loadAllData(); switchView('moderation'); };
+        window.deleteItem = async function(table, id) { const ok = await showConfirm('Удалить запись?', 'Это действие нельзя отменить.'); if (ok) { await supabase.from(table).delete().eq('id', id); await loadAllData(); const activeNav = document.querySelector('.nav-item.active').id; if (activeNav === 'nav-moderation') switchView('moderation'); if (activeNav === 'nav-feedback') switchView('feedback'); } };
+        window.markRead = async function(id) { await supabase.from('feedback').update({ is_read: true }).eq('id', id); await loadAllData(); switchView('feedback'); };
+        window.saveSettings = async function() { const mode = document.querySelector('input[name="publish_mode"]:checked').value; await supabase.from('site_settings').update({ value: mode }).eq('key', 'submission_mode'); alert('Настройки сохранены!'); };
+        window.logout = async function() { await supabase.auth.signOut(); window.location.href = 'index.html'; };
 
         checkAuth();
     </script>
