@@ -22,7 +22,6 @@
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         #stl-viewer-container { width: 100%; height: 60vh; min-height: 400px; }
 
-        /* Анимации для стильных уведомлений */
         @keyframes slideIn {
             0% { transform: translateX(50px); opacity: 0; }
             100% { transform: translateX(0); opacity: 1; }
@@ -32,7 +31,6 @@
             100% { opacity: 0; transform: translateY(-10px); }
         }
     </style>
-    <!-- Подключаем Three.js и загрузчики -->
     <script type="importmap">
     {
         "imports": {
@@ -44,7 +42,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
-    <!-- HEADER -->
     <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
             <a href="index.html" class="flex items-center gap-3 group shrink-0">
@@ -66,7 +63,6 @@
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
@@ -164,12 +160,10 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="bg-brand-dark py-8 text-gray-400 text-xs border-t border-brand-border text-center">
         <p>© 2026 BELGEE X80 Club Portal. Все права защищены.</p>
     </footer>
 
-    <!-- СКРИПТЫ -->
     <script type="module">
         import { supabase } from './js/config.js';
         import * as THREE from 'three';
@@ -181,7 +175,6 @@
         let generatedBase64Image = null;
         let uploadedFileUrl = null;
 
-        // === ФУНКЦИЯ КРАСИВЫХ УВЕДОМЛЕНИЙ (TOAST) ===
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             const isSuccess = type === 'success';
@@ -192,20 +185,15 @@
             toast.className = `fixed bottom-6 right-6 z-[100] bg-brand-card border ${borderColor} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold text-white`;
             toast.style.animation = 'slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
             
-            toast.innerHTML = `
-                <i class="fa-solid ${iconClass} text-xl ${iconColor}"></i>
-                <span>${message}</span>
-            `;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-xl ${iconColor}"></i><span>${message}</span>`;
             document.body.appendChild(toast);
 
-            // Автоматическое скрытие
             setTimeout(() => {
                 toast.style.animation = 'fadeOut 0.3s ease forwards';
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
 
-        // === 1. ЗАГРУЗКА МОДЕЛЕЙ ИЗ БАЗЫ ===
         async function loadModels() {
             const { data: models, error } = await supabase
                 .from('models_3d')
@@ -250,7 +238,6 @@
             });
         }
 
-        // === 2. ЗАГРУЗКА ФАЙЛА И РЕНДЕР ПРЕВЬЮ ===
         window.processUpload = async function() {
             const fileInput = document.getElementById('model-file');
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -282,7 +269,6 @@
                 
                 status.textContent = 'Шаг 2: Генерация 3D-превью...';
 
-                // Рендер
                 const width = 600, height = 400;
                 const scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x161e2b);
@@ -347,7 +333,6 @@
             }
         };
 
-        // === 3. ОТПРАВКА ФОРМЫ ===
         window.handleAddModelSubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submit-model-btn');
@@ -360,6 +345,9 @@
             btn.textContent = 'Отправка...';
             btn.disabled = true;
 
+            // ПОЛУЧАЕМ СЕССИЮ ПОЛЬЗОВАТЕЛЯ
+            const { data: { session } } = await supabase.auth.getSession();
+
             const newModel = {
                 title: document.getElementById('model-title').value,
                 category: document.getElementById('model-category').value,
@@ -368,7 +356,8 @@
                 link: uploadedFileUrl,
                 stl_url: uploadedFileUrl,
                 image_url: generatedBase64Image,
-                status: 'pending'
+                status: 'pending',
+                user_id: session ? session.user.id : null // ПРИВЯЗКА К ПОЛЬЗОВАТЕЛЮ
             };
 
             const { error } = await supabase.from('models_3d').insert([newModel]);
@@ -379,9 +368,8 @@
             if (error) {
                 showToast('Ошибка при отправке: ' + error.message, 'error');
             } else {
-                showToast('Спасибо! Ваша модель отправлена на проверку.'); // Используем красивый Toast
+                showToast('Спасибо! Ваша модель отправлена на проверку.');
                 
-                // Очищаем форму
                 e.target.reset();
                 document.getElementById('preview-container').classList.add('hidden');
                 document.getElementById('upload-status').classList.add('hidden');
@@ -390,14 +378,12 @@
                 generatedBase64Image = null;
                 uploadedFileUrl = null;
                 
-                // Плавно закрываем окно
                 setTimeout(() => {
                     document.getElementById('add-model-modal').classList.add('hidden');
                 }, 500);
             }
         };
 
-        // === 4. ОТКРЫТИЕ МОДАЛЬНЫХ ОКОН ===
         window.openSubmission = async function() {
             const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'submission_mode').single();
             const mode = settings ? settings.value : 'everyone';
@@ -413,7 +399,6 @@
 
         window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); }
 
-        // === 5. 3D ПРОСМОТР ===
         let viewerScene, viewerCamera, viewerRenderer, viewerControls, animId;
         
         window.openSTLModal = (url, title) => {
@@ -486,7 +471,6 @@
             animate();
         }
 
-        // Запуск
         loadModels();
     </script>
 </body>
