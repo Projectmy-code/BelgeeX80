@@ -21,15 +21,28 @@
         .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .card-glow { transition: all 0.3s ease; }
         .card-glow:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15); transform: translateY(-2px); }
+        
+        /* Стили для скроллбара всей страницы */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         
-        /* Красивый ползунок */
+        /* Красивый ползунок для модалки */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; margin: 16px 0; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #253142; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+
+        /* ЖЕСТКИЕ СТИЛИ ДЛЯ КАРТИНОК В СТАТЬЯХ (чтобы точно сработало) */
+        #info-modal-content img {
+            border-radius: 16px !important;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8) !important;
+            margin: 24px auto !important;
+            display: block !important;
+            max-width: 100% !important;
+            height: auto !important;
+            border: none !important;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-black">
@@ -89,7 +102,7 @@
         </div>
     </main>
 
-    <!-- MODAL: FULL ARTICLE (С КЛИКОМ НА ФОН И СТИЛЯМИ) -->
+    <!-- MODAL: FULL ARTICLE -->
     <div id="info-modal" onclick="closeModalOnBg(event)" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
             <button onclick="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg z-10">
@@ -103,7 +116,7 @@
                     <span id="info-modal-time"></span>
                 </div>
             </div>
-            <!-- Добавлен класс content-html -->
+            <!-- Класс content-html добавлен для стилей -->
             <div id="info-modal-content" class="content-html text-sm text-gray-300 leading-relaxed"></div>
             <div class="mt-6 pt-4 border-t border-brand-border/60 flex items-center justify-between">
                 <span class="text-xs text-gray-500">BELGEE X80 Knowledge Base</span>
@@ -183,6 +196,7 @@
             
             nextItems.forEach(article => {
                 const imgUrl = article.image_url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80';
+
                 const div = document.createElement('div');
                 div.className = 'bg-brand-card rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full overflow-hidden';
                 div.onclick = () => openArticle(article);
@@ -221,6 +235,8 @@
             document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readtime}`;
             
             let content = article.content || '';
+            
+            // Вставляем картинку без лишних классов Tailwind, чтобы она не перебивала стили
             if (article.image_url) {
                 content = `<figure><img src="${article.image_url}" alt="${article.title}" loading="lazy"></figure>` + `<div class="content-html">${content}</div>`;
             } else {
@@ -231,7 +247,7 @@
             contentEl.innerHTML = content;
             document.getElementById('info-modal').classList.remove('hidden');
 
-            // Принудительные стили для картинок
+            // Жесткое применение стилей через JavaScript
             setTimeout(() => {
                 contentEl.querySelectorAll('img').forEach(img => {
                     img.style.setProperty('border-radius', '16px', 'important');
@@ -240,6 +256,7 @@
                     img.style.setProperty('display', 'block', 'important');
                     img.style.setProperty('max-width', '100%', 'important');
                     img.style.setProperty('height', 'auto', 'important');
+                    img.style.setProperty('border', 'none', 'important');
                 });
             }, 100);
         }
