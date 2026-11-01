@@ -1,3 +1,13 @@
+/* ЯДЕРНЫЙ CSS ДЛЯ КАРТИНОК */
+#info-modal-content img {
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8) !important;
+    margin: 24px auto !important;
+    display: block !important;
+    max-width: 100% !important;
+    height: auto !important;
+    border: none !important;
+}
 /* ЖЕСТКИЕ СТИЛИ ДЛЯ ВСЕХ КАРТИНОК В МОДАЛКЕ СТАТЬИ */
 #info-modal-content img {
     display: block !important;
