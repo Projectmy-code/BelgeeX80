@@ -1,221 +1,25 @@
-/* ============================================================
-   Красивый вывод контента статей: картинки, цитаты, списки, код
-   Подключается в index.html, articles.html, page.html
-   ============================================================ */
-
-/* -------- КАРТИНКИ -------- */
-.content-html img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: 28px auto;
-  border-radius: 16px;
+/* -------- КАРТИНКИ (ЖЕСТКОЕ ПРИМЕНЕНИЕ) -------- */
+.content-html img,
+#info-modal-content img,
+#page-content img,
+.article-text img {
+  display: block !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 28px auto !important;
+  border-radius: 16px !important;
   box-shadow:
     0 10px 30px -10px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-  background: #161e2b;
+    0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+  transition: transform 0.35s ease, box-shadow 0.35s ease !important;
+  background: #161e2b !important;
 }
 
-.content-html img:hover {
-  transform: scale(1.015);
+.content-html img:hover,
+#info-modal-content img:hover,
+#page-content img:hover {
+  transform: scale(1.015) !important;
   box-shadow:
     0 18px 45px -12px rgba(0, 240, 255, 0.18),
-    0 0 0 1px rgba(0, 240, 255, 0.15);
-}
-
-.content-html figure {
-  margin: 32px 0;
-}
-
-.content-html figure img {
-  margin: 0 auto 12px;
-}
-
-.content-html figcaption {
-  text-align: center;
-  font-size: 13px;
-  color: #6b7891;
-  font-style: italic;
-  line-height: 1.5;
-}
-
-#info-modal-content.content-html img,
-#info-modal-content img {
-  margin: 20px auto;
-  border-radius: 14px;
-}
-
-/* -------- ТЕКСТ И ЗАГОЛОВКИ -------- */
-.content-html p {
-  margin-bottom: 18px;
-  line-height: 1.75;
-  color: #cbd5e1;
-}
-
-.content-html h2 {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  color: #00f0ff;
-  margin: 36px 0 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.15);
-  letter-spacing: -0.01em;
-}
-
-.content-html h3 {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 28px 0 12px;
-}
-
-.content-html h4 {
-  font-size: 17px;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 22px 0 10px;
-}
-
-.content-html strong {
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.content-html em {
-  color: #00f0ff;
-  font-style: italic;
-}
-
-/* -------- ССЫЛКИ -------- */
-.content-html a {
-  color: #00f0ff;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.3);
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-
-.content-html a:hover {
-  color: #ffffff;
-  border-bottom-color: #00f0ff;
-}
-
-/* -------- СПИСКИ -------- */
-.content-html ul,
-.content-html ol {
-  margin: 16px 0 20px;
-  padding-left: 26px;
-  color: #cbd5e1;
-}
-
-.content-html ul { list-style: disc; }
-.content-html ol { list-style: decimal; }
-
-.content-html li {
-  margin-bottom: 8px;
-  line-height: 1.7;
-}
-
-.content-html li::marker {
-  color: #00f0ff;
-}
-
-/* -------- ЦИТАТЫ -------- */
-.content-html blockquote {
-  border-left: 4px solid #00f0ff;
-  background: rgba(0, 240, 255, 0.05);
-  padding: 16px 20px;
-  margin: 24px 0;
-  border-radius: 0 12px 12px 0;
-  color: #9ca3af;
-  font-style: italic;
-  line-height: 1.7;
-}
-
-.content-html blockquote p:last-child {
-  margin-bottom: 0;
-}
-
-/* -------- КОД -------- */
-.content-html pre {
-  background: #0a0e15;
-  border: 1px solid #253142;
-  border-radius: 12px;
-  padding: 16px 20px;
-  overflow-x: auto;
-  margin: 20px 0;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.content-html code {
-  background: rgba(0, 240, 255, 0.08);
-  color: #00f0ff;
-  padding: 2px 6px;
-  border-radius: 5px;
-  font-size: 0.9em;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
-.content-html pre code {
-  background: none;
-  color: #cbd5e1;
-  padding: 0;
-}
-
-/* -------- РАЗДЕЛИТЕЛЬ -------- */
-.content-html hr {
-  border: none;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #253142, transparent);
-  margin: 36px 0;
-}
-
-/* -------- ТАБЛИЦЫ -------- */
-.content-html table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 14px;
-}
-
-.content-html th,
-.content-html td {
-  padding: 10px 14px;
-  border: 1px solid #253142;
-  text-align: left;
-}
-
-.content-html th {
-  background: #161e2b;
-  color: #00f0ff;
-  font-weight: 700;
-}
-
-.content-html tr:nth-child(even) td {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-/* -------- МОБИЛЬНАЯ АДАПТАЦИЯ -------- */
-@media (max-width: 640px) {
-  .content-html img {
-    border-radius: 12px;
-    margin: 20px auto;
-  }
-
-  .content-html h2 {
-    font-size: 22px;
-    margin-top: 28px;
-  }
-
-  .content-html h3 {
-    font-size: 18px;
-  }
-
-  .content-html pre {
-    padding: 12px 14px;
-    font-size: 12px;
-  }
+    0 0 0 1px rgba(0, 240, 255, 0.15) !important;
 }
