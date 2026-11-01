@@ -1,25 +1,20 @@
-/* -------- КАРТИНКИ (ЖЕСТКОЕ ПРИМЕНЕНИЕ) -------- */
-.content-html img,
+/* -------- ЖЕСТКИЕ СТИЛИ ДЛЯ КАРТИНОК -------- */
 #info-modal-content img,
 #page-content img,
-.article-text img {
+.content-html img {
   display: block !important;
   max-width: 100% !important;
   height: auto !important;
   margin: 28px auto !important;
   border-radius: 16px !important;
-  box-shadow:
-    0 10px 30px -10px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.04) !important;
-  transition: transform 0.35s ease, box-shadow 0.35s ease !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
   background: #161e2b !important;
 }
 
-.content-html img:hover,
 #info-modal-content img:hover,
-#page-content img:hover {
-  transform: scale(1.015) !important;
-  box-shadow:
-    0 18px 45px -12px rgba(0, 240, 255, 0.18),
-    0 0 0 1px rgba(0, 240, 255, 0.15) !important;
+#page-content img:hover,
+.content-html img:hover {
+  transform: scale(1.01) !important;
+  box-shadow: 0 15px 40px -10px rgba(0, 240, 255, 0.2), 0 0 0 1px rgba(0, 240, 255, 0.2) !important;
 }
