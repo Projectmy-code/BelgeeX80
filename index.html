@@ -67,6 +67,33 @@
 
         @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+
+        /* --- КРАСИВОЕ ОФОРМЛЕНИЕ КАРТИНОК В СТАТЬЯХ --- */
+        .content-html img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 16px; /* Скругленные углы */
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5); /* Объемная тень */
+            margin: 24px 0; /* Отступы сверху и снизу */
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        .content-html img:hover {
+            transform: scale(1.02); /* Легкое увеличение при наведении */
+        }
+
+        /* Красивое отображение цитат и списков внутри статьи */
+        .content-html blockquote {
+            border-left: 4px solid #00f0ff; /* Бирюзовая полоса */
+            padding-left: 16px;
+            margin: 20px 0;
+            color: #9ca3af;
+            font-style: italic;
+            background: rgba(0, 240, 255, 0.05);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+        }
     </style>
     <link rel="stylesheet" href="./css/shared.css">
 </head>
@@ -99,13 +126,11 @@
                 <a href="3d-prints.html" class="hover:text-brand-teal transition-colors">3D Печать</a>
                 <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка</a>
                 
-                <!-- СЮДА ДОБАВЛЯЮТСЯ СТРАНИЦЫ ИЗ КОНСТРУКТОРА -->
                 <div id="dynamic-pages-nav" class="flex items-center gap-3 2xl:gap-5"></div>
 
                 <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
             </nav>
 
-            <!-- Контейнер для авторизации (генерируется скриптом) -->
             <div id="auth-container" class="hidden xl:flex items-center gap-3 shrink-0">
                 <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
             </div>
@@ -191,7 +216,6 @@
 
     <!-- 3D CONFIGURATOR PROMO SECTION -->
     <section id="configurator-promo" class="py-12 bg-brand-dark border-b border-brand-border relative overflow-hidden">
-        <!-- Декоративный фон -->
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/80 to-transparent"></div>
         
@@ -332,9 +356,7 @@
                             <th class="p-4 text-center">Действие</th>
                         </tr>
                     </thead>
-                    <tbody id="parts-table-body" class="divide-y divide-brand-border/40 font-normal">
-                        <!-- Данные загрузятся через JS -->
-                    </tbody>
+                    <tbody id="parts-table-body" class="divide-y divide-brand-border/40 font-normal"></tbody>
                 </table>
             </div>
         </div>
@@ -391,451 +413,4 @@
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
-                            <span class="text-[11px] text-brand-teal font-semibold">Автопанорама</span>
-                            <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Belgee X80 PHEV — новый флагман. Подробный тест-драйв и обзор гибрида</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
-                    <div class="relative w-full aspect-video bg-slate-800">
-                        <iframe id="video-frame-2" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/ilfsu2HprjQ" title="Видео 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold">Видеообзор</span>
-                            <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Подробный обзор и тест-драйв Belgee X80</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
-                    <div class="relative w-full aspect-video bg-slate-800">
-                        <iframe id="video-frame-3" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/ilfsu2HprjQ" title="Видео 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold">Отзывы</span>
-                            <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Честный отзыв владельца Belgee X80</h3>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- COMMUNITY SECTION -->
-    <section id="community" class="py-16 border-b border-brand-border relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Сообщество Владельцев</span>
-                <h2 class="text-3xl font-display font-bold text-white mt-1">Клуб BELGEE X80</h2>
-                <p class="text-gray-400 text-sm mt-1">Присоединяйтесь к нашему Telegram-сообществу владельцев</p>
-            </div>
-
-            <div class="max-w-3xl mx-auto bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 sm:p-10 rounded-3xl border border-blue-500/30 text-center relative overflow-hidden card-glow">
-                <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
-
-                <div class="relative z-10 space-y-5">
-                    <div class="w-16 h-16 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-blue-500/20">
-                        <i class="fa-brands fa-telegram"></i>
-                    </div>
-                    <h3 class="text-2xl sm:text-3xl font-bold font-display text-white">Официальный Telegram Чат</h3>
-                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <a href="https://t.me/bgx80" class="tg-link w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 hover:scale-105">
-                            <i class="fa-brands fa-telegram text-xl"></i>
-                            <span>Присоединиться к чату</span>
-                        </a>
-                        <button onclick="toggleModal('feedback-modal')" class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
-                            <i class="fa-solid fa-envelope text-brand-teal"></i>
-                            <span>Написать администрации</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="bg-brand-dark py-12 text-gray-400 text-xs border-t border-brand-border">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <div class="font-display font-black text-lg text-white mb-3">BELGEE <span class="text-brand-teal">X80</span></div>
-                    <p class="text-gray-400 leading-relaxed">Неофициальный клубный портал и база знаний владельцев автомобиля BELGEE X80.</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-bold text-white mb-3">Разделы</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#specs" class="hover:text-brand-teal">Характеристики</a></li>
-                        <li><a href="#catalog" class="hover:text-brand-teal">Каталог запчастей</a></li>
-                        <li><a href="configurator.html" class="hover:text-brand-teal">3D Конфигуратор</a></li>
-                        <li><a href="manual.html" class="hover:text-brand-teal">Руководство (PDF)</a></li>
-                        <li><a href="articles.html" class="hover:text-brand-teal">Статьи</a></li>
-                        <li><a href="#videos" class="hover:text-brand-teal">Видео</a></li>
-                        <li><a href="3d-prints.html" class="hover:text-brand-teal">3D Печать</a></li>
-                        <li><a href="checklist.html" class="hover:text-brand-teal">Приёмка авто</a></li>
-                        <li><a href="#community" class="hover:text-brand-teal">Клуб</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-bold text-white mb-3">Сообщество</h4>
-                    <ul class="space-y-2">
-                        <li><a href="https://t.me/bgx80" class="tg-link hover:text-brand-teal"><i class="fa-brands fa-telegram mr-1 text-blue-400"></i> Telegram Чат</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-3">Обратная связь</h4>
-                    <p class="mb-3">Есть предложение по улучшению портала?</p>
-                    <button onclick="toggleModal('feedback-modal')" class="px-4 py-2 rounded-xl bg-brand-border hover:bg-brand-teal hover:text-black font-semibold text-white transition-colors">
-                        Написать нам
-                    </button>
-                </div>
-            </div>
-
-            <div class="pt-8 border-t border-brand-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-gray-500">
-                <p>© 2026 BELGEE X80 Club Portal. Все права защищены.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- MODAL: ADD ARTICLE FORM -->
-    <div id="add-article-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <div class="bg-brand-card w-full max-w-2xl rounded-3xl border border-brand-border p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleModal('add-article-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h3 class="text-xl font-bold font-display text-white mb-2">Написать статью</h3>
-            <p class="text-xs text-gray-400 mb-6">Материал появится на сайте после проверки администратором.</p>
-
-            <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Заголовок статьи</label>
-                    <input type="text" id="new-title" required placeholder="Например: Установка омывателя камеры заднего вида" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-300 mb-1">Категория</label>
-                        <select id="new-category" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
-                            <option value="Тюнинг & Защита">Тюнинг & Защита</option>
-                            <option value="Мультимедиа">Мультимедиа</option>
-                            <option value="Комфорт">Комфорт</option>
-                            <option value="Электрика">Электрика</option>
-                            <option value="Обслуживание">Обслуживание</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-300 mb-1">Время чтения</label>
-                        <input type="text" id="new-readtime" value="5 мин чтения" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
-                    </div>
-                </div>
-                
-                <!-- ЗАГРУЗКА ОБЛОЖКИ С КОМПЬЮТЕРА -->
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Обложка статьи (Главное фото)</label>
-                    <input type="file" id="new-image-file" accept="image/*" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-brand-teal file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-teal file:text-black hover:file:bg-brand-teal/80 mb-2">
-                    <div id="cover-preview-container" class="hidden mt-2">
-                        <img id="cover-preview-img" class="w-full h-32 object-cover rounded-lg border border-brand-border bg-black/50" alt="Превью">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Краткое описание</label>
-                    <textarea id="new-summary" rows="2" required placeholder="Краткая суть статьи в 2-3 предложениях..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-2">Полный текст статьи</label>
-                    <div id="editor-container"></div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Ваш никнейм / Автор</label>
-                    <input type="text" id="new-author" required placeholder="Например: Club_Member" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
-                </div>
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
-                    Отправить на модерацию
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: FEEDBACK FORM -->
-    <div id="feedback-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <div class="bg-brand-card w-full max-w-lg rounded-3xl border border-brand-border p-6 shadow-2xl relative">
-            <button onclick="toggleModal('feedback-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h3 class="text-xl font-bold font-display text-white mb-2">Обратная связь</h3>
-            <p class="text-xs text-gray-400 mb-6">Предложите новый каталожный номер, статью или задайте вопрос.</p>
-
-            <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Ваше имя или Telegram Nick</label>
-                    <input id="feedback-name" type="text" required placeholder="@username" class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Сообщение</label>
-                    <textarea id="feedback-message" rows="4" required placeholder="Опишите предложение..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal"></textarea>
-                </div>
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
-                    Отправить сообщение
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: FULL ARTICLE -->
-    <div id="info-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleModal('info-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div id="article-modal-header" class="mb-4">
-                <span id="info-modal-category" class="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 text-xs font-medium">Категория</span>
-                <h3 id="info-modal-title" class="text-2xl font-bold font-display text-white mt-2">Заголовок</h3>
-                <div class="flex items-center gap-4 text-xs text-gray-400 mt-2 border-b border-brand-border/60 pb-3">
-                    <span id="info-modal-author"></span>
-                    <span id="info-modal-time"></span>
-                </div>
-            </div>
-            <div id="info-modal-content" class="text-sm text-gray-300 space-y-4 leading-relaxed"></div>
-            <div class="mt-6 pt-4 border-t border-brand-border/60 flex items-center justify-between">
-                <span class="text-xs text-gray-500">BELGEE X80 Knowledge Base</span>
-                <button onclick="toggleModal('info-modal')" class="px-5 py-2 rounded-xl bg-brand-border hover:bg-brand-teal hover:text-black font-semibold text-xs transition-colors">
-                    Закрыть
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
-    <div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-        <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
-            <div id="confirm-icon-container" class="w-14 h-14 rounded-full bg-brand-teal/10 text-brand-teal flex items-center justify-center text-2xl mb-4 mx-auto border border-brand-teal/20">
-                <i class="fa-solid fa-circle-question"></i>
-            </div>
-            <h3 id="confirm-title" class="text-xl font-bold text-center text-white mb-2">Вы уверены?</h3>
-            <p id="confirm-message" class="text-sm text-gray-400 text-center mb-6">...</p>
-            <div class="flex gap-3">
-                <button id="confirm-cancel-btn" class="flex-1 py-2.5 rounded-xl bg-brand-border hover:bg-gray-700 text-white font-semibold text-sm transition-colors">Отмена</button>
-                <button id="confirm-ok-btn" class="flex-1 py-2.5 rounded-xl bg-brand-teal text-black font-semibold text-sm transition-colors shadow-lg">ОК</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script type="module">
-        import { supabase } from './js/config.js';
-
-        // === КАТАЛОГ ЗАПЧАСТЕЙ ===
-        let globalPartsData = [];
-
-        async function loadPartsFromDB() {
-            const tbody = document.getElementById('parts-table-body');
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка каталога...</td></tr>';
-
-            const { data, error } = await supabase.from('parts').select('*').order('name');
-            
-            if (error) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-red-400">Ошибка загрузки каталога</td></tr>`;
-                return;
-            }
-
-            globalPartsData = data || [];
-            renderPartsTable(globalPartsData);
-        }
-
-        function renderPartsTable(items) {
-            const tbody = document.getElementById('parts-table-body');
-            
-            if (items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">В каталоге пока нет запчастей</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = items.map(part => `
-                <tr class="hover:bg-brand-border/30 transition-colors">
-                    <td class="p-4 font-semibold text-white max-w-[200px] break-words">${part.name}</td>
-                    <td class="p-4 text-xs text-gray-400">${part.interval || '-'}</td>
-                    <td class="p-4 max-w-[150px]">
-                        <span class="font-mono text-xs bg-brand-dark px-2.5 py-1 rounded border border-brand-border text-brand-teal inline-block break-all whitespace-normal">${part.oem}</span>
-                    </td>
-                    <td class="p-4 text-xs text-gray-300 max-w-[250px] break-words">${part.analog || '-'}</td>
-                    <td class="p-4 text-right font-semibold text-emerald-400 text-xs">${part.price || '-'}</td>
-                    <td class="p-4 text-center">
-                        <button onclick="navigator.clipboard.writeText('${part.oem}'); alert('Артикул ${part.oem} скопирован!')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium" title="Скопировать артикул">Код</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        window.filterCategory = function(cat) {
-            document.querySelectorAll('.cat-tab').forEach(btn => {
-                btn.className = (btn.dataset.cat === cat)
-                    ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md'
-                    : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
-            });
-            renderPartsTable(cat === 'all' ? globalPartsData : globalPartsData.filter(p => p.cat === cat || p.category === cat));
-        };
-
-        window.handleGlobalSearch = function() {
-            const q = document.getElementById('global-search-input').value.toLowerCase();
-            renderPartsTable(globalPartsData.filter(p => 
-                p.name.toLowerCase().includes(q) || 
-                p.oem.toLowerCase().includes(q) || 
-                (p.analog && p.analog.toLowerCase().includes(q))
-            ));
-        };
-
-        window.quickFilter = function(term) {
-            const q = term.toLowerCase();
-            if(term === 'все') {
-                renderPartsTable(globalPartsData);
-                return;
-            }
-            renderPartsTable(globalPartsData.filter(p => 
-                p.name.toLowerCase().includes(q) || 
-                (p.category && p.category.toLowerCase().includes(q)) ||
-                (p.analog && p.analog.toLowerCase().includes(q))
-            ));
-        };
-
-        // === ДИНАМИЧЕСКИЙ КОНТЕНТ (ВИДЖЕТЫ И ТЕКСТЫ) ===
-        async function loadSiteContent() {
-            const { data } = await supabase.from('site_content').select('*');
-            if (!data) return;
-
-            const content = {};
-            data.forEach(item => { content[item.key] = item.value; });
-
-            const heroTitle = document.getElementById('dynamic-hero-title');
-            if (heroTitle && content['hero_title']) heroTitle.textContent = content['hero_title'];
-
-            document.querySelectorAll('.tg-link').forEach(link => {
-                if (content['tg_link']) link.href = content['tg_link'];
-            });
-
-            if (document.getElementById('video-frame-1') && content['video_1_url']) 
-                document.getElementById('video-frame-1').src = content['video_1_url'];
-            if (document.getElementById('video-frame-2') && content['video_2_url']) 
-                document.getElementById('video-frame-2').src = content['video_2_url'];
-            if (document.getElementById('video-frame-3') && content['video_3_url']) 
-                document.getElementById('video-frame-3').src = content['video_3_url'];
-
-            const toggleSection = (id, isVisible) => {
-                const el = document.getElementById(id);
-                if (el) {
-                    if (isVisible) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
-                }
-            };
-
-            toggleSection('videos', content['show_videos'] === '1');
-            toggleSection('catalog', content['show_catalog'] === '1');
-            toggleSection('community', content['show_community'] === '1');
-            
-            document.querySelectorAll('a[href="3d-prints.html"]').forEach(link => {
-                if (content['show_3d'] === '1') link.classList.remove('hidden');
-                else link.classList.add('hidden');
-            });
-        }
-
-        // === АВТОМАТИЧЕСКОЕ МЕНЮ ИЗ КОНСТРУКТОРА (ТОЛЬКО ДОБАВЛЯЕМ СТРАНИЦЫ) ===
-        async function loadDynamicPages() {
-            const { data: pages } = await supabase.from('custom_pages').select('title, slug').eq('status', 'published');
-            if (!pages || pages.length === 0) return;
-
-            const navContainer = document.getElementById('dynamic-pages-nav');
-            const mobileContainer = document.getElementById('dynamic-pages-mobile');
-
-            pages.forEach(page => {
-                const linkDesktop = document.createElement('a');
-                linkDesktop.href = `page.html?p=${page.slug}`;
-                linkDesktop.className = 'hover:text-brand-teal transition-colors';
-                linkDesktop.textContent = page.title;
-                navContainer.appendChild(linkDesktop);
-
-                const linkMobile = document.createElement('a');
-                linkMobile.href = `page.html?p=${page.slug}`;
-                linkMobile.className = 'block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800';
-                linkMobile.textContent = page.title;
-                mobileContainer.appendChild(linkMobile);
-            });
-        }
-
-        // === ОБРАТНАЯ СВЯЗЬ ===
-        window.handleFeedbackSubmit = async function(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.textContent;
-            btn.textContent = 'Отправка...';
-            btn.disabled = true;
-
-            const name = document.getElementById('feedback-name').value;
-            const message = document.getElementById('feedback-message').value;
-
-            const { error } = await supabase.from('feedback').insert([{ name, message }]);
-
-            btn.textContent = originalText;
-            btn.disabled = false;
-
-            if (error) {
-                alert('Ошибка: ' + error.message);
-            } else {
-                alert('Спасибо! Ваше сообщение отправлено администратору.');
-                e.target.reset();
-                document.getElementById('feedback-modal').classList.add('hidden');
-            }
-        };
-
-        // === СЛУЖЕБНЫЕ ФУНКЦИИ ===
-        window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); };
-        window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); };
-
-        // === АВТОРИЗАЦИЯ ===
-        async function updateAuthUI() {
-            const { data: { session } } = await supabase.auth.getSession();
-            const authContainer = document.getElementById('auth-container');
-            if (!authContainer) return;
-            
-            if (session) {
-                authContainer.innerHTML = `
-                    <a href="profile.html" class="text-gray-400 text-xs hidden 2xl:block hover:text-white transition-colors">Мой профиль</a>
-                    <a href="admin.html" class="text-brand-teal text-sm font-semibold hover:underline">Админка</a>
-                    <button onclick="logout()" class="text-red-400 text-sm font-semibold hover:text-red-300">Выйти</button>
-                `;
-            } else {
-                authContainer.innerHTML = `
-                    <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
-                `;
-            }
-        }
-
-        window.logout = async function() {
-            await supabase.auth.signOut();
-            window.location.reload();
-        }
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            loadPartsFromDB();
-            loadSiteContent();
-            loadDynamicPages();
-            updateAuthUI();
-        });
-    </script>
-    <script type="module" src="./js/articles.js"></script>
-
-    <!-- Регистрация Service Worker для PWA -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .catch(err => console.log('SW Error:', err));
-            });
-        }
-    </script>
-</body>
-</html>
+                            <span class="text-[11px]
