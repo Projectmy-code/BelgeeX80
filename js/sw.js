@@ -1,6 +1,6 @@
-const CACHE_NAME = 'x80-portal-v4'; // Обновили версию кэша!
+const CACHE_NAME = 'x80-portal-v5'; // Обновили версию!
 const ASSETS = [
-  '../',               // Корень сайта (главная)
+  '../',               // Корень сайта
   '../index.html',
   '../checklist.html',
   '../login.html',
