@@ -165,7 +165,7 @@ function renderArticles(articles) {
         const imgUrl = article.image_url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80';
         const div = document.createElement('div');
         div.className = 'bg-brand-card rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full overflow-hidden';
-        div.onclick = () => openArticleModal(article);
+        div.onclick = () => ArticleModal(article);
         div.innerHTML = `
             <div class="h-48 bg-slate-800 relative shrink-0">
                 <img src="${imgUrl}" class="w-full h-full object-cover" alt="${article.title}">
@@ -209,18 +209,30 @@ export function openArticleModal(article) {
     contentEl.innerHTML = content;
     document.getElementById('info-modal').classList.remove('hidden');
 
-    // ПРИНУДИТЕЛЬНОЕ ПРИМЕНЕНИЕ СТИЛЕЙ К КАРТИНКАМ
-    setTimeout(() => {
-        const images = contentEl.querySelectorAll('img');
-        images.forEach(img => {
+    // Включаем "наблюдателя" за картинками, чтобы насильно вставить стили
+    applyForcedStyles(contentEl);
+}
+
+function applyForcedStyles(container) {
+    // Функция, которая применяет стили ко всем картинкам
+    const fixImages = () => {
+        container.querySelectorAll('img').forEach(img => {
             img.style.setProperty('border-radius', '16px', 'important');
             img.style.setProperty('box-shadow', '0 10px 30px -10px rgba(0,0,0,0.8)', 'important');
             img.style.setProperty('margin', '24px auto', 'important');
             img.style.setProperty('display', 'block', 'important');
             img.style.setProperty('max-width', '100%', 'important');
             img.style.setProperty('height', 'auto', 'important');
+            img.style.setProperty('border', 'none', 'important');
         });
-    }, 100);
+    };
+
+    // Применяем сразу
+    fixImages();
+
+    // И следим, если они вдруг подгрузятся позже (из-за base64)
+    const observer = new MutationObserver(fixImages);
+    observer.observe(container, { childList: true, subtree: true });
 }
 
 export async function openSubmission() {
