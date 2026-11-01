@@ -69,10 +69,14 @@
             <a href="index.html" class="flex items-center gap-3 group shrink-0">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
                     <span class="font-display font-black text-black text-xl">X</span>
+                </div> <!-- ВОТ ЭТОТ ЗАКРЫВАЮЩИЙ ТЕГ БЫЛ ПРОПУЩЕН -->
                 <div>
-                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-2">
+                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">
                         BELGEE <span class="text-brand-teal">X80</span>
-                        <span class="w-2 h-2 rounded-full bg-brand-teal pulse-dot" title="Клуб активен"></span>
+                        <span class="relative flex h-2 w-2 ml-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-teal"></span>
+                        </span>
                     </div>
                     <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Сообщество & Запчасти</div>
                 </div>
@@ -113,7 +117,7 @@
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
                 <a href="login.html" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
-                <a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
+                <a href="https://t.me/bg" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
                 </a>
                 <button onclick="toggleModal('feedback-modal'); toggleMobileMenu()" class="w-full py-2.5 bg-brand-teal text-black font-semibold rounded-xl">
@@ -131,7 +135,7 @@
             </div>
 
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-black text-white tracking-tight leading-tight">
-                <span id="dynamic-hero-title">Информационный портал</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal via-blue-400 to-indigo-400">BELGEE X80</span>
+                <span id="dynamic-hero-title">Информационный портал</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal via-blue-400 to-indigo-400">BELGEE </span>
             </h1>
 
             <p class="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto font-normal leading-relaxed">
