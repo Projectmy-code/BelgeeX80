@@ -551,10 +551,10 @@
         </div>
     </div>
 
-    <!-- MODAL: FULL ARTICLE -->
-    <div id="info-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleModal('info-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
+        <!-- MODAL: FULL ARTICLE -->
+    <div id="info-modal" onclick="closeModalOnBg(event)" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
+            <button onclick="toggleModal('info-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg z-10">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="article-modal-header" class="mb-4">
@@ -565,7 +565,6 @@
                     <span id="info-modal-time"></span>
                 </div>
             </div>
-            <!-- ТУТ КЛАСС content-html ДЛЯ КРАСИВЫХ КАРТИНОК -->
             <div id="info-modal-content" class="content-html text-sm text-gray-300 leading-relaxed"></div>
             <div class="mt-6 pt-4 border-t border-brand-border/60 flex items-center justify-between">
                 <span class="text-xs text-gray-500">BELGEE X80 Knowledge Base</span>
