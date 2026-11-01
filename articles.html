@@ -8,6 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Подключаем стили для статей -->
+    <link rel="stylesheet" href="./css/article-content.css">
+
     <script>
         tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb' } }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] } } } }
     </script>
@@ -20,6 +24,12 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
+        
+        /* Красивый ползунок */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; margin: 16px 0; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #253142; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-black">
@@ -79,10 +89,10 @@
         </div>
     </main>
 
-    <!-- MODAL: FULL ARTICLE -->
-    <div id="info-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
+    <!-- MODAL: FULL ARTICLE (С КЛИКОМ НА ФОН И СТИЛЯМИ) -->
+    <div id="info-modal" onclick="closeModalOnBg(event)" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg z-10">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="article-modal-header" class="mb-4">
@@ -93,7 +103,8 @@
                     <span id="info-modal-time"></span>
                 </div>
             </div>
-            <div id="info-modal-content" class="text-sm text-gray-300 space-y-4 leading-relaxed"></div>
+            <!-- Добавлен класс content-html -->
+            <div id="info-modal-content" class="content-html text-sm text-gray-300 leading-relaxed"></div>
             <div class="mt-6 pt-4 border-t border-brand-border/60 flex items-center justify-between">
                 <span class="text-xs text-gray-500">BELGEE X80 Knowledge Base</span>
                 <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-brand-border hover:bg-brand-teal hover:text-black font-semibold text-xs transition-colors">
@@ -154,9 +165,9 @@
         window.searchArticles = function() {
             const query = document.getElementById('search-input').value.toLowerCase();
             filteredArticles = allArticles.filter(a => 
-                a.title.toLowerCase().includes(query) || 
-                a.summary.toLowerCase().includes(query) ||
-                a.author.toLowerCase().includes(query)
+                (a.title || '').toLowerCase().includes(query) || 
+                (a.summary || '').toLowerCase().includes(query) ||
+                (a.author || '').toLowerCase().includes(query)
             );
             
             displayedCount = 0;
@@ -172,7 +183,6 @@
             
             nextItems.forEach(article => {
                 const imgUrl = article.image_url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80';
-
                 const div = document.createElement('div');
                 div.className = 'bg-brand-card rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full overflow-hidden';
                 div.onclick = () => openArticle(article);
@@ -210,17 +220,38 @@
             document.getElementById('info-modal-author').innerHTML = `<i class="fa-solid fa-user text-brand-teal mr-1"></i> ${article.author}`;
             document.getElementById('info-modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${article.readtime}`;
             
-            let content = article.content;
+            let content = article.content || '';
             if (article.image_url) {
-                content = `<img src="${article.image_url}" class="w-full h-64 object-cover rounded-xl mb-6 shadow-lg" alt="${article.title}">` + content;
+                content = `<figure><img src="${article.image_url}" alt="${article.title}" loading="lazy"></figure>` + `<div class="content-html">${content}</div>`;
+            } else {
+                content = `<div class="content-html">${content}</div>`;
             }
             
-            document.getElementById('info-modal-content').innerHTML = content;
+            const contentEl = document.getElementById('info-modal-content');
+            contentEl.innerHTML = content;
             document.getElementById('info-modal').classList.remove('hidden');
+
+            // Принудительные стили для картинок
+            setTimeout(() => {
+                contentEl.querySelectorAll('img').forEach(img => {
+                    img.style.setProperty('border-radius', '16px', 'important');
+                    img.style.setProperty('box-shadow', '0 10px 30px -10px rgba(0,0,0,0.8)', 'important');
+                    img.style.setProperty('margin', '24px auto', 'important');
+                    img.style.setProperty('display', 'block', 'important');
+                    img.style.setProperty('max-width', '100%', 'important');
+                    img.style.setProperty('height', 'auto', 'important');
+                });
+            }, 100);
         }
 
         window.closeModal = function() {
             document.getElementById('info-modal').classList.add('hidden');
+        }
+
+        window.closeModalOnBg = function(event) {
+            if (event.target.id === 'info-modal') {
+                document.getElementById('info-modal').classList.add('hidden');
+            }
         }
 
         // Инициализация
