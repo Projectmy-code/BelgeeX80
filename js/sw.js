@@ -1,10 +1,10 @@
-const CACHE_NAME = 'x80-portal-v2';
+const CACHE_NAME = 'x80-portal-v4'; // Обновили версию кэша!
 const ASSETS = [
-  './',
-  './index.html',
-  './checklist.html',
-  './login.html',
-  './favicon.svg'
+  '../',               // Корень сайта (главная)
+  '../index.html',
+  '../checklist.html',
+  '../login.html',
+  '../favicon.svg'
 ];
 
 // Установка и кэширование
