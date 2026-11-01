@@ -1,4 +1,4 @@
-const CACHE_NAME = 'x80-portal-v1';
+const CACHE_NAME = 'x80-portal-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -29,16 +29,23 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Перехват запросов (сначала ищем в кэше, потом в сети)
+// Перехват запросов
 self.addEventListener('fetch', (e) => {
   // Не кэшируем запросы к Supabase и YouTube
   if (e.request.url.includes('supabase.co') || e.request.url.includes('youtube.com')) {
     return;
   }
-  
+
+  // Для навигации (открытие страниц) — network-first
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Для остального — cache-first
   e.respondWith(
-    caches.match(e.request).then((res) => {
-      return res || fetch(e.request);
-    })
+    caches.match(e.request).then((res) => res || fetch(e.request))
   );
 });
