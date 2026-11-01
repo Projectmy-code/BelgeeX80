@@ -3,12 +3,8 @@ import { supabase } from './config.js';
 let quill = null;
 let loadedArticles = [];
 
-// === УВЕДОМЛЕНИЯ ===
 function showToast(message, type = 'success') {
-    if (typeof window.showToast === 'function') {
-        window.showToast(message, type);
-        return;
-    }
+    if (typeof window.showToast === 'function') { window.showToast(message, type); return; }
     const isSuccess = type === 'success';
     const toast = document.createElement('div');
     toast.className = `fixed bottom-6 right-6 z-[100] bg-[#161e2b] border ${isSuccess ? 'border-emerald-500' : 'border-red-500'} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold text-white`;
@@ -17,7 +13,6 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 3500);
 }
 
-// === ПОДТВЕРЖДЕНИЕ ===
 async function showConfirm(title, msg) {
     if (typeof window.showConfirm === 'function') {
         return window.showConfirm(title, msg, 'Отправить', 'bg-brand-teal', 'hover:bg-brand-teal/80', 'text-black');
@@ -25,7 +20,6 @@ async function showConfirm(title, msg) {
     return window.confirm(`${title}\n\n${msg}`);
 }
 
-// === СЖАТИЕ ИЗОБРАЖЕНИЙ ===
 async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) {
     return new Promise((resolve) => {
         if (!file.type.startsWith('image/')) { resolve(file); return; }
@@ -42,8 +36,7 @@ async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 
                     if (height > maxHeight) { width = Math.round((width * maxHeight) / height); height = maxHeight; }
                 }
                 const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
+                canvas.width = width; canvas.height = height;
                 canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                 const supportsWebp = canvas.toDataURL('image/webp').startsWith('data:image/webp');
                 const mime = supportsWebp ? 'image/webp' : 'image/jpeg';
@@ -60,7 +53,6 @@ async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 
     });
 }
 
-// === ИНИЦИАЛИЗАЦИЯ РЕДАКТОРА ===
 document.addEventListener('DOMContentLoaded', () => {
     loadArticlesFromDB();
     const editorContainer = document.getElementById('editor-container');
@@ -111,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// === ЗАГРУЗКА СТАТЕЙ ===
 export async function loadArticlesFromDB() {
     const grid = document.getElementById('articles-grid');
     if (!grid) return;
@@ -126,21 +117,23 @@ export async function loadArticlesFromDB() {
     }
 }
 
-// === РЕНДЕР КАРТОЧЕК ===
 function renderArticles(articles) {
     const grid = document.getElementById('articles-grid');
     if (!grid) return;
     if (!articles || articles.length === 0) { grid.innerHTML = '<p class="text-gray-400 col-span-3">Пока нет статей.</p>'; return; }
     grid.innerHTML = '';
-    articles.slice(0, 3).forEach((article) => {
+    articles.slice(0, 3).forEach((article, index) => {
         const imgUrl = article.image_url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80';
         const title = article.title || 'Без названия';
         const summary = article.summary || '';
         const author = article.author || article.guest_name || 'Участник';
         const readtime = article.readtime || '5 мин';
         const category = article.category || 'Статья';
+        
         const div = document.createElement('div');
-        div.className = 'bg-brand-card rounded-2xl border border-brand-border card-glow cursor-pointer flex flex-col h-full overflow-hidden';
+        // Добавили premium-card и animate-fade-in-up
+        div.className = 'bg-brand-card rounded-2xl border border-brand-border premium-card cursor-pointer flex flex-col h-full overflow-hidden animate-fade-in-up';
+        div.style.animationDelay = `${index * 0.1}s`; // Каскадное появление
         div.onclick = () => openArticleModal(article);
         div.innerHTML = `
             <div class="h-48 bg-slate-800 relative shrink-0 overflow-hidden">
@@ -159,7 +152,6 @@ function renderArticles(articles) {
     });
 }
 
-// === ПОИСК ===
 window.handleArticlesSearch = function () {
     const input = document.getElementById('articles-search-input');
     if (!input) return;
@@ -168,7 +160,6 @@ window.handleArticlesSearch = function () {
     renderArticles(filtered);
 };
 
-// === МОДАЛКА СТАТЬИ ===
 export function openArticleModal(article) {
     const categoryEl = document.getElementById('info-modal-category');
     const titleEl = document.getElementById('info-modal-title');
@@ -188,7 +179,6 @@ export function openArticleModal(article) {
     applyForcedStyles(contentEl);
 }
 
-// === ПРИНУДИТЕЛЬНЫЕ СТИЛИ КАРТИНОК ===
 function applyForcedStyles(container) {
     const fixImages = () => {
         container.querySelectorAll('img').forEach(img => {
@@ -208,14 +198,12 @@ function applyForcedStyles(container) {
     observer.observe(container, { childList: true, subtree: true });
 }
 
-// === ЗАКРЫТИЕ ПО КЛИКУ НА ФОН ===
 window.closeModalOnBg = function(event) {
     if (event.target.id === 'info-modal') {
         document.getElementById('info-modal').classList.add('hidden');
     }
 };
 
-// === ОТПРАВКА СТАТЬИ ===
 export async function openSubmission() {
     const { data: { session } } = await supabase.auth.getSession();
     const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'submission_mode').maybeSingle();
