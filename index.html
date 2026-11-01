@@ -837,10 +837,13 @@
     <script type="module" src="./js/articles.js"></script>
 
     <!-- PWA -->
+        <!-- Регистрация Service Worker для PWA -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // ОБРАТИ ВНИМАНИЕ НА ПУТЬ: ./js/sw.js
                 navigator.serviceWorker.register('./js/sw.js')
+                    .then(() => console.log('SW зарегистрирован!'))
                     .catch(err => console.log('SW Error:', err));
             });
         }
