@@ -228,7 +228,7 @@ export async function openSubmission() {
     const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'submission_mode').single();
     if (settings?.value === 'registered' && !session) {
         showToast("Публиковать статьи могут только зарегистрированные пользователи.", "error");
-        setTimeout(() => { window.location.href = '../pages/login.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
         return;
     }
     if (quill) quill.root.innerHTML = '';
