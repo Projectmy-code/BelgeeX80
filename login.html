@@ -1,156 +1,381 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark">
+<html lang="ru" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход — BELGEE X80</title>
+    <title>BELGEE X80 — Клуб владельцев, Запчасти, Артикулы, Отзывы</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00f0ff">
+    <link rel="apple-touch-icon" href="favicon.svg">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
     <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142' } } } } }
-    </script>
-    <style> 
-        body { background-color: #0c1017; color: white; font-family: sans-serif; } 
-        
-        /* ФИКС ДЛЯ МОБИЛЬНЫХ: разрешаем клики и поднимаем форму наверх */
-        form, button, input {
-            pointer-events: auto !important;
-        }
-    </style>
-</head>
-<body class="min-h-screen flex items-center justify-center p-4">
-    
-    <!-- Добавлен relative и z-[999], чтобы форма всегда была поверх любых других элементов -->
-    <div class="bg-brand-card w-full max-w-md p-8 rounded-3xl border border-brand-border shadow-2xl relative z-[999]">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold mb-2">Вход в клуб</h1>
-            <p class="text-gray-400 text-sm">Авторизуйтесь, чтобы предлагать статьи</p>
-        </div>
-
-        <form id="auth-form" class="space-y-4">
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">Email</label>
-                <input type="email" id="email" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none relative z-[1000]">
-            </div>
-            <div>
-                <div class="flex justify-between items-center mb-1">
-                    <label class="block text-xs text-gray-400">Пароль</label>
-                    <button type="button" id="forgot-password-btn" class="text-xs text-brand-teal hover:underline focus:outline-none relative z-[1000]">Забыли пароль?</button>
-                </div>
-                <input type="password" id="password" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none relative z-[1000]">
-            </div>
-            
-            <div id="error-msg" class="text-red-400 text-xs hidden"></div>
-            <div id="success-msg" class="text-emerald-400 text-xs hidden"></div>
-
-            <button type="submit" id="submit-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl hover:opacity-90 transition-all relative z-[1000]">Войти</button>
-        </form>
-
-        <div class="mt-6 text-center text-sm text-gray-400 relative z-[1000]">
-            <span id="toggle-text">Нет аккаунта?</span>
-            <button id="toggle-btn" class="text-brand-teal hover:underline ml-1">Зарегистрироваться</button>
-        </div>
-        
-        <div class="mt-6 text-center relative z-[1000]">
-            <a href="index.html" class="text-xs text-gray-500 hover:text-white">← Вернуться на главную</a>
-        </div>
-    </div>
-
-    <script type="module">
-        import { supabase } from './js/config.js';
-
-        let isLoginMode = true;
-        const form = document.getElementById('auth-form');
-        const errorMsg = document.getElementById('error-msg');
-        const successMsg = document.getElementById('success-msg');
-
-        // Убрали авто-редирект, чтобы страница не "мигала" при загрузке
-
-        document.getElementById('toggle-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            isLoginMode = !isLoginMode;
-            document.getElementById('submit-btn').textContent = isLoginMode ? 'Войти' : 'Зарегистрироваться';
-            document.getElementById('toggle-text').textContent = isLoginMode ? 'Нет аккаунта?' : 'Уже есть аккаунт?';
-            document.getElementById('toggle-btn').textContent = isLoginMode ? 'Зарегистрироваться' : 'Войти';
-            errorMsg.classList.add('hidden');
-            successMsg.classList.add('hidden');
-        });
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const btn = document.getElementById('submit-btn');
-            
-            btn.disabled = true;
-            btn.textContent = 'Загрузка...';
-            errorMsg.classList.add('hidden');
-            successMsg.classList.add('hidden');
-
-            try {
-                if (isLoginMode) {
-                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
-                    
-                    if (!data.session) {
-                        throw new Error('Не удалось создать сессию. Проверьте настройки браузера или попробуйте снова.');
-                    }
-                    
-                    // Задержка 300мс для сохранения токена в localStorage
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 300);
-                    
-                } else {
-                    const { error } = await supabase.auth.signUp({ email, password });
-                    if (error) throw error;
-                    successMsg.textContent = 'Регистрация успешна! Теперь вы можете войти.';
-                    successMsg.classList.remove('hidden');
-                    document.getElementById('toggle-btn').click();
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { red: '#e63946', teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142', accent: '#10b981', blue: '#2563eb' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Montserrat', 'sans-serif'] }
                 }
-            } catch (error) {
-                errorMsg.textContent = "Ошибка: " + (error.message || "Не удалось выполнить вход");
-                errorMsg.classList.remove('hidden');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = isLoginMode ? 'Войти' : 'Зарегистрироваться';
             }
-        });
-
-        // Логика сброса пароля
-        document.getElementById('forgot-password-btn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            
-            if (!email) {
-                errorMsg.textContent = 'Пожалуйста, введите ваш Email в поле выше, чтобы мы отправили ссылку.';
-                errorMsg.classList.remove('hidden');
-                return;
-            }
-
-            const btn = e.target;
-            const originalText = btn.textContent;
-            btn.textContent = 'Отправка...';
-            btn.disabled = true;
-
-            const redirectTo = window.location.origin + window.location.pathname.replace('login.html', 'update-password.html');
-
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: redirectTo
-            });
-
-            btn.textContent = originalText;
-            btn.disabled = false;
-            errorMsg.classList.add('hidden');
-
-            if (error) {
-                errorMsg.textContent = 'Ошибка: ' + error.message;
-                errorMsg.classList.remove('hidden');
-            } else {
-                successMsg.textContent = 'Ссылка для сброса пароля отправлена на вашу почту! Проверьте папку «Спам».';
-                successMsg.classList.remove('hidden');
-            }
-        });
+        }
     </script>
-</body>
-</html>
+    <style>
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 30%, rgba(0, 240, 255, 0.12) 0%, rgba(37, 99, 235, 0.08) 35%, rgba(12, 16, 23, 0.95) 70%), linear-gradient(to bottom, rgba(12,16,23,0.3), rgba(12,16,23,1));
+        }
+        .card-glow { transition: all 0.3s ease; }
+        .card-glow:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15); transform: translateY(-2px); }
+        .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c1017; }
+        ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+
+        .ql-toolbar.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 12px 12px 0 0; }
+        .ql-container.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 0 0 12px 12px; font-family: 'Inter', sans-serif; font-size: 14px; color: #e2e8f0; }
+        .ql-editor { min-height: 200px; color: #e2e8f0; }
+        .ql-editor.ql-blank::before { color: #6b7891 !important; }
+        .ql-snow .ql-stroke { stroke: #6b7891; }
+        .ql-snow .ql-fill { fill: #6b7891; }
+        .ql-snow .ql-picker { color: #6b7891; }
+        .ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: #00f0ff !important; }
+        .ql-snow.ql-toolbar button:hover .ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-fill { fill: #00f0ff !important; }
+        .ql-snow.ql-toolbar button:hover, .ql-snow.ql-toolbar button.ql-active { color: #00f0ff !important; }
+
+        @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+    </style>
+    <link rel="stylesheet" href="./css/shared.css">
+    <link rel="stylesheet" href="./css/article-content.css">
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
+
+    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-3 group shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
+                    <span class="font-display font-black text-black text-xl">X</span>
+                </div>
+                <div>
+                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">
+                        BELGEE <span class="text-brand-teal">X80</span>
+                        <span class="relative flex h-2 w-2 ml-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-teal"></span>
+                        </span>
+                    </div>
+                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Сообщество & Запчасти</div>
+                </div>
+            </a>
+
+            <nav class="hidden xl:flex items-center gap-3 2xl:gap-5 text-sm font-medium text-gray-300 whitespace-nowrap">
+                <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
+                <a href="#catalog" class="hover:text-brand-teal transition-colors">Каталог</a>
+                <a href="configurator.html" class="hover:text-brand-teal transition-colors">3D Конфигуратор</a>
+                <a href="manual.html" class="hover:text-brand-teal transition-colors">Мануал</a>
+                <a href="articles.html" class="hover:text-brand-teal transition-colors">Статьи</a>
+                <a href="#videos" class="hover:text-brand-teal transition-colors">Видео</a>
+                <a href="3d-prints.html" class="hover:text-brand-teal transition-colors">3D Печать</a>
+                <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка</a>
+                <div id="dynamic-pages-nav" class="flex items-center gap-3 2xl:gap-5"></div>
+                <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
+            </nav>
+
+            <div id="auth-container" class="hidden xl:flex items-center gap-3 shrink-0">
+                <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
+            </div>
+
+            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="xl:hidden text-gray-300 hover:text-white p-2">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="hidden xl:hidden bg-brand-card border-b border-brand-border px-4 pt-2 pb-6 space-y-3">
+            <a href="#specs" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Характеристики</a>
+            <a href="#catalog" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Каталог запчастей</a>
+            <a href="configurator.html" class="block py-2 text-brand-teal font-semibold border-b border-gray-800">3D Конфигуратор</a>
+            <a href="manual.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Руководство (PDF)</a>
+            <a href="articles.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Все статьи</a>
+            <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
+            <a href="3d-prints.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">3D Печать</a>
+            <a href="checklist.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Приёмка авто</a>
+            <div id="dynamic-pages-mobile" class="space-y-3"></div>
+            <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
+            <div class="pt-2 flex flex-col gap-2">
+                <!-- ВОТ ЗДЕСЬ ДОБАВЛЕН toggleMobileMenu() -->
+                <a href="login.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
+                <a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
+                    <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
+                </a>
+                <button onclick="toggleModal('feedback-modal'); toggleMobileMenu()" class="w-full py-2.5 bg-brand-teal text-black font-semibold rounded-xl">
+                    Обратная связь
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="relative overflow-hidden hero-gradient py-16 lg:py-24 border-b border-brand-border text-center">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase">
+                <span class="w-2 h-2 rounded-full bg-brand-teal animate-ping"></span>
+                Флагманский кроссовер BELGEE
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-black text-white tracking-tight leading-tight animate-fade-in-up" style="animation-delay: 0.1s;">
+                <span id="dynamic-hero-title">Информационный портал</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal via-blue-400 to-indigo-400">BELGEE X80</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto font-normal leading-relaxed">
+                Единый клуб владельцев и база знаний: оригинальные артикулы OEM, аналоги расходников, технические карты, пошаговые инструкции и активное Telegram-сообщество.
+            </p>
+
+            <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 pt-4">
+                <a href="#catalog" class="btn-premium w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-2xl shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.6)] hover:scale-105 transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-boxes-packing text-lg"></i> <span>База артикулов</span>
+                </a>
+                <a href="checklist.html" class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-clipboard-check text-brand-teal text-lg"></i> <span>Приёмка авто</span>
+                </a>
+                <a href="articles.html" class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-book-open text-brand-teal text-lg"></i> <span>Статьи</span>
+                </a>
+                <a href="3d-prints.html" class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-cube text-brand-teal text-lg"></i> <span>3D Печать</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 pt-8 border-t border-brand-border/60 max-w-lg mx-auto">
+                <div>
+                    <div class="text-2xl font-bold font-display text-white">1,450+</div>
+                    <div class="text-xs text-gray-400">Участников</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold font-display text-brand-teal">320+</div>
+                    <div class="text-xs text-gray-400">Артикулов</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold font-display text-blue-400">45+</div>
+                    <div class="text-xs text-gray-400">Статей</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="configurator-promo" class="py-12 bg-brand-dark border-b border-brand-border relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/80 to-transparent"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="bg-brand-card/80 backdrop-blur-md rounded-3xl border border-brand-teal/30 p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 card-glow">
+                <div class="max-w-xl text-center md:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-4">
+                        <i class="fa-solid fa-cube"></i> 3D Интерактив
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-display font-bold text-white mb-4">Создай свой BELGEE X80</h2>
+                    <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                        Изучи автомобиль в мельчайших деталях. Покрути 3D-модель, оцени дизайн со всех сторон и выбери идеальный цвет кузова с помощью нашего интерактивного конфигуратора.
+                    </p>
+                </div>
+                <div class="shrink-0">
+                    <a href="configurator.html" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-2xl shadow-lg shadow-brand-teal/20 hover:scale-105 transition-all text-lg">
+                        <i class="fa-solid fa-play"></i> Запустить 3D
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="search-section" class="py-8 bg-brand-dark/80 border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-brand-card p-4 sm:p-6 rounded-2xl border border-brand-border shadow-lg flex flex-col md:flex-row items-center gap-4">
+                <div class="flex-1 w-full relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="global-search-input" onkeyup="handleGlobalSearch()" placeholder="Быстрый поиск по порталу: 'Антикор', 'Масляный фильтр'..."
+                           class="w-full bg-brand-dark border border-brand-border rounded-xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors">
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                    <button onclick="quickFilter('все')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Все</button>
+                    <button onclick="quickFilter('ТО')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Расходники ТО</button>
+                    <button onclick="quickFilter('Масло')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Масла</button>
+                    <button onclick="quickFilter('Тормоза')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Тормоза</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="specs" class="py-16 border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl font-display font-bold text-white">Технические характеристики BELGEE X80</h2>
+                <p class="text-gray-400 mt-2 text-sm">Актуальные данные для гибридной версии PHEV (Plug-in Hybrid)</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-4 border border-blue-500/20">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-white">Силовая установка</h3>
+                    <p class="text-2xl font-extrabold text-brand-teal mt-1">PHEV 218 л.с.</p>
+                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
+                        <li>• ДВС: <strong>1.5 л (99 л.с.)</strong></li>
+                        <li>• Электромотор: <strong>218 л.с. / 262 Н·м</strong></li>
+                        <li>• Тип: <strong>Последовательно-параллельный гибрид</strong></li>
+                    </ul>
+                </div>
+
+                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
+                    <div class="w-12 h-12 rounded-xl bg-brand-teal/10 text-brand-teal flex items-center justify-center text-xl mb-4 border border-brand-teal/20">
+                        <i class="fa-solid fa-gears"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-white">Трансмиссия и привод</h3>
+                    <p class="text-2xl font-extrabold text-white mt-1">Редуктор</p>
+                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
+                        <li>• Привод: <strong>Передний</strong></li>
+                        <li>• Батарея: <strong>18.4 кВт·ч (LFP)</strong></li>
+                        <li>• Запас хода: <strong>до 940 км (суммарно)</strong></li>
+                    </ul>
+                </div>
+
+                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl mb-4 border border-purple-500/20">
+                        <i class="fa-solid fa-ruler-combined"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-white">Габариты и клиренс</h3>
+                    <p class="text-2xl font-extrabold text-white mt-1">4740 × 1905 мм</p>
+                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
+                        <li>• Высота: <strong>1685 мм</strong></li>
+                        <li>• Колёсная база: <strong>2755 мм</strong></li>
+                        <li>• Дорожный просвет: <strong>172 мм</strong></li>
+                    </ul>
+                </div>
+
+                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4 border border-emerald-500/20">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-white">Динамика и расход</h3>
+                    <p class="text-2xl font-extrabold text-white mt-1">7.5 сек</p>
+                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
+                        <li>• Разгон 0–100 км/ч: <strong>~7.5 сек</strong></li>
+                        <li>• Расход (смешанный): <strong>от 6.4 л/100 км</strong></li>
+                        <li>• Топливо: <strong>АИ-92 и выше</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="catalog" class="py-16 bg-brand-dark border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Официальные и Аналоговые детали</span>
+                    <h2 class="text-3xl font-display font-bold text-white mt-1">Каталог запчастей & Артикулы ТО</h2>
+                    <p class="text-gray-400 text-sm mt-1">База OEM номеров для проведения планового технического обслуживания BELGEE X80</p>
+                </div>
+
+                <div class="flex flex-wrap gap-2 max-w-full">
+                    <button onclick="filterCategory('all')" class="cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all" data-cat="all">Все</button>
+                    <button onclick="filterCategory('oils')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="oils">Моторные масла</button>
+                    <button onclick="filterCategory('filters')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="filters">Фильтры</button>
+                    <button onclick="filterCategory('spark')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="spark">Свечи и катушки</button>
+                    <button onclick="filterCategory('transmission')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="transmission">КПП/Редуктор</button>
+                    <button onclick="filterCategory('fluids')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="fluids">Техжидкости</button>
+                    <button onclick="filterCategory('wheels')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="wheels">Колёса</button>
+                    <button onclick="filterCategory('wipers')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="wipers">Щётки</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-brand-border bg-brand-card shadow-xl">
+                <table class="w-full text-left text-sm text-gray-300">
+                    <thead class="bg-brand-border/50 text-xs font-semibold uppercase text-gray-400 border-b border-brand-border">
+                        <tr>
+                            <th class="p-4">Наименование</th>
+                            <th class="p-4">Регламент</th>
+                            <th class="p-4">OEM Артикул</th>
+                            <th class="p-4">Аналоги / Примечания</th>
+                            <th class="p-4 text-right">Цена</th>
+                            <th class="p-4 text-center">Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parts-table-body" class="divide-y divide-brand-border/40 font-normal"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="articles" class="py-16 border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">База знаний и инструкции</span>
+                    <h2 class="text-3xl font-display font-bold text-white mt-1">Полезные статьи и Доработки</h2>
+                </div>
+                <div class="flex gap-2">
+                    <a href="articles.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-bold text-xs rounded-xl shadow-lg transition-all whitespace-nowrap">
+                        <i class="fa-solid fa-list"></i>
+                        <span>Смотреть все</span>
+                    </a>
+                    <button onclick="openSubmission()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all whitespace-nowrap">
+                        <i class="fa-solid fa-plus text-sm"></i>
+                        <span>Добавить</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-8 relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="articles-search-input" onkeyup="handleArticlesSearch()" placeholder="Поиск по статьям..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors shadow-lg">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="articles-grid"></div>
+        </div>
+    </section>
+
+    <section id="videos" class="py-16 bg-brand-dark border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                <div>
+                    <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Видеообзоры и Тест-Драйвы</span>
+                    <h2 class="text-3xl font-display font-bold text-white mt-1">Что говорят блогеры и автоэксперты</h2>
+                </div>
+                <a href="https://www.youtube.com/results?search_query=Belgee+X80+PHEV+%D1%82%D0%B5%D1%81%D1%82-%D0%B4%D1%80%D0%B0%D0%B9%D0%B2" target="_blank" class="mt-4 md:mt-0 text-xs text-gray-400 hover:text-brand-teal transition-colors flex items-center gap-2">
+                    <span>Смотреть все на YouTube</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
+                    <div class="relative w-full aspect-video bg-slate-800">
+                        <iframe id="video-frame-1" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/IMb8q6G7HAI" title="Видео 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[11px] text-brand-teal font-semibold">Автопанорама</span>
+                            <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Belgee X80 PHEV — новый флагман. Подробный тест-драйв и обзор гибрида</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
+                    <div class="relative w-full aspect-video bg-slate-800">
+                        <iframe id="video-frame-2" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/ilfsu2HprjQ" title="Видео 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div
