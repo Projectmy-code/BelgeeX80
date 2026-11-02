@@ -9,10 +9,19 @@
     <script>
         tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { teal: '#00f0ff', dark: '#0c1017', card: '#161e2b', border: '#253142' } } } } }
     </script>
-    <style> body { background-color: #0c1017; color: white; font-family: sans-serif; } </style>
+    <style> 
+        body { background-color: #0c1017; color: white; font-family: sans-serif; } 
+        
+        /* ФИКС ДЛЯ МОБИЛЬНЫХ: разрешаем клики и поднимаем форму наверх */
+        form, button, input {
+            pointer-events: auto !important;
+        }
+    </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
-    <div class="bg-brand-card w-full max-w-md p-8 rounded-3xl border border-brand-border shadow-2xl">
+    
+    <!-- Добавлен relative и z-[999], чтобы форма всегда была поверх любых других элементов -->
+    <div class="bg-brand-card w-full max-w-md p-8 rounded-3xl border border-brand-border shadow-2xl relative z-[999]">
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold mb-2">Вход в клуб</h1>
             <p class="text-gray-400 text-sm">Авторизуйтесь, чтобы предлагать статьи</p>
@@ -21,28 +30,28 @@
         <form id="auth-form" class="space-y-4">
             <div>
                 <label class="block text-xs text-gray-400 mb-1">Email</label>
-                <input type="email" id="email" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none">
+                <input type="email" id="email" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none relative z-[1000]">
             </div>
             <div>
                 <div class="flex justify-between items-center mb-1">
                     <label class="block text-xs text-gray-400">Пароль</label>
-                    <button type="button" id="forgot-password-btn" class="text-xs text-brand-teal hover:underline focus:outline-none">Забыли пароль?</button>
+                    <button type="button" id="forgot-password-btn" class="text-xs text-brand-teal hover:underline focus:outline-none relative z-[1000]">Забыли пароль?</button>
                 </div>
-                <input type="password" id="password" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none">
+                <input type="password" id="password" required class="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-white focus:border-brand-teal focus:outline-none relative z-[1000]">
             </div>
             
             <div id="error-msg" class="text-red-400 text-xs hidden"></div>
             <div id="success-msg" class="text-emerald-400 text-xs hidden"></div>
 
-            <button type="submit" id="submit-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl hover:opacity-90 transition-all">Войти</button>
+            <button type="submit" id="submit-btn" class="w-full py-3 bg-brand-teal text-black font-bold rounded-xl hover:opacity-90 transition-all relative z-[1000]">Войти</button>
         </form>
 
-        <div class="mt-6 text-center text-sm text-gray-400">
+        <div class="mt-6 text-center text-sm text-gray-400 relative z-[1000]">
             <span id="toggle-text">Нет аккаунта?</span>
             <button id="toggle-btn" class="text-brand-teal hover:underline ml-1">Зарегистрироваться</button>
         </div>
         
-        <div class="mt-6 text-center">
+        <div class="mt-6 text-center relative z-[1000]">
             <a href="index.html" class="text-xs text-gray-500 hover:text-white">← Вернуться на главную</a>
         </div>
     </div>
@@ -55,7 +64,7 @@
         const errorMsg = document.getElementById('error-msg');
         const successMsg = document.getElementById('success-msg');
 
-        // УБРАЛИ авто-редирект при загрузке, чтобы страница не "мигала"
+        // Убрали авто-редирект, чтобы страница не "мигала" при загрузке
 
         document.getElementById('toggle-btn').addEventListener('click', (e) => {
             e.preventDefault();
@@ -87,7 +96,7 @@
                         throw new Error('Не удалось создать сессию. Проверьте настройки браузера или попробуйте снова.');
                     }
                     
-                    // Добавили задержку в 300мс, чтобы браузер успел сохранить токен в localStorage
+                    // Задержка 300мс для сохранения токена в localStorage
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 300);
