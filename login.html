@@ -11,11 +11,13 @@
     </script>
     <style> 
         body { background-color: #0c1017; color: white; font-family: sans-serif; } 
+        /* Фикс для мобильных: разрешаем клики по форме */
         form, button, input { pointer-events: auto !important; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
     
+    <!-- z-[999] поднимает форму выше любых мобильных меню -->
     <div class="bg-brand-card w-full max-w-md p-8 rounded-3xl border border-brand-border shadow-2xl relative z-[999]">
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold mb-2">Вход в клуб</h1>
@@ -82,33 +84,44 @@
 
             try {
                 if (isLoginMode) {
-                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    // ПРИНУДИТЕЛЬНЫЙ ТАЙМАУТ (10 секунд)
+                    // Если мобильный интернет блокирует Supabase, мы не будем висеть вечно
+                    const loginPromise = supabase.auth.signInWithPassword({ email, password });
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Превышено время ожидания. Скорее всего, сеть блокирует запрос к Supabase. Попробуйте включить VPN.')), 10000)
+                    );
+
+                    const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
                     
-                    // Отладка: если ошибка, показываем её
                     if (error) {
-                        alert("Ошибка Supabase: " + error.message); // ВРЕМЕННО ДЛЯ ТЕСТА
+                        alert("ОШИБКА ВХОДА: " + error.message); 
                         throw error;
                     }
                     
                     if (!data.session) {
-                        alert("Сессия не создалась. Проверьте подтверждение Email в Supabase."); // ВРЕМЕННО
+                        alert("ОШИБКА: Сессия не создалась. Проверьте, подтвержден ли Email в панели Supabase.");
                         throw new Error('Не удалось создать сессию.');
                     }
                     
-                    // Принудительная задержка 500мс для сохранения токена в память
+                    // Небольшая задержка, чтобы токен 100% сохранился в память телефона
                     btn.textContent = 'Успех! Переход...';
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 500);
                     
                 } else {
+                    // РЕЖИМ РЕГИСТРАЦИИ
                     const { error } = await supabase.auth.signUp({ email, password });
-                    if (error) throw error;
+                    if (error) {
+                        alert("ОШИБКА РЕГИСТРАЦИИ: " + error.message);
+                        throw error;
+                    }
                     successMsg.textContent = 'Регистрация успешна! Теперь вы можете войти.';
                     successMsg.classList.remove('hidden');
                     document.getElementById('toggle-btn').click();
                 }
             } catch (error) {
+                console.error(error);
                 errorMsg.textContent = "Ошибка: " + (error.message || "Не удалось выполнить вход");
                 errorMsg.classList.remove('hidden');
                 btn.disabled = false;
@@ -116,6 +129,7 @@
             }
         });
 
+        // Логика сброса пароля
         document.getElementById('forgot-password-btn').addEventListener('click', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
@@ -142,6 +156,7 @@
             errorMsg.classList.add('hidden');
 
             if (error) {
+                alert("ОШИБКА СБРОСА: " + error.message);
                 errorMsg.textContent = 'Ошибка: ' + error.message;
                 errorMsg.classList.remove('hidden');
             } else {
