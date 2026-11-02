@@ -7,9 +7,9 @@ export const configured = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
-        storage: window.localStorage, // Принудительно сохраняем сессию в localStorage
+        storage: window.localStorage,
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: false // Отключаем, чтобы избежать сброса сессии
     }
 });
