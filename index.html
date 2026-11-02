@@ -799,13 +799,12 @@
             const authContainer = document.getElementById('auth-container');
             if (!authContainer) return;
 
-            // Ждем полсекунды, чтобы localStorage успел прочитаться
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // Используем getUser() — он надежнее на мобильных, чем getSession()
-            const { data: { user }, error } = await supabase.auth.getUser();
-
-            if (user && !error) {
+            // Задержка, чтобы localStorage успел прочитаться на мобильных
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
                 authContainer.innerHTML = `
                     <a href="profile.html" class="text-gray-400 text-xs hidden 2xl:block hover:text-white transition-colors">Мой профиль</a>
                     <a href="admin.html" class="text-brand-teal text-sm font-semibold hover:underline">Админка</a>
@@ -817,6 +816,11 @@
                 `;
             }
         }
+
+        // Слушаем изменения (если сессия подгрузилась с задержкой, кнопки появятся сами)
+        supabase.auth.onAuthStateChange((event, session) => {
+            updateAuthUI();
+        });
 
         // Слушаем изменения авторизации (сработает, даже если сессия подгрузится с задержкой)
         supabase.auth.onAuthStateChange((event, session) => {
