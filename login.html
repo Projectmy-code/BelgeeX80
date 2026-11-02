@@ -55,10 +55,7 @@
         const errorMsg = document.getElementById('error-msg');
         const successMsg = document.getElementById('success-msg');
 
-        // Проверка, не вошел ли уже пользователь
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) window.location.href = 'index.html';
-        });
+        // УБРАЛИ авто-редирект при загрузке, чтобы страница не "мигала"
 
         document.getElementById('toggle-btn').addEventListener('click', (e) => {
             e.preventDefault();
@@ -86,12 +83,15 @@
                     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                     if (error) throw error;
                     
-                    // Если сессия не создалась, выбрасываем ошибку
                     if (!data.session) {
                         throw new Error('Не удалось создать сессию. Проверьте настройки браузера или попробуйте снова.');
                     }
                     
-                    window.location.href = 'index.html';
+                    // Добавили задержку в 300мс, чтобы браузер успел сохранить токен в localStorage
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 300);
+                    
                 } else {
                     const { error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
