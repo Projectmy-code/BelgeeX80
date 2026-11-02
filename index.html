@@ -69,7 +69,7 @@
             <a href="index.html" class="flex items-center gap-3 group shrink-0">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
                     <span class="font-display font-black text-black text-xl">X</span>
-                </div> <!-- ВОТ ЭТОТ ЗАКРЫВАЮЩИЙ ТЕГ БЫЛ ПРОПУЩЕН -->
+                </div>
                 <div>
                     <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">
                         BELGEE <span class="text-brand-teal">X80</span>
@@ -80,7 +80,7 @@
                     </div>
                     <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Сообщество & Запчасти</div>
                 </div>
-            </a> 
+            </a>
 
             <nav class="hidden xl:flex items-center gap-3 2xl:gap-5 text-sm font-medium text-gray-300 whitespace-nowrap">
                 <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
@@ -116,8 +116,9 @@
             <div id="dynamic-pages-mobile" class="space-y-3"></div>
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
-                <a href="login.html" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
-                <a href="https://t.me/bg" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
+                <!-- ВОТ ЗДЕСЬ ДОБАВЛЕН toggleMobileMenu() -->
+                <a href="login.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
+                <a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
                 </a>
                 <button onclick="toggleModal('feedback-modal'); toggleMobileMenu()" class="w-full py-2.5 bg-brand-teal text-black font-semibold rounded-xl">
@@ -135,7 +136,7 @@
             </div>
 
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-black text-white tracking-tight leading-tight animate-fade-in-up" style="animation-delay: 0.1s;">
-                <span id="dynamic-hero-title">Информационный портал</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal via-blue-400 to-indigo-400">BELGEE </span>
+                <span id="dynamic-hero-title">Информационный портал</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal via-blue-400 to-indigo-400">BELGEE X80</span>
             </h1>
 
             <p class="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto font-normal leading-relaxed">
@@ -380,7 +381,7 @@
                         <div>
                             <span class="text-[11px] text-brand-teal font-semibold">Видеообзор</span>
                             <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Подробный обзор и тест-драйв Belgee X80</h3>
-                                                </div>
+                        </div>
                     </div>
                 </div>
 
@@ -470,8 +471,8 @@
             </div>
         </div>
     </footer>
-    
-    <!-- MODAL: ADD ARTICLE FORM -->
+
+    <!-- MODALS -->
     <div id="add-article-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="bg-brand-card w-full max-w-2xl rounded-3xl border border-brand-border p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="toggleModal('add-article-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
@@ -529,7 +530,6 @@
         </div>
     </div>
 
-    <!-- MODAL: FEEDBACK FORM -->
     <div id="feedback-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="bg-brand-card w-full max-w-lg rounded-3xl border border-brand-border p-6 shadow-2xl relative">
             <button onclick="toggleModal('feedback-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg">
@@ -555,7 +555,6 @@
         </div>
     </div>
 
-        <!-- MODAL: FULL ARTICLE -->
     <div id="info-modal" onclick="closeModalOnBg(event)" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
             <button onclick="toggleModal('info-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg z-10">
@@ -579,7 +578,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
     <div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="bg-brand-card w-full max-w-sm rounded-3xl border border-brand-border p-6 shadow-2xl relative transform scale-95 transition-transform duration-300">
             <div id="confirm-icon-container" class="w-14 h-14 rounded-full bg-brand-teal/10 text-brand-teal flex items-center justify-center text-2xl mb-4 mx-auto border border-brand-teal/20">
@@ -598,20 +596,17 @@
     <script type="module">
         import { supabase } from './js/config.js';
 
-        // === КАТАЛОГ ЗАПЧАСТЕЙ ===
         let globalPartsData = [];
 
         async function loadPartsFromDB() {
             const tbody = document.getElementById('parts-table-body');
             tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка каталога...</td></tr>';
-
             const { data, error } = await supabase.from('parts').select('*').order('name');
             
             if (error) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-red-400">Ошибка загрузки каталога</td></tr>`;
                 return;
             }
-
             globalPartsData = data || [];
             renderPartsTable(globalPartsData);
         }
@@ -622,7 +617,6 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">В каталоге пока нет запчастей</td></tr>';
                 return;
             }
-
             tbody.innerHTML = items.map(part => `
                 <tr class="hover:bg-brand-border/30 transition-colors">
                     <td class="p-4 font-semibold text-white max-w-[200px] break-words">${part.name || '-'}</td>
@@ -670,7 +664,6 @@
             ));
         };
 
-        // === ДИНАМИЧЕСКИЙ КОНТЕНТ ===
         async function loadSiteContent() {
             const { data } = await supabase.from('site_content').select('*');
             if (!data) return;
@@ -709,7 +702,6 @@
             });
         }
 
-        // === ДИНАМИЧЕСКИЕ СТРАНИЦЫ ===
         async function loadDynamicPages() {
             const { data: pages } = await supabase.from('custom_pages').select('title, slug').eq('status', 'published');
             if (!pages || pages.length === 0) return;
@@ -732,7 +724,6 @@
             });
         }
 
-        // === ОБРАТНАЯ СВЯЗЬ ===
         window.handleFeedbackSubmit = async function(e) {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -744,13 +735,12 @@
             const message = document.getElementById('feedback-message').value;
             const website = document.getElementById('feedback-website')?.value;
 
-            if (website) { // Honeypot
+            if (website) {
                 btn.textContent = originalText; btn.disabled = false;
                 return;
             }
 
             const { error } = await supabase.from('feedback').insert([{ name, message }]);
-
             btn.textContent = originalText;
             btn.disabled = false;
 
@@ -763,11 +753,9 @@
             }
         };
 
-        // === УТИЛИТЫ ===
         window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); };
         window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
-        // === КАСТОМНЫЙ CONFIRM ===
         let confirmResolve = null;
         window.showConfirm = function(title, message, btnText = 'ОК', btnColor = 'bg-brand-teal', hoverColor = 'hover:bg-brand-teal/80', textColor = 'text-black') {
             return new Promise((resolve) => {
@@ -804,7 +792,6 @@
         document.getElementById('confirm-cancel-btn')?.addEventListener('click', () => closeConfirm(false));
         document.getElementById('confirm-ok-btn')?.addEventListener('click', () => closeConfirm(true));
 
-        // === АВТОРИЗАЦИЯ ===
         async function updateAuthUI() {
             const { data: { session } } = await supabase.auth.getSession();
             const authContainer = document.getElementById('auth-container');
@@ -828,7 +815,6 @@
             window.location.reload();
         }
 
-        // === ИНИЦИАЛИЗАЦИЯ ===
         document.addEventListener('DOMContentLoaded', () => {
             loadPartsFromDB();
             loadSiteContent();
@@ -839,12 +825,9 @@
     
     <script type="module" src="./js/articles.js"></script>
 
-    <!-- PWA -->
-        <!-- Регистрация Service Worker для PWA -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // ОБРАТИ ВНИМАНИЕ НА ПУТЬ: ./js/sw.js
                 navigator.serviceWorker.register('./js/sw.js')
                     .then(() => console.log('SW зарегистрирован!'))
                     .catch(err => console.log('SW Error:', err));
