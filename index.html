@@ -95,6 +95,7 @@
                 <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
             </nav>
 
+            <!-- КОНТЕЙНЕР АВТОРИЗАЦИИ -->
             <div id="auth-container" class="hidden xl:flex items-center gap-3 shrink-0">
                 <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
             </div>
@@ -116,7 +117,6 @@
             <div id="dynamic-pages-mobile" class="space-y-3"></div>
             <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
             <div class="pt-2 flex flex-col gap-2">
-                <!-- ВОТ ЗДЕСЬ ДОБАВЛЕН toggleMobileMenu() -->
                 <a href="login.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
                 <a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
                     <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
@@ -792,16 +792,19 @@
         document.getElementById('confirm-cancel-btn')?.addEventListener('click', () => closeConfirm(false));
         document.getElementById('confirm-ok-btn')?.addEventListener('click', () => closeConfirm(true));
 
+        // ==========================================
+        // УЛУЧШЕННАЯ ПРОВЕРКА АВТОРИЗАЦИИ (ДЛЯ МОБИЛЬНЫХ)
+        // ==========================================
         async function updateAuthUI() {
             const authContainer = document.getElementById('auth-container');
             if (!authContainer) return;
-            
-            // Ждем полсекунды, чтобы мобильный браузер успел прочитать localStorage
+
+            // Ждем полсекунды, чтобы localStorage успел прочитаться
             await new Promise(resolve => setTimeout(resolve, 500));
-            
+
             // Используем getUser() — он надежнее на мобильных, чем getSession()
             const { data: { user }, error } = await supabase.auth.getUser();
-            
+
             if (user && !error) {
                 authContainer.innerHTML = `
                     <a href="profile.html" class="text-gray-400 text-xs hidden 2xl:block hover:text-white transition-colors">Мой профиль</a>
