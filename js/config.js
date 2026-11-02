@@ -10,6 +10,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         storage: window.localStorage,
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: false // Отключаем, чтобы избежать сброса сессии
+        detectSessionInUrl: false
     }
 });
