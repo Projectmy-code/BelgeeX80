@@ -55,6 +55,7 @@
         const errorMsg = document.getElementById('error-msg');
         const successMsg = document.getElementById('success-msg');
 
+        // Проверка, не вошел ли уже пользователь
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session) window.location.href = 'index.html';
         });
@@ -82,8 +83,14 @@
 
             try {
                 if (isLoginMode) {
-                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                     if (error) throw error;
+                    
+                    // Если сессия не создалась, выбрасываем ошибку
+                    if (!data.session) {
+                        throw new Error('Не удалось создать сессию. Проверьте настройки браузера или попробуйте снова.');
+                    }
+                    
                     window.location.href = 'index.html';
                 } else {
                     const { error } = await supabase.auth.signUp({ email, password });
@@ -117,7 +124,6 @@
             btn.textContent = 'Отправка...';
             btn.disabled = true;
 
-            // Ссылка для возврата после смены пароля
             const redirectTo = window.location.origin + window.location.pathname.replace('login.html', 'update-password.html');
 
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
