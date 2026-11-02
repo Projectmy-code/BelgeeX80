@@ -83,15 +83,23 @@
             try {
                 if (isLoginMode) {
                     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
                     
-                    if (!data.session) {
-                        throw new Error('Не удалось создать сессию. Проверьте настройки браузера или попробуйте снова.');
+                    // Отладка: если ошибка, показываем её
+                    if (error) {
+                        alert("Ошибка Supabase: " + error.message); // ВРЕМЕННО ДЛЯ ТЕСТА
+                        throw error;
                     }
                     
+                    if (!data.session) {
+                        alert("Сессия не создалась. Проверьте подтверждение Email в Supabase."); // ВРЕМЕННО
+                        throw new Error('Не удалось создать сессию.');
+                    }
+                    
+                    // Принудительная задержка 500мс для сохранения токена в память
+                    btn.textContent = 'Успех! Переход...';
                     setTimeout(() => {
                         window.location.href = 'index.html';
-                    }, 300);
+                    }, 500);
                     
                 } else {
                     const { error } = await supabase.auth.signUp({ email, password });
@@ -103,7 +111,6 @@
             } catch (error) {
                 errorMsg.textContent = "Ошибка: " + (error.message || "Не удалось выполнить вход");
                 errorMsg.classList.remove('hidden');
-            } finally {
                 btn.disabled = false;
                 btn.textContent = isLoginMode ? 'Войти' : 'Зарегистрироваться';
             }
