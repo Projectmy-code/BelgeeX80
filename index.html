@@ -158,7 +158,7 @@
                 </a>
             </div>
 
-            <!-- БЛОК СТАТИСТИКИ (Добавлены ID) -->
+            <!-- БЛОК СТАТИСТИКИ -->
             <div class="grid grid-cols-3 gap-4 pt-8 border-t border-brand-border/60 max-w-lg mx-auto">
                 <div>
                     <div id="stat-members" class="text-2xl font-bold font-display text-white">...</div>
@@ -725,23 +725,14 @@
                     document.getElementById('stat-parts').innerText = `${partsCount.toLocaleString('ru-RU')}+`;
                 }
 
-                // 3. Считаем участников (профили)
-                // Сначала пробуем обычный запрос. Если RLS запрещает, будет ошибка.
-                const { count: profilesCount, error: profilesError } = await supabase
-                    .from('profiles')
-                    .select('*', { count: 'exact', head: true });
+                // 3. Считаем участников (через безопасную RPC-функцию)
+                const { data: profilesCount, error: profilesError } = await supabase.rpc('get_public_users_count');
                 
-                if (profilesCount !== null && !profilesError) {
+                if (profilesCount !== null && !profilesError && profilesCount > 0) {
                     document.getElementById('stat-members').innerText = `${profilesCount.toLocaleString('ru-RU')}+`;
                 } else {
-                    // Пробуем через RPC (если пользователь создал функцию get_public_users_count)
-                    const { data: rpcCount, error: rpcError } = await supabase.rpc('get_public_users_count');
-                    if (!rpcError && rpcCount !== null) {
-                        document.getElementById('stat-members').innerText = `${rpcCount.toLocaleString('ru-RU')}+`;
-                    } else {
-                        // Если совсем никак, оставляем заглушку
-                        document.getElementById('stat-members').innerText = `1 450+`;
-                    }
+                    // Если функция не создана или вернула 0, ставим красивую заглушку
+                    document.getElementById('stat-members').innerText = `1 450+`;
                 }
 
             } catch (e) {
@@ -861,7 +852,7 @@
                     <a href="admin.html" class="text-brand-teal text-sm font-semibold hover:underline">Админка</a>
                     <button onclick="logout()" class="text-red-400 text-sm font-semibold hover:text-red-300">Выйти</button>
                 `;
-                // Обновляем МОБИЛЬНОЕ меню (добавляем кнопки, если вошел)
+                // Обновляем МОБИЛЬНОЕ меню
                 mobileAuthContainer.innerHTML = `
                     <a href="profile.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Мой профиль</a>
                     <a href="admin.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Админка</a>
@@ -874,7 +865,7 @@
                     </button>
                 `;
             } else {
-                // Если НЕ вошел, обновляем на "Вход / Регистрация"
+                // Если НЕ вошел
                 authContainer.innerHTML = `
                     <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
                 `;
@@ -890,7 +881,6 @@
             }
         }
 
-        // Слушаем изменения авторизации
         supabase.auth.onAuthStateChange((event, session) => {
             updateAuthUI();
         });
@@ -905,7 +895,7 @@
             loadSiteContent();
             loadDynamicPages();
             updateAuthUI();
-            loadRealStats(); // <--- ДОБАВЛЕН ВЫЗОВ СТАТИСТИКИ
+            loadRealStats(); // Запуск статистики
         });
     </script>
     
