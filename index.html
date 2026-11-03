@@ -45,7 +45,7 @@
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
 
-        /* Стили для Quill в полноэкранном редакторе */
+        /* Стили для Quill */
         .ql-toolbar.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 12px 12px 0 0; padding: 12px; border-top: none; border-left: none; border-right: none; position: sticky; top: 0; z-index: 10; }
         .ql-container.ql-snow { border: none !important; font-family: 'Inter', sans-serif; font-size: 16px; color: #e2e8f0; }
         .ql-editor { padding: 24px; color: #e2e8f0; line-height: 1.8; min-height: 400px; }
@@ -60,25 +60,13 @@
         @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
-        /* Выпадающие списки (Dropdowns) */
-        .dropdown-menu {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .group:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+        .dropdown-menu { opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .group:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
 
-        /* Выпадающий поиск */
         .search-dropdown { display: none; }
         .search-dropdown.active { display: block; animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Мобильное меню (Drawer) */
         #mobile-drawer { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         #mobile-overlay { transition: opacity 0.3s ease; }
     </style>
@@ -87,13 +75,9 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
-    <!-- ============================================== -->
-    <!-- ОБНОВЛЕННАЯ ШАПКА -->
-    <!-- ============================================== -->
+    <!-- ШАПКА (ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ) -->
     <header class="sticky top-0 z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            
-            <!-- Логотип -->
             <a href="index.html" class="flex items-center gap-3 group shrink-0">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
                     <span class="font-display font-black text-black text-xl">X</span>
@@ -110,10 +94,7 @@
                 </div>
             </a>
 
-            <!-- ДЕСКТОПНОЕ МЕНЮ (Группировка) -->
             <nav class="hidden xl:flex items-center gap-1 text-sm font-medium text-gray-300 whitespace-nowrap">
-                
-                <!-- Автомобиль -->
                 <div class="relative group">
                     <button class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors flex items-center gap-1.5">
                         Автомобиль <i class="fa-solid fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
@@ -125,7 +106,6 @@
                     </div>
                 </div>
 
-                <!-- База знаний -->
                 <div class="relative group">
                     <button class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors flex items-center gap-1.5">
                         База знаний <i class="fa-solid fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
@@ -138,10 +118,8 @@
                     </div>
                 </div>
 
-                <!-- Каталог -->
                 <a href="#catalog" class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors">Каталог</a>
 
-                <!-- Сервис -->
                 <div class="relative group">
                     <button class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors flex items-center gap-1.5">
                         Клуб <i class="fa-solid fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
@@ -153,9 +131,7 @@
                 </div>
             </nav>
 
-            <!-- ПРАВАЯ ЧАСТЬ (Профиль и Мобильное меню) -->
             <div class="flex items-center gap-3 shrink-0">
-                
                 <button onclick="scrollToSearch()" class="hidden xl:flex w-9 h-9 rounded-full bg-brand-border/50 hover:bg-brand-border text-gray-400 hover:text-white items-center justify-center transition-colors">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
@@ -171,9 +147,7 @@
         </div>
     </header>
 
-    <!-- ============================================== -->
-    <!-- МОБИЛЬНОЕ МЕНЮ (DRAWER СПРАВА) -->
-    <!-- ============================================== -->
+    <!-- МОБИЛЬНОЕ МЕНЮ -->
     <div id="mobile-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden opacity-0 xl:hidden"></div>
     
     <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm bg-brand-card border-l border-brand-border z-[70] transform translate-x-full xl:hidden flex flex-col">
@@ -185,8 +159,6 @@
         </div>
 
         <div class="flex-1 overflow-y-auto py-4 px-4 space-y-6">
-            
-            <!-- Блок: Автомобиль -->
             <div>
                 <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 px-2">Автомобиль</div>
                 <div class="space-y-1">
@@ -202,7 +174,6 @@
                 </div>
             </div>
 
-            <!-- Блок: База знаний -->
             <div>
                 <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 px-2">База знаний</div>
                 <div class="space-y-1">
@@ -219,7 +190,6 @@
                 </div>
             </div>
 
-            <!-- Блок: Сервис и Клуб -->
             <div>
                 <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 px-2">Клуб</div>
                 <div class="space-y-1">
@@ -236,7 +206,6 @@
             </div>
         </div>
 
-        <!-- Подвал мобильного меню (Авторизация) -->
         <div class="p-4 border-t border-brand-border bg-brand-dark/50">
             <div id="mobile-auth-container" class="flex flex-col gap-2"></div>
         </div>
@@ -359,13 +328,13 @@
         </div>
     </section>
 
-    <!-- CATALOG -->
+    <!-- КАТАЛОГ (С ОГРАНИЧЕНИЕМ В 5 СТРОК) -->
     <section id="catalog" class="py-16 bg-brand-dark border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                 <div>
                     <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Официальные и Аналоговые детали</span>
-                    <h2 class="text-3xl font-display font-bold text-white mt-1">Каталог запчастей & Артикулы ТО</h2>
+                    <h2 class="text-3xl font-display font-bold text-white mt-1">Популярные запчасти & Артикулы</h2>
                 </div>
                 <div class="flex flex-wrap gap-2 max-w-full">
                     <button onclick="filterCategory('all')" class="cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all" data-cat="all">Все</button>
@@ -373,6 +342,7 @@
                     <button onclick="filterCategory('filters')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="filters">Фильтры</button>
                 </div>
             </div>
+
             <div class="overflow-x-auto rounded-2xl border border-brand-border bg-brand-card shadow-xl">
                 <table class="w-full text-left text-sm text-gray-300">
                     <thead class="bg-brand-border/50 text-xs font-semibold uppercase text-gray-400 border-b border-brand-border">
@@ -387,6 +357,13 @@
                     </thead>
                     <tbody id="parts-table-body" class="divide-y divide-brand-border/40 font-normal"></tbody>
                 </table>
+            </div>
+            
+            <!-- Кнопка "Показать все" -->
+            <div class="mt-6 text-center">
+                <button id="view-all-parts-btn" onclick="toggleCatalogExpand()" class="hidden px-8 py-3 bg-brand-card border border-brand-border hover:border-brand-teal text-white font-bold rounded-xl transition-all shadow-lg">
+                    Показать все артикулы <i class="fa-solid fa-arrow-down ml-2 text-brand-teal"></i>
+                </button>
             </div>
         </div>
     </section>
@@ -516,6 +493,11 @@
             </div>
         </div>
     </footer>
+
+    <!-- КНОПКА "НАВЕРХ" -->
+    <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 left-6 z-40 w-12 h-12 bg-brand-card border border-brand-border text-brand-teal rounded-full shadow-2xl hidden items-center justify-center hover:bg-brand-border transition-colors">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
 
     <!-- ============================================== -->
     <!-- ПОЛНОЭКРАННЫЙ РЕДАКТОР -->
@@ -694,11 +676,22 @@
             }
         };
 
-        // --- 2. Скролл к поиску ---
+        // --- 2. Скролл к поиску и наверх ---
         window.scrollToSearch = function() {
             document.getElementById('search-section').scrollIntoView({ behavior: 'smooth' });
             setTimeout(() => document.getElementById('global-search-input').focus(), 500);
         };
+
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scrollToTopBtn');
+            if (window.scrollY > 500) {
+                btn.classList.remove('hidden');
+                btn.classList.add('flex');
+            } else {
+                btn.classList.add('hidden');
+                btn.classList.remove('flex');
+            }
+        });
 
         // --- 3. Глобальный поиск ---
         let searchTimeout = null;
@@ -805,20 +798,33 @@
             }
         });
 
-        // --- 4. Каталог ---
+        // --- 4. Каталог (С ограничением) ---
         let globalPartsData = [];
+        let isCatalogExpanded = false; // По умолчанию показываем 5
+
         async function loadPartsFromDB() {
             const tbody = document.getElementById('parts-table-body');
             tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Загрузка каталога...</td></tr>';
             const { data, error } = await supabase.from('parts').select('*').order('name');
             if (error) { tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-red-400">Ошибка загрузки каталога</td></tr>`; return; }
-            globalPartsData = data || []; renderPartsTable(globalPartsData);
+            globalPartsData = data || []; 
+            renderPartsTable(globalPartsData);
         }
 
         function renderPartsTable(items) {
             const tbody = document.getElementById('parts-table-body');
-            if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">В каталоге пока нет запчастей</td></tr>'; return; }
-            tbody.innerHTML = items.map(part => `
+            const btn = document.getElementById('view-all-parts-btn');
+            
+            if (items.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">Запчасти не найдены</td></tr>'; 
+                btn.classList.add('hidden');
+                return; 
+            }
+
+            const searchQuery = document.getElementById('global-search-input').value.trim();
+            const displayItems = (isCatalogExpanded || searchQuery.length > 0) ? items : items.slice(0, 5);
+            
+            tbody.innerHTML = displayItems.map(part => `
                 <tr class="hover:bg-brand-border/30 transition-colors">
                     <td class="p-4 font-semibold text-white max-w-[200px] break-words">${part.name || '-'}</td>
                     <td class="p-4 text-xs text-gray-400">${part.interval || '-'}</td>
@@ -827,9 +833,22 @@
                     <td class="p-4 text-right font-semibold text-emerald-400 text-xs">${part.price || '-'}</td>
                     <td class="p-4 text-center"><button onclick="navigator.clipboard.writeText('${part.oem || ''}'); alert('Артикул ${part.oem || ''} скопирован!')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium transition-colors" title="Скопировать артикул">Код</button></td>
                 </tr>`).join('');
+
+            if (items.length > 5 && !isCatalogExpanded && searchQuery.length === 0) {
+                btn.classList.remove('hidden');
+                btn.innerHTML = `Показать все (${items.length}) <i class="fa-solid fa-arrow-down ml-1"></i>`;
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        window.toggleCatalogExpand = function() {
+            isCatalogExpanded = !isCatalogExpanded;
+            renderPartsTable(globalPartsData);
         }
 
         window.filterCategory = function(cat) {
+            isCatalogExpanded = false; // Сбрасываем при фильтрации
             document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.className = (btn.dataset.cat === cat) ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md' : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
             });
@@ -837,11 +856,13 @@
         };
 
         window.handleGlobalSearch = function() {
+            isCatalogExpanded = false; // Сбрасываем при поиске
             const q = document.getElementById('global-search-input').value.toLowerCase();
             renderPartsTable(globalPartsData.filter(p => (p.name || '').toLowerCase().includes(q) || (p.oem || '').toLowerCase().includes(q) || (p.analog || '').toLowerCase().includes(q)));
         };
 
         window.quickFilter = function(term) {
+            isCatalogExpanded = false;
             const q = term.toLowerCase();
             if(term === 'все') { renderPartsTable(globalPartsData); return; }
             renderPartsTable(globalPartsData.filter(p => (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q) || (p.analog || '').toLowerCase().includes(q)));
