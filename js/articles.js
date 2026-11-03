@@ -3,16 +3,17 @@ import { supabase } from './config.js';
 let quill = null;
 let loadedArticles = [];
 
+// Уведомления (используем глобальную функцию, если она есть)
 function showToast(message, type = 'success') {
-    if (typeof window.showToast === 'function') { window.showToast(message, type); return; }
-    const isSuccess = type === 'success';
-    const toast = document.createElement('div');
-    toast.className = `fixed bottom-6 right-6 z-[100] bg-[#161e2b] border ${isSuccess ? 'border-emerald-500' : 'border-red-500'} px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold text-white`;
-    toast.innerHTML = `<i class="fa-solid ${isSuccess ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-red-400'} text-xl"></i><span>${message}</span>`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
+    if (typeof window.showToast === 'function') {
+        window.showToast(message, type);
+        return;
+    }
+    // Фолбэк, если вдруг функции нет
+    alert(message);
 }
 
+// Подтверждение (используем глобальную функцию из index.html)
 async function showConfirm(title, msg) {
     if (typeof window.showConfirm === 'function') {
         return window.showConfirm(title, msg, 'Отправить', 'bg-brand-teal', 'hover:bg-brand-teal/80', 'text-black');
@@ -54,13 +55,11 @@ async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Загружаем статьи только если это ГЛАВНАЯ страница (нет кнопки load-more-btn)
     if (document.getElementById('articles-grid') && !document.getElementById('load-more-btn')) {
         loadArticlesFromDB();
     }
     
     const editorContainer = document.getElementById('editor-container');
-    
     if (editorContainer) {
         quill = new Quill('#editor-container', {
             theme: 'snow', 
@@ -113,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const fileName = `inline_${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
                     const { error } = await supabase.storage.from('images').upload(fileName, compressedFile);
                     if (error) throw error;
-                    const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
+                    const { data: urlData } = await supabase.storage.from('images').getPublicUrl(fileName);
                     quill.deleteText(range.index, placeholder.length);
                     quill.insertEmbed(range.index, 'image', urlData.publicUrl);
                 } catch (error) {
@@ -294,7 +293,7 @@ export async function handleAddArticleSubmit(e) {
             const fileName = `cover_${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
             const { error: uploadError } = await supabase.storage.from('images').upload(fileName, compressedFile);
             if (uploadError) throw new Error('Ошибка загрузки обложки: ' + uploadError.message);
-            const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
+            const { data: urlData } = await supabase.storage.from('images').getPublicUrl(fileName);
             imageUrl = urlData.publicUrl;
         }
 
@@ -313,7 +312,7 @@ export async function handleAddArticleSubmit(e) {
         const { error: dbError } = await supabase.from('articles').insert([newArticle]);
         if (dbError) throw dbError;
 
-        showToast('Статья успешно отправлена на модерацию!');
+        showToast('Статья успешно отправлена на модерацию!', 'success');
         
         localStorage.removeItem('belgee_article_draft');
         e.target.reset(); 
