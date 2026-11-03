@@ -51,7 +51,7 @@
     <!-- Оверлей для мобильного меню -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-    <!-- SIDEBAR (Выезжающее меню на мобильных) -->
+    <!-- SIDEBAR -->
     <aside id="sidebar" class="w-64 glass-panel fixed h-full flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="h-20 flex items-center justify-between px-6 border-b border-brand-border">
             <a href="index.html" class="flex items-center gap-3 group">
@@ -63,7 +63,6 @@
                     <div class="text-[10px] text-gray-400 uppercase">BELGEE X80</div>
                 </div>
             </a>
-            <!-- Кнопка закрытия на мобильных -->
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -80,6 +79,10 @@
             </a>
             <a href="builder.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
                 <i class="fa-solid fa-file-code w-5 text-center"></i> Страницы
+            </a>
+            <!-- НОВЫЙ ПУНКТ: РЕДАКТОР ЭКРАНОВ -->
+            <a href="edit-dashboard.html" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="fa-solid fa-tv w-5 text-center"></i> Экран авто
             </a>
             <a href="#" onclick="switchView('media')" id="nav-media" class="nav-item px-6 py-3 flex items-center gap-3 text-sm font-medium text-gray-300">
                 <i class="fa-regular fa-images w-5 text-center"></i> Медиафайлы
@@ -135,7 +138,6 @@
 
     <!-- MAIN CONTENT -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden md:ml-64 w-full relative">
-        <!-- Мобильная шапка -->
         <header class="md:hidden h-16 bg-brand-card border-b border-brand-border flex items-center justify-between px-4 shrink-0 z-30">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="text-gray-300 hover:text-white p-2">
@@ -274,7 +276,6 @@
             currentUser = session.user;
             document.getElementById('user-email').textContent = currentUser.email;
             
-            // Проверка через RPC (так как таблицы admins может не быть)
             const { data: isAdmin, error: adminErr } = await supabase.rpc('is_admin');
             
             document.getElementById('view-loading').classList.add('hidden');
@@ -308,7 +309,6 @@
         }
 
         window.switchView = function(viewName) {
-            // Закрываем меню на мобильных при выборе пункта
             if (window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.add('-translate-x-full');
                 document.getElementById('sidebar-overlay').classList.add('hidden');
