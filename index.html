@@ -120,6 +120,8 @@
                         Автомобиль <i class="fa-solid fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
                     </button>
                     <div class="absolute top-full left-0 mt-1 w-56 bg-brand-card border border-brand-border rounded-xl shadow-xl dropdown-menu overflow-hidden flex flex-col p-1">
+                        <!-- ДОБАВЛЕНА ССЫЛКА НА ЭКРАН -->
+                        <a href="dashboard.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-brand-teal font-semibold transition-colors"><i class="fa-solid fa-tv mr-2"></i> Экран авто (3D)</a>
                         <a href="#specs" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Характеристики</a>
                         <a href="configurator.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">3D Конфигуратор</a>
                         <a href="manual.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Руководство (PDF)</a>
@@ -190,6 +192,10 @@
             <div>
                 <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 px-2">Автомобиль</div>
                 <div class="space-y-1">
+                    <!-- ДОБАВЛЕНА ССЫЛКА НА ЭКРАН (МОБИЛКА) -->
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-teal/10 text-brand-teal font-semibold border border-brand-teal/20">
+                        <i class="fa-solid fa-tv w-5 text-center"></i> Экран авто (3D)
+                    </a>
                     <a href="#specs" onclick="toggleMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
                         <i class="fa-solid fa-gauge-high w-5 text-center text-brand-teal"></i> Характеристики
                     </a>
@@ -464,6 +470,7 @@
                 <div>
                     <h4 class="font-bold text-white mb-3">Разделы</h4>
                     <ul class="space-y-2">
+                        <li><a href="dashboard.html" class="hover:text-brand-teal">Экран авто</a></li>
                         <li><a href="#specs" class="hover:text-brand-teal">Характеристики</a></li>
                         <li><a href="#catalog" class="hover:text-brand-teal">Каталог запчастей</a></li>
                         <li><a href="configurator.html" class="hover:text-brand-teal">3D Конфигуратор</a></li>
@@ -724,7 +731,8 @@
                 const staticPages = [
                     { title: 'Руководство по эксплуатации (PDF)', url: 'manual.html', icon: 'fa-book' },
                     { title: 'Приёмка автомобиля (Чек-лист)', url: 'checklist.html', icon: 'fa-clipboard-check' },
-                    { title: '3D Конфигуратор', url: 'configurator.html', icon: 'fa-cube' }
+                    { title: '3D Конфигуратор', url: 'configurator.html', icon: 'fa-cube' },
+                    { title: 'Интерактивный экран авто', url: 'dashboard.html', icon: 'fa-tv' }
                 ].filter(p => p.title.toLowerCase().includes(query.toLowerCase()));
 
                 let html = '';
@@ -783,7 +791,7 @@
             if (mi && md && !mi.contains(e.target) && !md.contains(e.target)) md.classList.remove('active');
         });
 
-        // --- 4. КАТАЛОГ (ИСПРАВЛЕННАЯ ЛОГИКА) ---
+        // --- 4. КАТАЛОГ ---
         let originalPartsData = [];
         let currentPartsData = [];
         let isCatalogExpanded = false;
@@ -799,7 +807,6 @@
             updateCatalog();
         }
 
-        // Обновление визуала переключателя (Таблица/Плитка)
         function updateViewUI() {
             const btnTable = document.getElementById('btn-view-table');
             const btnGrid = document.getElementById('btn-view-grid');
@@ -827,16 +834,13 @@
             renderParts();
         }
 
-        // Основная функция фильтрации и поиска
         function updateCatalog() {
             currentPartsData = [...originalPartsData];
             
-            // Фильтр по категории
             if (activeCategory !== 'all') {
                 currentPartsData = currentPartsData.filter(p => p.cat === activeCategory || p.category === activeCategory);
             }
 
-            // Фильтр по поиску
             if (activeSearch) {
                 currentPartsData = currentPartsData.filter(p => 
                     (p.name || '').toLowerCase().includes(activeSearch) ||
@@ -848,7 +852,6 @@
             renderParts();
         }
 
-        // Обработчик клика по категориям
         window.filterCategory = function(cat) {
             activeCategory = cat;
             isCatalogExpanded = false;
@@ -860,12 +863,10 @@
             updateCatalog();
         };
 
-        // Обработчик поиска
         window.handleGlobalSearch = function() {
             const desktopInput = document.getElementById('global-search-input');
             const mobileInput = document.getElementById('mobile-search-input');
             
-            // Берем значение из того поля, где печатают
             let val = '';
             if (desktopInput && desktopInput.value.trim()) val = desktopInput.value.trim();
             else if (mobileInput && mobileInput.value.trim()) val = mobileInput.value.trim();
@@ -875,7 +876,6 @@
             updateCatalog();
         };
 
-        // Отрисовка каталога
         function renderParts() {
             const tbody = document.getElementById('parts-table-body');
             const gridContainer = document.getElementById('parts-grid-container');
@@ -888,7 +888,6 @@
                 return; 
             }
 
-            // Если идет поиск — показываем все результаты, иначе ограничиваем 5
             const displayItems = (isCatalogExpanded || activeSearch) ? currentPartsData : currentPartsData.slice(0, 5);
             
             tbody.innerHTML = displayItems.map(part => `
@@ -920,7 +919,6 @@
                 </div>
             `).join('');
 
-            // Умная кнопка "Показать все / Свернуть"
             if (currentPartsData.length > 5 && !activeSearch) {
                 btn.classList.remove('hidden');
                 if (isCatalogExpanded) {
@@ -977,7 +975,7 @@
             localStorage.setItem('pwa_banner_closed', 'true');
         };
 
-        // --- 6. ОСТАЛЬНАЯ ЛОГИКА (АВТОРИЗАЦИЯ, МОДАЛКИ, КОНТЕНТ) ---
+        // --- 6. АВТОРИЗАЦИЯ И МОДАЛКИ ---
         async function updateAuthUI() {
             const authContainer = document.getElementById('auth-container');
             const mobileAuthContainer = document.getElementById('mobile-auth-container');
