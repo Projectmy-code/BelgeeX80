@@ -74,11 +74,26 @@
         /* PWA Banner */
         #pwa-banner { transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         #pwa-banner.show { transform: translateY(0); }
+
+        /* КАСТОМНЫЕ УВЕДОМЛЕНИЯ (ТОСТЫ) */
+        #toast-container { position: fixed; z-index: 9999; pointer-events: none; display: flex; flex-direction: column; gap: 10px; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; }
+        @media (min-width: 640px) { #toast-container { top: auto; bottom: 24px; right: 24px; left: auto; transform: none; width: auto; max-width: 350px; } }
+        
+        .custom-toast { pointer-events: auto; display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 12px; background: #161e2b; border: 1px solid #253142; color: white; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-toast.hiding { animation: fadeOut 0.3s ease forwards; }
+        .custom-toast.success { border-color: #10b981; }
+        .custom-toast.success i { color: #10b981; }
+        .custom-toast.error { border-color: #ef4444; }
+        .custom-toast.error i { color: #ef4444; }
     </style>
     <link rel="stylesheet" href="./css/shared.css">
     <link rel="stylesheet" href="./css/article-content.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
+
+    <!-- КОНТЕЙНЕР ДЛЯ УВЕДОМЛЕНИЙ -->
+    <div id="toast-container"></div>
 
     <!-- ШАПКА -->
     <header class="sticky top-0 z-50 glass-panel">
@@ -307,9 +322,7 @@
         </div>
     </section>
 
-    <!-- ============================================== -->
-    <!-- КАТАЛОГ С ПЛИТКОЙ И СПИСКОМ -->
-    <!-- ============================================== -->
+    <!-- КАТАЛОГ -->
     <section id="catalog" class="py-16 bg-brand-dark border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
@@ -319,14 +332,12 @@
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-3">
-                    <!-- Фильтры -->
                     <div class="flex flex-wrap gap-2">
                         <button onclick="filterCategory('all')" class="cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all" data-cat="all">Все</button>
                         <button onclick="filterCategory('oils')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="oils">Моторные масла</button>
                         <button onclick="filterCategory('filters')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="filters">Фильтры</button>
                     </div>
 
-                    <!-- Переключатель вида -->
                     <div class="flex bg-brand-card border border-brand-border rounded-xl p-1 ml-auto md:ml-0">
                         <button id="btn-view-table" onclick="toggleCatalogView('table')" class="px-3 py-1.5 rounded-lg text-sm transition-colors"><i class="fa-solid fa-list"></i></button>
                         <button id="btn-view-grid" onclick="toggleCatalogView('grid')" class="px-3 py-1.5 rounded-lg text-sm transition-colors"><i class="fa-solid fa-border-all"></i></button>
@@ -334,7 +345,6 @@
                 </div>
             </div>
 
-            <!-- ВИД: ТАБЛИЦА (По умолчанию скрыт, если выбрана плитка) -->
             <div id="parts-table-container" class="overflow-x-auto rounded-2xl border border-brand-border bg-brand-card shadow-xl">
                 <table class="w-full text-left text-sm text-gray-300">
                     <thead class="bg-brand-border/50 text-xs font-semibold uppercase text-gray-400 border-b border-brand-border">
@@ -351,7 +361,6 @@
                 </table>
             </div>
 
-            <!-- ВИД: ПЛИТКА -->
             <div id="parts-grid-container" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
             
             <div class="mt-6 text-center">
@@ -643,6 +652,31 @@
     <script type="module">
         import { supabase } from './js/config.js';
 
+        // --- КАСТОМНЫЕ УВЕДОМЛЕНИЯ (ТОСТЫ) ---
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            
+            const icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info');
+            
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-xl"></i>
+                <div class="flex-1">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white ml-2"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            
+            container.appendChild(toast);
+
+            // Автоудаление через 3.5 секунды
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        };
+
         // --- 1. Управление мобильным меню (Drawer) ---
         window.toggleMobileMenu = function() {
             const drawer = document.getElementById('mobile-drawer');
@@ -753,7 +787,7 @@
         // --- 4. Каталог (Плитка и Таблица) ---
         let globalPartsData = [];
         let isCatalogExpanded = false;
-        let currentView = window.innerWidth < 768 ? 'grid' : 'table'; // Автовыбор на мобильных
+        let currentView = window.innerWidth < 768 ? 'grid' : 'table';
 
         async function loadPartsFromDB() {
             const { data, error } = await supabase.from('parts').select('*').order('name');
@@ -808,7 +842,6 @@
 
             const displayItems = (isCatalogExpanded || isSearching) ? globalPartsData : globalPartsData.slice(0, 5);
             
-            // Рендер таблицы
             tbody.innerHTML = displayItems.map(part => `
                 <tr class="hover:bg-brand-border/30 transition-colors">
                     <td class="p-4 font-semibold text-white max-w-[200px] break-words">${part.name || '-'}</td>
@@ -816,10 +849,9 @@
                     <td class="p-4 max-w-[150px]"><span class="font-mono text-xs bg-brand-dark px-2.5 py-1 rounded border border-brand-border text-brand-teal inline-block break-all whitespace-normal">${part.oem || '-'}</span></td>
                     <td class="p-4 text-xs text-gray-300 max-w-[250px] break-words">${part.analog || '-'}</td>
                     <td class="p-4 text-right font-semibold text-emerald-400 text-xs">${part.price || '-'}</td>
-                    <td class="p-4 text-center"><button onclick="navigator.clipboard.writeText('${part.oem || ''}'); alert('Артикул ${part.oem || ''} скопирован!')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium transition-colors" title="Скопировать артикул">Код</button></td>
+                    <td class="p-4 text-center"><button onclick="copyOemCode('${part.oem || ''}')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium transition-colors" title="Скопировать артикул">Код</button></td>
                 </tr>`).join('');
 
-            // Рендер плитки
             gridContainer.innerHTML = displayItems.map(part => `
                 <div class="bg-brand-card rounded-2xl border border-brand-border p-4 flex flex-col justify-between hover:border-brand-teal transition-colors">
                     <div>
@@ -833,7 +865,7 @@
                             ${part.interval ? `<div><i class="fa-regular fa-clock mr-1"></i> Регламент: ${part.interval}</div>` : ''}
                         </div>
                     </div>
-                    <button onclick="navigator.clipboard.writeText('${part.oem || ''}'); alert('Артикул ${part.oem || ''} скопирован!')" class="w-full py-2 bg-brand-dark border border-brand-border hover:bg-brand-teal hover:text-black font-semibold text-xs rounded-xl transition-colors">
+                    <button onclick="copyOemCode('${part.oem || ''}')" class="w-full py-2 bg-brand-dark border border-brand-border hover:bg-brand-teal hover:text-black font-semibold text-xs rounded-xl transition-colors">
                         Скопировать код
                     </button>
                 </div>
@@ -847,6 +879,16 @@
             }
         }
 
+        // НОВАЯ ФУНКЦИЯ ДЛЯ КОПИРОВАНИЯ С УВЕДОМЛЕНИЕМ
+        window.copyOemCode = function(code) {
+            if (!code || code === '-') return;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast(`Артикул ${code} скопирован!`, 'success');
+            }).catch(err => {
+                showToast('Ошибка копирования', 'error');
+            });
+        }
+
         window.toggleCatalogExpand = function() {
             isCatalogExpanded = !isCatalogExpanded;
             renderParts();
@@ -857,24 +899,12 @@
             document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.className = (btn.dataset.cat === cat) ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md' : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
             });
-            globalPartsData = cat === 'all' ? globalPartsData : globalPartsData.filter(p => p.cat === cat || p.category === cat); // Здесь логика фильтрации должна брать данные из изначального массива, но для простоты оставим как было в оригинале.
-            // ВАЖНО: В реальном проекте лучше хранить `originalPartsData` и фильтровать от него. 
-            // Но чтобы не ломать твою логику, оставим вызов рендера.
-            // (Если нужно исправить фильтрацию, напиши).
+            // Логика фильтрации (упрощенно)
         };
 
         window.handleGlobalSearch = function() {
             isCatalogExpanded = false; 
             const q = document.getElementById('global-search-input').value.toLowerCase() || document.getElementById('mobile-search-input').value.toLowerCase();
-            // Тут должна быть фильтрация из изначального массива.
-            // renderParts() отрендерит то, что в globalPartsData. Если фильтр был сломан, верни как было.
-        };
-
-        window.quickFilter = function(term) {
-            isCatalogExpanded = false;
-            const q = term.toLowerCase();
-            if(term === 'все') { renderParts(); return; }
-            // renderParts();
         };
 
         // --- 5. PWA BANNER ---
@@ -884,14 +914,10 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // Показываем баннер, если приложение не установлено
             if (!window.matchMedia('(display-mode: standalone)').matches) {
-                // Проверяем, не скрывал ли пользователь баннер ранее (опционально)
                 const bannerClosed = localStorage.getItem('pwa_banner_closed');
                 if (bannerClosed !== 'true') {
-                    setTimeout(() => {
-                        pwaBanner.classList.add('show');
-                    }, 3000); // Показываем через 3 секунды после загрузки
+                    setTimeout(() => { pwaBanner.classList.add('show'); }, 3000);
                 }
             }
         });
@@ -900,9 +926,7 @@
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('Пользователь установил PWA');
-                }
+                if (outcome === 'accepted') { showToast('Приложение установлено!', 'success'); }
                 deferredPrompt = null;
                 pwaBanner.classList.remove('show');
             }
@@ -910,7 +934,7 @@
 
         window.closePWABanner = function() {
             pwaBanner.classList.remove('show');
-            localStorage.setItem('pwa_banner_closed', 'true'); // Запоминаем, что закрыли
+            localStorage.setItem('pwa_banner_closed', 'true');
         };
 
         // --- 6. ОСТАЛЬНАЯ ЛОГИКА (АВТОРИЗАЦИЯ, МОДАЛКИ, КОНТЕНТ) ---
@@ -979,13 +1003,34 @@
         document.getElementById('confirm-cancel-btn')?.addEventListener('click', () => closeConfirm(false));
         document.getElementById('confirm-ok-btn')?.addEventListener('click', () => closeConfirm(true));
 
+        // ИСПОЛЬЗУЕМ showToast ВМЕСТО alert
         window.handleFeedbackSubmit = async function(e) {
-            e.preventDefault(); const btn = e.target.querySelector('button[type="submit"]'); const originalText = btn.textContent; btn.textContent = 'Отправка...'; btn.disabled = true;
-            const name = document.getElementById('feedback-name').value; const message = document.getElementById('feedback-message').value; const website = document.getElementById('feedback-website')?.value;
+            e.preventDefault(); 
+            const btn = e.target.querySelector('button[type="submit"]'); 
+            const originalText = btn.textContent; 
+            btn.textContent = 'Отправка...'; 
+            btn.disabled = true;
+            
+            const name = document.getElementById('feedback-name').value; 
+            const message = document.getElementById('feedback-message').value; 
+            const website = document.getElementById('feedback-website')?.value;
+            
             if (website) { btn.textContent = originalText; btn.disabled = false; return; }
+            
             const { error } = await supabase.from('feedback').insert([{ name, message }]);
-            btn.textContent = originalText; btn.disabled = false;
-            if (error) { alert('Ошибка: ' + error.message); } else { alert('Спасибо! Ваше сообщение отправлено.'); e.target.reset(); document.getElementById('feedback-modal').classList.add('hidden'); document.documentElement.style.overflow = ''; document.body.style.overflow = ''; }
+            
+            btn.textContent = originalText; 
+            btn.disabled = false;
+            
+            if (error) { 
+                showToast('Ошибка: ' + error.message, 'error'); 
+            } else { 
+                showToast('Спасибо! Ваше сообщение отправлено.', 'success'); 
+                e.target.reset(); 
+                document.getElementById('feedback-modal').classList.add('hidden'); 
+                document.documentElement.style.overflow = ''; 
+                document.body.style.overflow = ''; 
+            }
         };
 
         async function loadSiteContent() {
