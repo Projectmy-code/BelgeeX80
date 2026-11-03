@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const editorContainer = document.getElementById('editor-container');
     
     if (editorContainer) {
-        // Кастомная панель инструментов для профессионального вида
         quill = new Quill('#editor-container', {
             theme: 'snow', 
             placeholder: 'Расскажите о своем опыте, доработке или лайфхаке...',
@@ -74,30 +73,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Автосохранение в localStorage (черновик)
         quill.on('text-change', () => {
             const draft = quill.root.innerHTML;
             localStorage.setItem('belgee_article_draft', draft);
             updateReadTime();
         });
         
-        // Восстановление черновика при открытии
         const savedDraft = localStorage.getItem('belgee_article_draft');
         if (savedDraft && savedDraft !== '<p><br></p>') {
             quill.root.innerHTML = savedDraft;
             updateReadTime();
         }
 
-        // Подсчет времени чтения
         function updateReadTime() {
             const text = quill.getText();
             const words = text.trim().split(/\s+/).length;
-            const minutes = Math.max(1, Math.ceil(words / 180)); // ~180 слов в минуту
+            const minutes = Math.max(1, Math.ceil(words / 180));
             const readtimeInput = document.getElementById('new-readtime');
             if (readtimeInput) readtimeInput.value = `${minutes} мин чтения`;
         }
 
-        // Загрузка картинок в текст
         const toolbar = quill.getModule('toolbar');
         toolbar.addHandler('image', () => {
             const input = document.createElement('input');
@@ -134,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (e) => {
                 document.getElementById('cover-preview-img').src = e.target.result;
                 document.getElementById('cover-preview-container').classList.remove('hidden');
+                document.getElementById('cover-placeholder').classList.add('hidden');
             };
             reader.readAsDataURL(file);
         });
@@ -211,6 +207,7 @@ export function openArticleModal(article) {
 
     contentEl.innerHTML = html;
     document.getElementById('info-modal')?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Блокируем скролл фона
     applyForcedStyles(contentEl);
 }
 
@@ -233,8 +230,17 @@ function applyForcedStyles(container) {
 }
 
 window.closeModalOnBg = function(event) {
-    if (event.target.id === 'info-modal') document.getElementById('info-modal').classList.add('hidden');
+    if (event.target.id === 'info-modal') {
+        document.getElementById('info-modal').classList.add('hidden');
+        document.body.style.overflow = ''; // Возвращаем скролл
+    }
 };
+
+// Закрытие статьи по кнопке крестик
+window.closeArticleModal = function() {
+    document.getElementById('info-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
 
 export async function openSubmission() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -244,14 +250,20 @@ export async function openSubmission() {
         setTimeout(() => { window.location.href = 'login.html'; }, 2000);
         return;
     }
-    document.getElementById('add-article-modal').classList.remove('hidden');
-    document.getElementById('add-article-modal').classList.add('flex');
+    
+    // Блокируем скролл фоновой страницы
+    document.body.style.overflow = 'hidden'; 
+    
+    const modal = document.getElementById('add-article-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 
 // Закрытие полноэкранного редактора
 window.closeEditor = function() {
     document.getElementById('add-article-modal').classList.add('hidden');
     document.getElementById('add-article-modal').classList.remove('flex');
+    document.body.style.overflow = ''; // Возвращаем скролл
 }
 
 export async function handleAddArticleSubmit(e) {
@@ -263,7 +275,7 @@ export async function handleAddArticleSubmit(e) {
     const isConfirmed = await showConfirm('Отправить статью?', 'Ваша статья будет отправлена на модерацию.');
     if (!isConfirmed) return;
 
-    btn.textContent = 'Сжатие и отправка...'; btn.disabled = true;
+    btn.textContent = 'Отправка...'; btn.disabled = true;
 
     const { data: { session } } = await supabase.auth.getSession();
     let imageUrl = null;
@@ -276,7 +288,7 @@ export async function handleAddArticleSubmit(e) {
             const fileName = `cover_${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
             const { error: uploadError } = await supabase.storage.from('images').upload(fileName, compressedFile);
             if (uploadError) throw new Error('Ошибка загрузки обложки: ' + uploadError.message);
-            const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
+            const { data: urlData } = await supabase.storage.from('images').getPublicUrl(fileName);
             imageUrl = urlData.publicUrl;
         }
 
@@ -297,11 +309,12 @@ export async function handleAddArticleSubmit(e) {
 
         showToast('Статья успешно отправлена на модерацию!');
         
-        // Очищаем черновик и форму
         localStorage.removeItem('belgee_article_draft');
         e.target.reset(); 
         quill.root.innerHTML = ''; 
         document.getElementById('cover-preview-container')?.classList.add('hidden');
+        document.getElementById('cover-placeholder')?.classList.remove('hidden');
+        
         window.closeEditor();
 
     } catch (error) {
