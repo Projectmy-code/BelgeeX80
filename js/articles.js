@@ -207,7 +207,8 @@ export function openArticleModal(article) {
 
     contentEl.innerHTML = html;
     document.getElementById('info-modal')?.classList.remove('hidden');
-    document.body.style.overflow = 'hidden'; // Блокируем скролл фона
+    document.documentElement.style.overflow = 'hidden'; // Блокируем скролл html
+    document.body.style.overflow = 'hidden'; // Блокируем скролл body
     applyForcedStyles(contentEl);
 }
 
@@ -232,13 +233,14 @@ function applyForcedStyles(container) {
 window.closeModalOnBg = function(event) {
     if (event.target.id === 'info-modal') {
         document.getElementById('info-modal').classList.add('hidden');
-        document.body.style.overflow = ''; // Возвращаем скролл
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
     }
 };
 
-// Закрытие статьи по кнопке крестик
 window.closeArticleModal = function() {
     document.getElementById('info-modal').classList.add('hidden');
+    document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
 }
 
@@ -251,7 +253,7 @@ export async function openSubmission() {
         return;
     }
     
-    // Блокируем скролл фоновой страницы
+    document.documentElement.style.overflow = 'hidden'; 
     document.body.style.overflow = 'hidden'; 
     
     const modal = document.getElementById('add-article-modal');
@@ -259,11 +261,11 @@ export async function openSubmission() {
     modal.classList.add('flex');
 }
 
-// Закрытие полноэкранного редактора
 window.closeEditor = function() {
     document.getElementById('add-article-modal').classList.add('hidden');
     document.getElementById('add-article-modal').classList.remove('flex');
-    document.body.style.overflow = ''; // Возвращаем скролл
+    document.documentElement.style.overflow = ''; 
+    document.body.style.overflow = ''; 
 }
 
 export async function handleAddArticleSubmit(e) {
@@ -288,7 +290,7 @@ export async function handleAddArticleSubmit(e) {
             const fileName = `cover_${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
             const { error: uploadError } = await supabase.storage.from('images').upload(fileName, compressedFile);
             if (uploadError) throw new Error('Ошибка загрузки обложки: ' + uploadError.message);
-            const { data: urlData } = await supabase.storage.from('images').getPublicUrl(fileName);
+            const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
             imageUrl = urlData.publicUrl;
         }
 
