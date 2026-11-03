@@ -45,10 +45,10 @@
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
 
-        /* Стили для Quill в полноэкранном режиме */
-        .ql-toolbar.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 12px 12px 0 0; padding: 12px; border-top: none; border-left: none; border-right: none; }
+        /* Стили для Quill в полноэкранном редакторе */
+        .ql-toolbar.ql-snow { border-color: #253142 !important; background-color: #0c1017; border-radius: 12px 12px 0 0; padding: 12px; border-top: none; border-left: none; border-right: none; position: sticky; top: 0; z-index: 10; }
         .ql-container.ql-snow { border: none !important; font-family: 'Inter', sans-serif; font-size: 16px; color: #e2e8f0; }
-        .ql-editor { min-height: calc(100vh - 200px); padding: 24px; color: #e2e8f0; line-height: 1.8; }
+        .ql-editor { padding: 24px; color: #e2e8f0; line-height: 1.8; min-height: 400px; }
         .ql-editor.ql-blank::before { color: #6b7891 !important; font-style: normal; }
         .ql-snow .ql-stroke { stroke: #6b7891; }
         .ql-snow .ql-fill { fill: #6b7891; }
@@ -473,13 +473,12 @@
     </footer>
 
     <!-- ============================================== -->
-    <!-- ПРОФЕССИОНАЛЬНЫЙ ПОЛНОЭКРАННЫЙ РЕДАКТОР -->
+    <!-- ПОЛНОЭКРАННЫЙ РЕДАКТОР -->
     <!-- ============================================== -->
-    <div id="add-article-modal" class="fixed inset-0 z-[100] hidden bg-brand-dark flex-col h-screen w-screen overflow-hidden">
-        <!-- Шапка редактора -->
+    <div id="add-article-modal" class="fixed inset-0 z-[100] hidden bg-brand-dark flex-col h-[100dvh] w-screen overflow-hidden">
         <header class="h-16 shrink-0 bg-brand-card border-b border-brand-border flex items-center justify-between px-4 sm:px-6">
             <div class="flex items-center gap-3">
-                <button onclick="closeEditor()" class="w-8 h-8 rounded-full bg-brand-border hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors">
+                <button type="button" onclick="closeEditor()" class="w-8 h-8 rounded-full bg-brand-border hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <div>
@@ -498,11 +497,9 @@
             </div>
         </header>
 
-        <!-- Рабочая область (2 колонки) -->
-        <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden overflow-y-auto">
             
-            <!-- Левая часть: Редактор -->
-            <div class="flex-1 flex flex-col bg-[#0c1017] overflow-y-auto">
+            <div class="flex-1 flex flex-col bg-[#0c1017] lg:overflow-y-auto">
                 <div class="max-w-3xl w-full mx-auto py-8 px-4 sm:px-8">
                     <input type="text" id="new-title" required placeholder="Заголовок статьи..." class="w-full bg-transparent text-3xl sm:text-4xl font-display font-bold text-white placeholder-gray-600 focus:outline-none mb-6">
                     
@@ -512,10 +509,8 @@
                 </div>
             </div>
 
-            <!-- Правая часть: Настройки -->
-            <aside class="w-full lg:w-80 shrink-0 bg-brand-card border-l border-brand-border overflow-y-auto p-6 space-y-6">
+            <aside class="w-full lg:w-80 shrink-0 bg-brand-card border-t lg:border-t-0 lg:border-l border-brand-border p-6 space-y-6 lg:overflow-y-auto">
                 
-                <!-- Обложка -->
                 <div>
                     <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Обложка</h3>
                     <label class="block w-full aspect-video rounded-xl border-2 border-dashed border-brand-border hover:border-brand-teal bg-brand-dark flex flex-col items-center justify-center cursor-pointer transition-colors relative overflow-hidden group">
@@ -533,7 +528,6 @@
                     </label>
                 </div>
 
-                <!-- Метаданные -->
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Категория</label>
@@ -562,7 +556,6 @@
                     </div>
                 </div>
 
-                <!-- Кнопка для мобильных (дубль) -->
                 <button type="submit" class="w-full lg:hidden py-3 bg-brand-teal text-black font-bold rounded-xl shadow-lg mt-4">
                     Отправить на модерацию
                 </button>
@@ -599,7 +592,7 @@
 
     <div id="info-modal" onclick="closeModalOnBg(event)" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-brand-border p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
-            <button onclick="toggleModal('info-modal')" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg z-10">
+            <button onclick="closeArticleModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-lg z-10">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="article-modal-header" class="mb-4">
@@ -613,7 +606,7 @@
             <div id="info-modal-content" class="content-html text-sm text-gray-300 leading-relaxed"></div>
             <div class="mt-6 pt-4 border-t border-brand-border/60 flex items-center justify-between">
                 <span class="text-xs text-gray-500">BELGEE X80 Knowledge Base</span>
-                <button onclick="toggleModal('info-modal')" class="px-5 py-2 rounded-xl bg-brand-border hover:bg-brand-teal hover:text-black font-semibold text-xs transition-colors">
+                <button onclick="closeArticleModal()" class="px-5 py-2 rounded-xl bg-brand-border hover:bg-brand-teal hover:text-black font-semibold text-xs transition-colors">
                     Закрыть
                 </button>
             </div>
@@ -634,7 +627,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC (ТА ЖЕ, ЧТО И БЫЛА) -->
+    <!-- JAVASCRIPT LOGIC -->
     <script type="module">
         import { supabase } from './js/config.js';
 
@@ -725,10 +718,19 @@
             if (website) { btn.textContent = originalText; btn.disabled = false; return; }
             const { error } = await supabase.from('feedback').insert([{ name, message }]);
             btn.textContent = originalText; btn.disabled = false;
-            if (error) { alert('Ошибка: ' + error.message); } else { alert('Спасибо! Ваше сообщение отправлено администратору.'); e.target.reset(); document.getElementById('feedback-modal').classList.add('hidden'); }
+            if (error) { alert('Ошибка: ' + error.message); } else { alert('Спасибо! Ваше сообщение отправлено администратору.'); e.target.reset(); document.getElementById('feedback-modal').classList.add('hidden'); document.body.style.overflow = ''; }
         };
 
-        window.toggleModal = function(id) { document.getElementById(id).classList.toggle('hidden'); };
+        window.toggleModal = function(id) { 
+            const modal = document.getElementById(id);
+            if(modal.classList.contains('hidden')) {
+                document.body.style.overflow = 'hidden';
+                modal.classList.remove('hidden');
+            } else {
+                document.body.style.overflow = '';
+                modal.classList.add('hidden');
+            }
+        };
         window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
         let confirmResolve = null;
