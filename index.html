@@ -63,6 +63,7 @@
         .dropdown-menu { opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .group:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
 
+        /* Выпадающий поиск */
         .search-dropdown { display: none; }
         .search-dropdown.active { display: block; animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
@@ -77,23 +78,26 @@
 
     <!-- ШАПКА -->
     <header class="sticky top-0 z-50 glass-panel">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            <a href="index.html" class="flex items-center gap-3 group shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
-                    <span class="font-display font-black text-black text-xl">X</span>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-2 sm:gap-4">
+            
+            <!-- Логотип -->
+            <a href="index.html" class="flex items-center gap-2 sm:gap-3 group shrink-0">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
+                    <span class="font-display font-black text-black text-lg sm:text-xl">X</span>
                 </div>
                 <div>
-                    <div class="font-display font-black text-xl tracking-wider text-white flex items-center gap-1.5">
+                    <div class="font-display font-black text-lg sm:text-xl tracking-wider text-white flex items-center gap-1.5">
                         BELGEE <span class="text-brand-teal">X80</span>
                         <span class="relative flex h-2 w-2 ml-1">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-teal"></span>
                         </span>
                     </div>
-                    <div class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">Сообщество & Запчасти</div>
+                    <div class="text-[9px] sm:text-[10px] text-gray-400 tracking-widest uppercase font-semibold hidden sm:block">Сообщество & Запчасти</div>
                 </div>
             </a>
 
+            <!-- ДЕСКТОПНОЕ МЕНЮ -->
             <nav class="hidden xl:flex items-center gap-1 text-sm font-medium text-gray-300 whitespace-nowrap">
                 <div class="relative group">
                     <button class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors flex items-center gap-1.5">
@@ -131,31 +135,49 @@
                 </div>
             </nav>
 
-            <div class="flex items-center gap-3 shrink-0">
-                <button onclick="scrollToSearch()" class="hidden xl:flex w-9 h-9 rounded-full bg-brand-border/50 hover:bg-brand-border text-gray-400 hover:text-white items-center justify-center transition-colors">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-
-                <div id="auth-container" class="hidden xl:flex items-center">
-                    <a href="login.html" class="px-4 py-2 rounded-lg bg-brand-teal/10 text-brand-teal border border-brand-teal/20 hover:bg-brand-teal hover:text-black font-semibold text-sm transition-all">Войти</a>
+            <!-- ПРАВАЯ ЧАСТЬ (Поиск, Профиль, Бургер) -->
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                
+                <!-- ГЛОБАЛЬНЫЙ ПОИСК (ПК) -->
+                <div class="hidden xl:flex items-center relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-400 z-10 pointer-events-none"></i>
+                    <input type="text" id="global-search-input" oninput="debounceSearch('global')" placeholder="Поиск по сайту..." autocomplete="off"
+                           class="w-48 2xl:w-64 bg-brand-dark border border-brand-border rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-all">
+                    <!-- Выпадающий список -->
+                    <div id="global-search-dropdown" class="search-dropdown absolute top-full right-0 mt-2 w-[350px] bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[60vh] overflow-y-auto custom-scrollbar"></div>
                 </div>
 
-                <button onclick="toggleMobileMenu()" class="xl:hidden w-10 h-10 rounded-xl bg-brand-card border border-brand-border text-gray-300 hover:text-white flex items-center justify-center transition-colors">
-                    <i class="fa-solid fa-bars text-lg"></i>
+                <!-- Контейнер авторизации (ПК и Мобилка) -->
+                <div id="auth-container" class="flex items-center relative"></div>
+
+                <!-- Бургер (Мобильные) -->
+                <button onclick="toggleMobileMenu()" class="xl:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-card border border-brand-border text-gray-300 hover:text-white flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-bars text-base sm:text-lg"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- МОБИЛЬНОЕ МЕНЮ -->
+    <!-- МОБИЛЬНОЕ МЕНЮ (DRAWER) -->
     <div id="mobile-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden opacity-0 xl:hidden"></div>
     
     <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm bg-brand-card border-l border-brand-border z-[70] transform translate-x-full xl:hidden flex flex-col">
-        <div class="h-20 flex items-center justify-between px-6 border-b border-brand-border">
+        <div class="h-20 flex items-center justify-between px-6 border-b border-brand-border shrink-0">
             <div class="font-display font-black text-lg text-white">Меню</div>
             <button onclick="toggleMobileMenu()" class="w-9 h-9 rounded-full bg-brand-border text-gray-400 hover:text-white flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
+        </div>
+
+        <!-- ПОИСК В МОБИЛЬНОМ МЕНЮ -->
+        <div class="p-4 border-b border-brand-border shrink-0">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"></i>
+                <input type="text" id="mobile-search-input" oninput="debounceSearch('mobile')" placeholder="Поиск по сайту..." autocomplete="off"
+                       class="w-full bg-brand-dark border border-brand-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal">
+                <!-- Выпадающий список (внутри меню) -->
+                <div id="mobile-search-dropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[40vh] overflow-y-auto custom-scrollbar"></div>
+            </div>
         </div>
 
         <div class="flex-1 overflow-y-auto py-4 px-4 space-y-6">
@@ -206,7 +228,8 @@
             </div>
         </div>
 
-        <div class="p-4 border-t border-brand-border bg-brand-dark/50">
+        <!-- Подвал мобильного меню (Профиль) -->
+        <div class="p-4 border-t border-brand-border bg-brand-dark/50 shrink-0">
             <div id="mobile-auth-container" class="flex flex-col gap-2"></div>
         </div>
     </div>
@@ -259,29 +282,7 @@
         </div>
     </section>
 
-    <!-- ГЛОБАЛЬНЫЙ ПОИСК -->
-    <section id="search-section" class="py-8 bg-brand-dark/80 border-b border-brand-border relative z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-brand-card p-4 sm:p-6 rounded-2xl border border-brand-border shadow-lg flex flex-col md:flex-row items-center gap-4 relative">
-                <div class="flex-1 w-full relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="global-search-input" oninput="debounceSearch()" placeholder="Поиск по всему сайту: 'масло', 'антикор'..." autocomplete="off"
-                           class="w-full bg-brand-dark border border-brand-border rounded-xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors relative z-50">
-                    
-                    <div id="search-dropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[60vh] overflow-y-auto custom-scrollbar"></div>
-                </div>
-                <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                    <button onclick="quickFilter('все')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Все</button>
-                    <button onclick="quickFilter('ТО')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Расходники ТО</button>
-                    <button onclick="quickFilter('Масло')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Масла</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- ОБНОВЛЕННЫЕ ТЕХНИЧЕСКИЕ ХАРАКТЕРИСТИКИ (КОМПАКТНЫЕ) -->
-    <!-- ============================================== -->
+    <!-- SPECS (Компактные) -->
     <section id="specs" class="py-12 border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-8">
@@ -290,7 +291,6 @@
             </div>
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Мощность -->
                 <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
                     <div class="w-10 h-10 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg mb-3 border border-blue-500/20">
                         <i class="fa-solid fa-bolt"></i>
@@ -300,7 +300,6 @@
                     <div class="text-[11px] text-gray-400 mt-1">Гибрид PHEV</div>
                 </div>
 
-                <!-- Привод -->
                 <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
                     <div class="w-10 h-10 rounded-full bg-brand-teal/10 text-brand-teal flex items-center justify-center text-lg mb-3 border border-brand-teal/20">
                         <i class="fa-solid fa-gears"></i>
@@ -310,7 +309,6 @@
                     <div class="text-[11px] text-gray-400 mt-1">Редуктор</div>
                 </div>
 
-                <!-- Длина -->
                 <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
                     <div class="w-10 h-10 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg mb-3 border border-purple-500/20">
                         <i class="fa-solid fa-ruler-combined"></i>
@@ -320,7 +318,6 @@
                     <div class="text-[11px] text-gray-400 mt-1">Длина кузова</div>
                 </div>
 
-                <!-- Разгон -->
                 <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
                     <div class="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg mb-3 border border-emerald-500/20">
                         <i class="fa-solid fa-gauge-high"></i>
@@ -680,12 +677,7 @@
             }
         };
 
-        // --- 2. Скролл к поиску и наверх ---
-        window.scrollToSearch = function() {
-            document.getElementById('search-section').scrollIntoView({ behavior: 'smooth' });
-            setTimeout(() => document.getElementById('global-search-input').focus(), 500);
-        };
-
+        // --- 2. Скролл наверх ---
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('scrollToTopBtn');
             if (window.scrollY > 500) {
@@ -697,16 +689,20 @@
             }
         });
 
-        // --- 3. Глобальный поиск ---
+        // --- 3. Глобальный поиск (Поддержка ПК и Мобилки) ---
         let searchTimeout = null;
-        window.debounceSearch = function() {
+        
+        window.debounceSearch = function(type) {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => { performGlobalSearch(); }, 300);
+            searchTimeout = setTimeout(() => { performGlobalSearch(type); }, 300);
         }
 
-        async function performGlobalSearch() {
-            const query = document.getElementById('global-search-input').value.trim();
-            const dropdown = document.getElementById('search-dropdown');
+        async function performGlobalSearch(type) {
+            const inputId = type === 'mobile' ? 'mobile-search-input' : 'global-search-input';
+            const dropdownId = type === 'mobile' ? 'mobile-search-dropdown' : 'global-search-dropdown';
+            
+            const query = document.getElementById(inputId).value.trim();
+            const dropdown = document.getElementById(dropdownId);
             
             if (query.length < 2) {
                 dropdown.innerHTML = '';
@@ -783,22 +779,38 @@
         }
 
         window.scrollToCatalog = function(searchTerm) {
-            document.getElementById('search-dropdown').classList.remove('active');
-            document.getElementById('global-search-input').value = searchTerm;
+            document.getElementById('global-search-dropdown').classList.remove('active');
+            document.getElementById('mobile-search-dropdown').classList.remove('active');
+            
+            // Если мы на мобильном, закрываем меню
+            if (window.innerWidth < 1280) toggleMobileMenu();
+
+            // Ищем поле (на ПК или мобилке) и устанавливаем значение
+            const inputToUpdate = window.innerWidth < 1280 ? document.getElementById('mobile-search-input') : document.getElementById('global-search-input');
+            if (inputToUpdate) inputToUpdate.value = searchTerm;
+            
             document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
             handleGlobalSearch();
         }
 
         window.goToArticle = function(id) {
-            document.getElementById('search-dropdown').classList.remove('active');
+            document.getElementById('global-search-dropdown').classList.remove('active');
+            document.getElementById('mobile-search-dropdown').classList.remove('active');
             window.location.href = `articles.html#article-${id}`;
         }
 
+        // Закрытие поиска при клике вне его
         document.addEventListener('click', (e) => {
-            const searchContainer = document.getElementById('global-search-input');
-            const dropdown = document.getElementById('search-dropdown');
-            if (searchContainer && dropdown && !searchContainer.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.remove('active');
+            const globalInput = document.getElementById('global-search-input');
+            const globalDropdown = document.getElementById('global-search-dropdown');
+            if (globalInput && globalDropdown && !globalInput.contains(e.target) && !globalDropdown.contains(e.target)) {
+                globalDropdown.classList.remove('active');
+            }
+
+            const mobileInput = document.getElementById('mobile-search-input');
+            const mobileDropdown = document.getElementById('mobile-search-dropdown');
+            if (mobileInput && mobileDropdown && !mobileInput.contains(e.target) && !mobileDropdown.contains(e.target)) {
+                mobileDropdown.classList.remove('active');
             }
         });
 
@@ -825,8 +837,12 @@
                 return; 
             }
 
-            const searchQuery = document.getElementById('global-search-input').value.trim();
-            const displayItems = (isCatalogExpanded || searchQuery.length > 0) ? items : items.slice(0, 5);
+            // Проверяем, есть ли активный поиск
+            const globalSearchVal = document.getElementById('global-search-input').value.trim();
+            const mobileSearchVal = document.getElementById('mobile-search-input').value.trim();
+            const isSearching = globalSearchVal.length > 0 || mobileSearchVal.length > 0;
+
+            const displayItems = (isCatalogExpanded || isSearching) ? items : items.slice(0, 5);
             
             tbody.innerHTML = displayItems.map(part => `
                 <tr class="hover:bg-brand-border/30 transition-colors">
@@ -838,7 +854,7 @@
                     <td class="p-4 text-center"><button onclick="navigator.clipboard.writeText('${part.oem || ''}'); alert('Артикул ${part.oem || ''} скопирован!')" class="px-2.5 py-1 rounded bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-medium transition-colors" title="Скопировать артикул">Код</button></td>
                 </tr>`).join('');
 
-            if (items.length > 5 && !isCatalogExpanded && searchQuery.length === 0) {
+            if (items.length > 5 && !isCatalogExpanded && !isSearching) {
                 btn.classList.remove('hidden');
                 btn.innerHTML = `Показать все (${items.length}) <i class="fa-solid fa-arrow-down ml-1"></i>`;
             } else {
@@ -861,7 +877,7 @@
 
         window.handleGlobalSearch = function() {
             isCatalogExpanded = false; 
-            const q = document.getElementById('global-search-input').value.toLowerCase();
+            const q = document.getElementById('global-search-input').value.toLowerCase() || document.getElementById('mobile-search-input').value.toLowerCase();
             renderPartsTable(globalPartsData.filter(p => (p.name || '').toLowerCase().includes(q) || (p.oem || '').toLowerCase().includes(q) || (p.analog || '').toLowerCase().includes(q)));
         };
 
@@ -959,11 +975,13 @@
             const { data: { session } } = await supabase.auth.getSession();
             
             if (session) {
+                const shortEmail = session.user.email.split('@')[0];
+
                 authContainer.innerHTML = `
-                    <div class="relative group">
+                    <div class="relative group hidden xl:block">
                         <button class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-brand-card border border-brand-border hover:border-brand-teal transition-colors">
                             <div class="w-8 h-8 rounded-full bg-brand-teal/20 text-brand-teal flex items-center justify-center font-bold"><i class="fa-solid fa-user text-sm"></i></div>
-                            <span class="text-sm font-semibold text-white hidden 2xl:block max-w-[100px] truncate">${session.user.email.split('@')[0]}</span>
+                            <span class="text-sm font-semibold text-white max-w-[100px] truncate">${shortEmail}</span>
                             <i class="fa-solid fa-chevron-down text-[10px] text-gray-500 group-hover:rotate-180 transition-transform"></i>
                         </button>
                         <div class="absolute top-full right-0 mt-2 w-48 bg-brand-card border border-brand-border rounded-xl shadow-xl dropdown-menu overflow-hidden flex flex-col p-1 z-50">
@@ -973,14 +991,24 @@
                             <button onclick="logout()" class="px-3 py-2 rounded-lg hover:bg-red-500/20 text-red-400 font-semibold transition-colors text-left w-full"><i class="fa-solid fa-arrow-right-from-bracket w-4 text-center mr-2"></i> Выйти</button>
                         </div>
                     </div>
+
+                    <button onclick="toggleMobileMenu()" class="xl:hidden flex items-center gap-2 pl-1 pr-2 py-1 rounded-full bg-brand-card border border-brand-border hover:border-brand-teal transition-colors">
+                        <div class="w-7 h-7 rounded-full bg-brand-teal/20 text-brand-teal flex items-center justify-center font-bold"><i class="fa-solid fa-user text-xs"></i></div>
+                        <span class="text-xs font-semibold text-white max-w-[70px] truncate">${shortEmail}</span>
+                    </button>
                 `;
+
                 mobileAuthContainer.innerHTML = `
+                    <div class="px-3 py-2 mb-2 bg-brand-dark/50 rounded-xl border border-brand-border/50">
+                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Вы вошли как</div>
+                        <div class="text-sm font-semibold text-white truncate">${session.user.email}</div>
+                    </div>
                     <a href="profile.html" class="w-full py-2.5 rounded-xl bg-brand-border text-white font-semibold text-center flex items-center justify-center gap-2"><i class="fa-solid fa-id-card"></i> Мой профиль</a>
                     <a href="admin.html" class="w-full py-2.5 rounded-xl bg-brand-teal text-black font-bold text-center flex items-center justify-center gap-2"><i class="fa-solid fa-shield-halved"></i> Админка</a>
-                    <button onclick="logout()" class="w-full py-2.5 rounded-xl text-red-400 font-semibold text-center mt-2 border border-red-500/30"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Выйти</button>
+                    <button onclick="logout()" class="w-full py-2.5 rounded-xl text-red-400 font-semibold text-center mt-2 border border-red-500/30 hover:bg-red-500/10 transition-colors"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Выйти</button>
                 `;
             } else {
-                authContainer.innerHTML = `<a href="login.html" class="px-5 py-2 rounded-xl bg-brand-teal text-black font-bold text-sm hover:scale-105 transition-transform">Войти</a>`;
+                authContainer.innerHTML = `<a href="login.html" class="px-4 py-2 rounded-lg bg-brand-teal text-black font-bold text-xs sm:text-sm hover:scale-105 transition-transform whitespace-nowrap">Войти</a>`;
                 mobileAuthContainer.innerHTML = `<a href="login.html" class="w-full py-3 rounded-xl bg-brand-teal text-black font-bold text-center">Вход / Регистрация</a>`;
             }
         }
