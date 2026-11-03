@@ -59,6 +59,11 @@
 
         @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+
+        /* Стили для выпадающего поиска */
+        .search-dropdown { display: none; }
+        .search-dropdown.active { display: block; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
     <link rel="stylesheet" href="./css/shared.css">
     <link rel="stylesheet" href="./css/article-content.css">
@@ -199,13 +204,19 @@
         </div>
     </section>
 
-    <section id="search-section" class="py-8 bg-brand-dark/80 border-b border-brand-border">
+    <!-- ПОИСК -->
+    <section id="search-section" class="py-8 bg-brand-dark/80 border-b border-brand-border relative z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-brand-card p-4 sm:p-6 rounded-2xl border border-brand-border shadow-lg flex flex-col md:flex-row items-center gap-4">
+            <div class="bg-brand-card p-4 sm:p-6 rounded-2xl border border-brand-border shadow-lg flex flex-col md:flex-row items-center gap-4 relative">
                 <div class="flex-1 w-full relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="global-search-input" onkeyup="handleGlobalSearch()" placeholder="Быстрый поиск по порталу: 'Антикор', 'Масляный фильтр'..."
-                           class="w-full bg-brand-dark border border-brand-border rounded-xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors">
+                    <input type="text" id="global-search-input" oninput="debounceSearch()" placeholder="Поиск по всему сайту: 'масло', 'антикор', 'аккумулятор'..." autocomplete="off"
+                           class="w-full bg-brand-dark border border-brand-border rounded-xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors relative z-50">
+                    
+                    <!-- ВЫПАДАЮЩИЙ СПИСОК РЕЗУЛЬТАТОВ -->
+                    <div id="search-dropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                        <!-- Сюда рендерятся результаты -->
+                    </div>
                 </div>
                 <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
                     <button onclick="quickFilter('все')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Все</button>
@@ -633,6 +644,167 @@
     <script type="module">
         import { supabase } from './js/config.js';
 
+        // ==========================================
+        // ГЛОБАЛЬНЫЙ ПОИСК
+        // ==========================================
+        let searchTimeout = null;
+
+        window.debounceSearch = function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                performGlobalSearch();
+            }, 300); // Ждем 300мс после последнего нажатия
+        }
+
+        async function performGlobalSearch() {
+            const query = document.getElementById('global-search-input').value.trim();
+            const dropdown = document.getElementById('search-dropdown');
+            
+            if (query.length < 2) {
+                dropdown.innerHTML = '';
+                dropdown.classList.remove('active');
+                return;
+            }
+
+            dropdown.classList.add('active');
+            dropdown.innerHTML = `<div class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2 text-brand-teal"></i> Ищем по всему сайту...</div>`;
+
+            try {
+                // 1. Поиск по статьям
+                const { data: articles } = await supabase
+                    .from('articles')
+                    .select('id, title, summary')
+                    .eq('status', 'published')
+                    .or(`title.ilike.%${query}%,summary.ilike.%${query}%`)
+                    .limit(3);
+
+                // 2. Поиск по запчастям
+                const { data: parts } = await supabase
+                    .from('parts')
+                    .select('id, name, oem, analog')
+                    .or(`name.ilike.%${query}%,oem.ilike.%${query}%,analog.ilike.%${query}%`)
+                    .limit(3);
+
+                // 3. Поиск по 3D моделям
+                const { data: models } = await supabase
+                    .from('models_3d')
+                    .select('id, title')
+                    .eq('status', 'published')
+                    .ilike('title', `%${query}%`)
+                    .limit(3);
+
+                // 4. Поиск по кастомным страницам
+                const { data: pages } = await supabase
+                    .from('custom_pages')
+                    .select('title, slug')
+                    .eq('status', 'published')
+                    .ilike('title', `%${query}%`)
+                    .limit(3);
+
+                // 5. Поиск по статическим страницам
+                const staticPages = [
+                    { title: 'Руководство по эксплуатации (PDF)', url: 'manual.html', icon: 'fa-book' },
+                    { title: 'Приёмка автомобиля (Чек-лист)', url: 'checklist.html', icon: 'fa-clipboard-check' },
+                    { title: '3D Конфигуратор', url: 'configurator.html', icon: 'fa-cube' },
+                    { title: '3D Печать', url: '3d-prints.html', icon: 'fa-cubes' }
+                ].filter(p => p.title.toLowerCase().includes(query.toLowerCase()));
+
+                // Рендер результатов
+                let html = '';
+
+                if (parts && parts.length > 0) {
+                    html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Запчасти и артикулы</div>`;
+                    parts.forEach(p => {
+                        html += `<div onclick="scrollToCatalog('${p.oem || p.name}')" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
+                            <div class="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-box"></i></div>
+                            <div><div class="text-sm font-semibold text-white">${p.name}</div><div class="text-xs text-gray-400">Артикул: ${p.oem || '-'}</div></div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                if (articles && articles.length > 0) {
+                    html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Статьи и гайды</div>`;
+                    articles.forEach(a => {
+                        html += `<div onclick="goToArticle('${a.id}')" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
+                            <div class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines"></i></div>
+                            <div><div class="text-sm font-semibold text-white">${a.title}</div><div class="text-xs text-gray-400 line-clamp-1">${a.summary}</div></div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                if (models && models.length > 0) {
+                    html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">3D Модели</div>`;
+                    models.forEach(m => {
+                        html += `<a href="3d-prints.html" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
+                            <div class="w-8 h-8 rounded bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-cube"></i></div>
+                            <div class="text-sm font-semibold text-white">${m.title}</div>
+                        </a>`;
+                    });
+                    html += `</div>`;
+                }
+
+                if (pages && pages.length > 0) {
+                    html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Страницы сайта</div>`;
+                    pages.forEach(p => {
+                        html += `<a href="page.html?p=${p.slug}" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
+                            <div class="w-8 h-8 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-file"></i></div>
+                            <div class="text-sm font-semibold text-white">${p.title}</div>
+                        </a>`;
+                    });
+                    html += `</div>`;
+                }
+
+                if (staticPages.length > 0) {
+                    html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Разделы</div>`;
+                    staticPages.forEach(p => {
+                        html += `<a href="${p.url}" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
+                            <div class="w-8 h-8 rounded bg-brand-teal/10 text-brand-teal flex items-center justify-center shrink-0"><i class="fa-solid ${p.icon}"></i></div>
+                            <div class="text-sm font-semibold text-white">${p.title}</div>
+                        </a>`;
+                    });
+                    html += `</div>`;
+                }
+
+                if (!html) {
+                    html = `<div class="p-6 text-center text-gray-400"><i class="fa-solid fa-magnifying-glass mb-2 text-2xl opacity-50"></i><br>По запросу «${query}» ничего не найдено.</div>`;
+                }
+
+                dropdown.innerHTML = html;
+
+            } catch (err) {
+                dropdown.innerHTML = `<div class="p-6 text-center text-red-400">Ошибка поиска. Попробуйте позже.</div>`;
+            }
+        }
+
+        // Действия при клике на результаты поиска
+        window.scrollToCatalog = function(searchTerm) {
+            document.getElementById('search-dropdown').classList.remove('active');
+            document.getElementById('global-search-input').value = searchTerm;
+            document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
+            // Опционально: можно добавить логику фильтрации таблицы по поиску
+            handleGlobalSearch();
+        }
+
+        window.goToArticle = function(id) {
+            document.getElementById('search-dropdown').classList.remove('active');
+            // Перенаправляем на страницу статей и передаем ID в хэше, чтобы открыть нужную
+            window.location.href = `articles.html#article-${id}`;
+        }
+
+        // Закрытие поиска при клике вне его
+        document.addEventListener('click', (e) => {
+            const searchContainer = document.getElementById('global-search-input');
+            const dropdown = document.getElementById('search-dropdown');
+            if (searchContainer && dropdown && !searchContainer.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // ==========================================
+        // ОСТАЛЬНАЯ ЛОГИКА
+        // ==========================================
         let globalPartsData = [];
         async function loadPartsFromDB() {
             const tbody = document.getElementById('parts-table-body');
