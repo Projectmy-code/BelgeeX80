@@ -51,12 +51,24 @@
 
             <!-- Правая панель: Рабочая область -->
             <div class="lg:col-span-3">
-                <div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-4 flex flex-col sm:flex-row items-end gap-4">
-                    <label class="flex-1 w-full">
-                        <span class="block text-xs font-bold text-gray-400 mb-1">Ссылка на фото (из Supabase Storage)</span>
-                        <input type="text" id="screen-image-url" placeholder="https://..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white">
-                    </label>
-                    <button onclick="updateImage()" class="w-full sm:w-auto px-6 py-2 bg-brand-teal text-black font-bold rounded-lg text-sm">Применить фото</button>
+                
+                <!-- БЛОК ЗАГРУЗКИ ФОТО -->
+                <div class="bg-brand-card p-4 rounded-xl border border-brand-border mb-4">
+                    <div class="flex flex-col sm:flex-row items-center gap-4">
+                        <!-- Кнопка загрузки файла -->
+                        <label class="w-full sm:w-auto px-5 py-3 bg-brand-teal text-black font-bold text-sm rounded-lg cursor-pointer hover:scale-105 transition-transform flex items-center justify-center gap-2 shrink-0">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Загрузить с устройства
+                            <input type="file" id="screen-image-file" accept="image/*" class="hidden" onchange="uploadScreenImage(event)">
+                        </label>
+
+                        <div class="text-xs text-gray-500 font-bold uppercase tracking-wider">или</div>
+
+                        <!-- Поле для ввода URL -->
+                        <div class="flex-1 w-full flex gap-2">
+                            <input type="text" id="screen-image-url" placeholder="Вставить URL вручную..." class="flex-1 w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-teal">
+                            <button onclick="updateImageFromUrl()" class="px-4 py-2.5 bg-brand-border text-white font-semibold rounded-lg text-sm hover:bg-gray-700 transition-colors shrink-0">Применить</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="bg-brand-card rounded-xl border border-brand-border overflow-hidden">
@@ -124,11 +136,63 @@
             }
         }
 
+        // ЗАГРУЗКА ФОТО ИЗ БРАУЗЕРА
+        window.uploadScreenImage = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const label = e.target.parentElement;
+            const originalHTML = label.innerHTML;
+            label.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Загрузка...';
+
+            try {
+                // 1. Формируем имя файла
+                const fileExt = file.name.split('.').pop();
+                const fileName = `screen_${currentScreenId}_${Date.now()}.${fileExt}`;
+
+                // 2. Загружаем в Supabase Storage (бакет 'images')
+                const { error: uploadError } = await supabase.storage.from('images').upload(fileName, file);
+                if (uploadError) throw uploadError;
+
+                // 3. Получаем публичный URL
+                const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
+                const publicUrl = urlData.publicUrl;
+
+                // 4. Сохраняем в БД
+                await supabase.from('dashboard_screens').update({ image_url: publicUrl }).eq('id', currentScreenId);
+                
+                // 5. Обновляем интерфейс
+                currentImageUrl = publicUrl;
+                document.getElementById('screen-image-url').value = publicUrl;
+                currentHotspots = []; // Сбрасываем старые зоны, так как фото новое
+                renderCanvas();
+                
+                alert('Фото успешно загружено!');
+
+            } catch (err) {
+                alert('Ошибка загрузки: ' + err.message);
+            } finally {
+                label.innerHTML = originalHTML;
+                e.target.value = ''; // Сбрасываем input
+            }
+        }
+
+        // ЗАГРУЗКА ПО ССЫЛКЕ (вручную)
+        window.updateImageFromUrl = async function() {
+            const url = document.getElementById('screen-image-url').value.trim();
+            if (!url) return;
+            
+            await supabase.from('dashboard_screens').update({ image_url: url }).eq('id', currentScreenId);
+            currentImageUrl = url;
+            currentHotspots = []; // Сбрасываем старые зоны
+            renderCanvas();
+        }
+
         // Отрисовка холста
         function renderCanvas() {
             const container = document.getElementById('canvas-area');
             if (!currentImageUrl) {
-                container.innerHTML = '<div class="text-gray-500 text-sm text-center px-4">Нет фото. Вставьте ссылку сверху и нажмите "Применить фото".</div>';
+                container.innerHTML = '<div class="text-gray-500 text-sm text-center px-4">Нет фото. Загрузите с устройства или вставьте ссылку выше.</div>';
                 return;
             }
 
@@ -250,16 +314,6 @@
             window.addEventListener('touchend', endDraw);
         }
 
-        window.updateImage = async function() {
-            const url = document.getElementById('screen-image-url').value.trim();
-            if (!url) return;
-            
-            await supabase.from('dashboard_screens').update({ image_url: url }).eq('id', currentScreenId);
-            currentImageUrl = url;
-            currentHotspots = []; // Очищаем старые зоны при смене фото
-            renderCanvas();
-        }
-
         window.deleteHotspot = function(index) {
             if(confirm('Удалить эту зону?')) {
                 currentHotspots.splice(index, 1);
@@ -297,7 +351,7 @@
             btn.textContent = 'Сохранить всё';
             btn.disabled = false;
             if (error) alert('Ошибка: ' + error.message);
-            else alert('Сохранено успешно!');
+            else alert('Зоны успешно сохранены!');
         }
 
         checkAdmin();
