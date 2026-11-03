@@ -39,7 +39,7 @@
         }
         .card-glow { transition: all 0.3s ease; }
         .card-glow:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15); transform: translateY(-2px); }
-        .glass-panel { background: rgba(22, 30, 43, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-panel { background: rgba(22, 30, 43, 0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0c1017; }
         ::-webkit-scrollbar-thumb { background: #253142; border-radius: 4px; }
@@ -60,18 +60,40 @@
         @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
-        /* Стили для выпадающего поиска */
+        /* Выпадающие списки (Dropdowns) */
+        .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .group:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Выпадающий поиск */
         .search-dropdown { display: none; }
         .search-dropdown.active { display: block; animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Мобильное меню (Drawer) */
+        #mobile-drawer { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        #mobile-overlay { transition: opacity 0.3s ease; }
     </style>
     <link rel="stylesheet" href="./css/shared.css">
     <link rel="stylesheet" href="./css/article-content.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
-    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border/60">
+    <!-- ============================================== -->
+    <!-- ОБНОВЛЕННАЯ ШАПКА -->
+    <!-- ============================================== -->
+    <header class="sticky top-0 z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Логотип -->
             <a href="index.html" class="flex items-center gap-3 group shrink-0">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:scale-105 transition-transform">
                     <span class="font-display font-black text-black text-xl">X</span>
@@ -88,51 +110,139 @@
                 </div>
             </a>
 
-            <nav class="hidden xl:flex items-center gap-3 2xl:gap-5 text-sm font-medium text-gray-300 whitespace-nowrap">
-                <a href="#specs" class="hover:text-brand-teal transition-colors">Характеристики</a>
-                <a href="#catalog" class="hover:text-brand-teal transition-colors">Каталог</a>
-                <a href="configurator.html" class="hover:text-brand-teal transition-colors">3D Конфигуратор</a>
-                <a href="manual.html" class="hover:text-brand-teal transition-colors">Мануал</a>
-                <a href="articles.html" class="hover:text-brand-teal transition-colors">Статьи</a>
-                <a href="#videos" class="hover:text-brand-teal transition-colors">Видео</a>
-                <a href="3d-prints.html" class="hover:text-brand-teal transition-colors">3D Печать</a>
-                <a href="checklist.html" class="hover:text-brand-teal transition-colors">Приёмка</a>
-                <div id="dynamic-pages-nav" class="flex items-center gap-3 2xl:gap-5"></div>
-                <a href="#community" class="hover:text-brand-teal transition-colors">Клуб</a>
+            <!-- ДЕСКТОПНОЕ МЕНЮ (Группировка) -->
+            <nav class="hidden xl:flex items-center gap-1 text-sm font-medium text-gray-300 whitespace-nowrap">
+                
+                <!-- Автомобиль -->
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors flex items-center gap-1.5">
+                        Автомобиль <i class="fa-solid fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
+                    </button>
+                    <div class="absolute top-full left-0 mt-1 w-56 bg-brand-card border border-brand-border rounded-xl shadow-xl dropdown-menu overflow-hidden flex flex-col p-1">
+                        <a href="#specs" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Характеристики</a>
+                        <a href="configurator.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">3D Конфигуратор</a>
+                        <a href="manual.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Руководство (PDF)</a>
+                    </div>
+                </div>
+
+                <!-- База знаний -->
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors flex items-center gap-1.5">
+                        База знаний <i class="fa-solid fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
+                    </button>
+                    <div class="absolute top-full left-0 mt-1 w-56 bg-brand-card border border-brand-border rounded-xl shadow-xl dropdown-menu overflow-hidden flex flex-col p-1">
+                        <a href="articles.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Статьи и гайды</a>
+                        <a href="#videos" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Видеообзоры</a>
+                        <a href="3d-prints.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">3D Печать</a>
+                        <div id="dynamic-pages-nav" class="flex flex-col"></div>
+                    </div>
+                </div>
+
+                <!-- Каталог -->
+                <a href="#catalog" class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors">Каталог</a>
+
+                <!-- Сервис -->
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded-lg hover:bg-white/5 hover:text-brand-teal transition-colors flex items-center gap-1.5">
+                        Клуб <i class="fa-solid fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
+                    </button>
+                    <div class="absolute top-full left-0 mt-1 w-56 bg-brand-card border border-brand-border rounded-xl shadow-xl dropdown-menu overflow-hidden flex flex-col p-1">
+                        <a href="checklist.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Приёмка авто</a>
+                        <a href="#community" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors">Telegram-чат</a>
+                    </div>
+                </div>
             </nav>
 
-            <div id="auth-container" class="hidden xl:flex items-center gap-3 shrink-0">
-                <a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>
-            </div>
+            <!-- ПРАВАЯ ЧАСТЬ (Профиль и Мобильное меню) -->
+            <div class="flex items-center gap-3 shrink-0">
+                
+                <button onclick="scrollToSearch()" class="hidden xl:flex w-9 h-9 rounded-full bg-brand-border/50 hover:bg-brand-border text-gray-400 hover:text-white items-center justify-center transition-colors">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
 
-            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="xl:hidden text-gray-300 hover:text-white p-2">
-                <i class="fa-solid fa-bars text-xl"></i>
-            </button>
-        </div>
+                <div id="auth-container" class="hidden xl:flex items-center">
+                    <a href="login.html" class="px-4 py-2 rounded-lg bg-brand-teal/10 text-brand-teal border border-brand-teal/20 hover:bg-brand-teal hover:text-black font-semibold text-sm transition-all">Войти</a>
+                </div>
 
-        <div id="mobile-menu" class="hidden xl:hidden bg-brand-card border-b border-brand-border px-4 pt-2 pb-6 space-y-3">
-            <a href="#specs" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Характеристики</a>
-            <a href="#catalog" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Каталог запчастей</a>
-            <a href="configurator.html" class="block py-2 text-brand-teal font-semibold border-b border-gray-800">3D Конфигуратор</a>
-            <a href="manual.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Руководство (PDF)</a>
-            <a href="articles.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Все статьи</a>
-            <a href="#videos" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Видеообзоры</a>
-            <a href="3d-prints.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">3D Печать</a>
-            <a href="checklist.html" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Приёмка авто</a>
-            <div id="dynamic-pages-mobile" class="space-y-3"></div>
-            <a href="#community" onclick="toggleMobileMenu()" class="block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800">Сообщество</a>
-            <div id="mobile-auth-container" class="pt-2 flex flex-col gap-2">
-                <a href="login.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a>
-                <a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium">
-                    <i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram
-                </a>
-                <button onclick="toggleModal('feedback-modal'); toggleMobileMenu()" class="w-full py-2.5 bg-brand-teal text-black font-semibold rounded-xl">
-                    Обратная связь
+                <button onclick="toggleMobileMenu()" class="xl:hidden w-10 h-10 rounded-xl bg-brand-card border border-brand-border text-gray-300 hover:text-white flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-bars text-lg"></i>
                 </button>
             </div>
         </div>
     </header>
 
+    <!-- ============================================== -->
+    <!-- МОБИЛЬНОЕ МЕНЮ (DRAWER СПРАВА) -->
+    <!-- ============================================== -->
+    <div id="mobile-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden opacity-0 xl:hidden"></div>
+    
+    <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm bg-brand-card border-l border-brand-border z-[70] transform translate-x-full xl:hidden flex flex-col">
+        <div class="h-20 flex items-center justify-between px-6 border-b border-brand-border">
+            <div class="font-display font-black text-lg text-white">Меню</div>
+            <button onclick="toggleMobileMenu()" class="w-9 h-9 rounded-full bg-brand-border text-gray-400 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto py-4 px-4 space-y-6">
+            
+            <!-- Блок: Автомобиль -->
+            <div>
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 px-2">Автомобиль</div>
+                <div class="space-y-1">
+                    <a href="#specs" onclick="toggleMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-gauge-high w-5 text-center text-brand-teal"></i> Характеристики
+                    </a>
+                    <a href="configurator.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-cube w-5 text-center text-brand-teal"></i> 3D Конфигуратор
+                    </a>
+                    <a href="manual.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-book w-5 text-center text-brand-teal"></i> Мануал (PDF)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Блок: База знаний -->
+            <div>
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 px-2">База знаний</div>
+                <div class="space-y-1">
+                    <a href="articles.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-file-lines w-5 text-center text-blue-400"></i> Статьи и гайды
+                    </a>
+                    <a href="#videos" onclick="toggleMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-video w-5 text-center text-blue-400"></i> Видеообзоры
+                    </a>
+                    <a href="3d-prints.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-cubes w-5 text-center text-blue-400"></i> 3D Печать
+                    </a>
+                    <div id="dynamic-pages-mobile" class="space-y-1 flex flex-col"></div>
+                </div>
+            </div>
+
+            <!-- Блок: Сервис и Клуб -->
+            <div>
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 px-2">Клуб</div>
+                <div class="space-y-1">
+                    <a href="#catalog" onclick="toggleMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-boxes-packing w-5 text-center text-emerald-400"></i> Каталог запчастей
+                    </a>
+                    <a href="checklist.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-clipboard-check w-5 text-center text-emerald-400"></i> Приёмка авто
+                    </a>
+                    <a href="https://t.me/bgx80" class="tg-link flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white">
+                        <i class="fa-brands fa-telegram w-5 text-center text-blue-500"></i> Telegram-чат
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Подвал мобильного меню (Авторизация) -->
+        <div class="p-4 border-t border-brand-border bg-brand-dark/50">
+            <div id="mobile-auth-container" class="flex flex-col gap-2"></div>
+        </div>
+    </div>
+
+    <!-- HERO -->
     <section class="relative overflow-hidden hero-gradient py-16 lg:py-24 border-b border-brand-border text-center">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-6">
             <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase">
@@ -180,54 +290,27 @@
         </div>
     </section>
 
-    <section id="configurator-promo" class="py-12 bg-brand-dark border-b border-brand-border relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/80 to-transparent"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="bg-brand-card/80 backdrop-blur-md rounded-3xl border border-brand-teal/30 p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 card-glow">
-                <div class="max-w-xl text-center md:text-left">
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal text-xs font-semibold tracking-wide uppercase mb-4">
-                        <i class="fa-solid fa-cube"></i> 3D Интерактив
-                    </div>
-                    <h2 class="text-3xl sm:text-4xl font-display font-bold text-white mb-4">Создай свой BELGEE X80</h2>
-                    <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
-                        Изучи автомобиль в мельчайших деталях. Покрути 3D-модель, оцени дизайн со всех сторон и выбери идеальный цвет кузова с помощью нашего интерактивного конфигуратора.
-                    </p>
-                </div>
-                <div class="shrink-0">
-                    <a href="configurator.html" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-brand-teal to-blue-600 text-black font-bold rounded-2xl shadow-lg shadow-brand-teal/20 hover:scale-105 transition-all text-lg">
-                        <i class="fa-solid fa-play"></i> Запустить 3D
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ПОИСК -->
+    <!-- ГЛОБАЛЬНЫЙ ПОИСК -->
     <section id="search-section" class="py-8 bg-brand-dark/80 border-b border-brand-border relative z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-brand-card p-4 sm:p-6 rounded-2xl border border-brand-border shadow-lg flex flex-col md:flex-row items-center gap-4 relative">
                 <div class="flex-1 w-full relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="global-search-input" oninput="debounceSearch()" placeholder="Поиск по всему сайту: 'масло', 'антикор', 'аккумулятор'..." autocomplete="off"
+                    <input type="text" id="global-search-input" oninput="debounceSearch()" placeholder="Поиск по всему сайту: 'масло', 'антикор'..." autocomplete="off"
                            class="w-full bg-brand-dark border border-brand-border rounded-xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors relative z-50">
                     
-                    <!-- ВЫПАДАЮЩИЙ СПИСОК РЕЗУЛЬТАТОВ -->
-                    <div id="search-dropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                        <!-- Сюда рендерятся результаты -->
-                    </div>
+                    <div id="search-dropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[60vh] overflow-y-auto custom-scrollbar"></div>
                 </div>
                 <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
                     <button onclick="quickFilter('все')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Все</button>
                     <button onclick="quickFilter('ТО')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Расходники ТО</button>
                     <button onclick="quickFilter('Масло')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Масла</button>
-                    <button onclick="quickFilter('Тормоза')" class="px-3.5 py-2 rounded-lg bg-brand-border hover:bg-brand-teal hover:text-black text-xs font-semibold whitespace-nowrap transition-colors">Тормоза</button>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- SPECS -->
     <section id="specs" class="py-16 border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-12">
@@ -237,81 +320,59 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-4 border border-blue-500/20">
-                        <i class="fa-solid fa-bolt"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-4 border border-blue-500/20"><i class="fa-solid fa-bolt"></i></div>
                     <h3 class="font-display font-bold text-lg text-white">Силовая установка</h3>
                     <p class="text-2xl font-extrabold text-brand-teal mt-1">PHEV 218 л.с.</p>
                     <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
                         <li>• ДВС: <strong>1.5 л (99 л.с.)</strong></li>
                         <li>• Электромотор: <strong>218 л.с. / 262 Н·м</strong></li>
-                        <li>• Тип: <strong>Последовательно-параллельный гибрид</strong></li>
                     </ul>
                 </div>
-
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-brand-teal/10 text-brand-teal flex items-center justify-center text-xl mb-4 border border-brand-teal/20">
-                        <i class="fa-solid fa-gears"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-brand-teal/10 text-brand-teal flex items-center justify-center text-xl mb-4 border border-brand-teal/20"><i class="fa-solid fa-gears"></i></div>
                     <h3 class="font-display font-bold text-lg text-white">Трансмиссия и привод</h3>
                     <p class="text-2xl font-extrabold text-white mt-1">Редуктор</p>
                     <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
                         <li>• Привод: <strong>Передний</strong></li>
                         <li>• Батарея: <strong>18.4 кВт·ч (LFP)</strong></li>
-                        <li>• Запас хода: <strong>до 940 км (суммарно)</strong></li>
                     </ul>
                 </div>
-
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl mb-4 border border-purple-500/20">
-                        <i class="fa-solid fa-ruler-combined"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl mb-4 border border-purple-500/20"><i class="fa-solid fa-ruler-combined"></i></div>
                     <h3 class="font-display font-bold text-lg text-white">Габариты и клиренс</h3>
                     <p class="text-2xl font-extrabold text-white mt-1">4740 × 1905 мм</p>
                     <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
                         <li>• Высота: <strong>1685 мм</strong></li>
-                        <li>• Колёсная база: <strong>2755 мм</strong></li>
                         <li>• Дорожный просвет: <strong>172 мм</strong></li>
                     </ul>
                 </div>
-
                 <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4 border border-emerald-500/20">
-                        <i class="fa-solid fa-gauge-high"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4 border border-emerald-500/20"><i class="fa-solid fa-gauge-high"></i></div>
                     <h3 class="font-display font-bold text-lg text-white">Динамика и расход</h3>
                     <p class="text-2xl font-extrabold text-white mt-1">7.5 сек</p>
                     <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
-                        <li>• Разгон 0–100 км/ч: <strong>~7.5 сек</strong></li>
-                        <li>• Расход (смешанный): <strong>от 6.4 л/100 км</strong></li>
-                        <li>• Топливо: <strong>АИ-92 и выше</strong></li>
+                        <li>• Разгон 0–100: <strong>~7.5 сек</strong></li>
+                        <li>• Расход: <strong>от 6.4 л/100 км</strong></li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- CATALOG -->
     <section id="catalog" class="py-16 bg-brand-dark border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                 <div>
                     <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Официальные и Аналоговые детали</span>
                     <h2 class="text-3xl font-display font-bold text-white mt-1">Каталог запчастей & Артикулы ТО</h2>
-                    <p class="text-gray-400 text-sm mt-1">База OEM номеров для проведения планового технического обслуживания BELGEE X80</p>
                 </div>
-
                 <div class="flex flex-wrap gap-2 max-w-full">
                     <button onclick="filterCategory('all')" class="cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all" data-cat="all">Все</button>
                     <button onclick="filterCategory('oils')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="oils">Моторные масла</button>
                     <button onclick="filterCategory('filters')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="filters">Фильтры</button>
-                    <button onclick="filterCategory('spark')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="spark">Свечи и катушки</button>
-                    <button onclick="filterCategory('transmission')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="transmission">КПП/Редуктор</button>
-                    <button onclick="filterCategory('fluids')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="fluids">Техжидкости</button>
-                    <button onclick="filterCategory('wheels')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="wheels">Колёса</button>
-                    <button onclick="filterCategory('wipers')" class="cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border" data-cat="wipers">Щётки</button>
                 </div>
             </div>
-
             <div class="overflow-x-auto rounded-2xl border border-brand-border bg-brand-card shadow-xl">
                 <table class="w-full text-left text-sm text-gray-300">
                     <thead class="bg-brand-border/50 text-xs font-semibold uppercase text-gray-400 border-b border-brand-border">
@@ -319,7 +380,7 @@
                             <th class="p-4">Наименование</th>
                             <th class="p-4">Регламент</th>
                             <th class="p-4">OEM Артикул</th>
-                            <th class="p-4">Аналоги / Примечания</th>
+                            <th class="p-4">Аналоги</th>
                             <th class="p-4 text-right">Цена</th>
                             <th class="p-4 text-center">Действие</th>
                         </tr>
@@ -330,6 +391,7 @@
         </div>
     </section>
 
+    <!-- ARTICLES -->
     <section id="articles" class="py-16 border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
@@ -339,25 +401,22 @@
                 </div>
                 <div class="flex gap-2">
                     <a href="articles.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-bold text-xs rounded-xl shadow-lg transition-all whitespace-nowrap">
-                        <i class="fa-solid fa-list"></i>
-                        <span>Смотреть все</span>
+                        <i class="fa-solid fa-list"></i> Смотреть все
                     </a>
                     <button onclick="openSubmission()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all whitespace-nowrap">
-                        <i class="fa-solid fa-plus text-sm"></i>
-                        <span>Добавить</span>
+                        <i class="fa-solid fa-plus text-sm"></i> Добавить
                     </button>
                 </div>
             </div>
-
             <div class="mb-8 relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input type="text" id="articles-search-input" onkeyup="handleArticlesSearch()" placeholder="Поиск по статьям..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-colors shadow-lg">
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="articles-grid"></div>
         </div>
     </section>
 
+    <!-- VIDEOS -->
     <section id="videos" class="py-16 bg-brand-dark border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
@@ -365,76 +424,54 @@
                     <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Видеообзоры и Тест-Драйвы</span>
                     <h2 class="text-3xl font-display font-bold text-white mt-1">Что говорят блогеры и автоэксперты</h2>
                 </div>
-                <a href="https://www.youtube.com/results?search_query=Belgee+X80+PHEV+%D1%82%D0%B5%D1%81%D1%82-%D0%B4%D1%80%D0%B0%D0%B9%D0%B2" target="_blank" class="mt-4 md:mt-0 text-xs text-gray-400 hover:text-brand-teal transition-colors flex items-center gap-2">
-                    <span>Смотреть все на YouTube</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
                     <div class="relative w-full aspect-video bg-slate-800">
                         <iframe id="video-frame-1" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/IMb8q6G7HAI" title="Видео 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold">Автопанорама</span>
-                            <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Belgee X80 PHEV — новый флагман. Подробный тест-драйв и обзор гибрида</h3>
-                        </div>
+                        <div><span class="text-[11px] text-brand-teal font-semibold">Автопанорама</span><h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Belgee X80 PHEV — новый флагман</h3></div>
                     </div>
                 </div>
-
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
                     <div class="relative w-full aspect-video bg-slate-800">
                         <iframe id="video-frame-2" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/ilfsu2HprjQ" title="Видео 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold">Видеообзор</span>
-                            <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Подробный обзор и тест-драйв Belgee X80</h3>
-                        </div>
+                        <div><span class="text-[11px] text-brand-teal font-semibold">Видеообзор</span><h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Подробный обзор и тест-драйв Belgee X80</h3></div>
                     </div>
                 </div>
-
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden card-glow group flex flex-col">
                     <div class="relative w-full aspect-video bg-slate-800">
                         <iframe id="video-frame-3" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/ilfsu2HprjQ" title="Видео 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] text-brand-teal font-semibold">Отзывы</span>
-                            <h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Честный отзыв владельца Belgee X80</h3>
-                        </div>
+                        <div><span class="text-[11px] text-brand-teal font-semibold">Отзывы</span><h3 class="font-bold text-white text-sm mt-1 group-hover:text-brand-teal transition-colors">Честный отзыв владельца Belgee X80</h3></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- COMMUNITY -->
     <section id="community" class="py-16 border-b border-brand-border relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-10">
                 <span class="text-brand-teal text-xs font-bold uppercase tracking-wider">Сообщество Владельцев</span>
                 <h2 class="text-3xl font-display font-bold text-white mt-1">Клуб BELGEE X80</h2>
-                <p class="text-gray-400 text-sm mt-1">Присоединяйтесь к нашему Telegram-сообществу владельцев</p>
             </div>
-
             <div class="max-w-3xl mx-auto bg-gradient-to-r from-blue-900/40 via-brand-card to-slate-900 p-8 sm:p-10 rounded-3xl border border-blue-500/30 text-center relative overflow-hidden card-glow">
                 <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
-
                 <div class="relative z-10 space-y-5">
-                    <div class="w-16 h-16 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-blue-500/20">
-                        <i class="fa-brands fa-telegram"></i>
-                    </div>
+                    <div class="w-16 h-16 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-blue-500/20"><i class="fa-brands fa-telegram"></i></div>
                     <h3 class="text-2xl sm:text-3xl font-bold font-display text-white">Официальный Telegram Чат</h3>
                     <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
                         <a href="https://t.me/bgx80" class="tg-link w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 hover:scale-105">
-                            <i class="fa-brands fa-telegram text-xl"></i>
-                            <span>Присоединиться к чату</span>
+                            <i class="fa-brands fa-telegram text-xl"></i> Присоединиться к чату
                         </a>
                         <button onclick="toggleModal('feedback-modal')" class="w-full sm:w-auto px-8 py-4 bg-brand-card hover:bg-brand-border border border-brand-border text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3">
-                            <i class="fa-solid fa-envelope text-brand-teal"></i>
-                            <span>Написать администрации</span>
+                            <i class="fa-solid fa-envelope text-brand-teal"></i> Написать администрации
                         </button>
                     </div>
                 </div>
@@ -442,6 +479,7 @@
         </div>
     </section>
 
+    <!-- FOOTER -->
     <footer class="bg-brand-dark py-12 text-gray-400 text-xs border-t border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -457,10 +495,6 @@
                         <li><a href="configurator.html" class="hover:text-brand-teal">3D Конфигуратор</a></li>
                         <li><a href="manual.html" class="hover:text-brand-teal">Руководство (PDF)</a></li>
                         <li><a href="articles.html" class="hover:text-brand-teal">Статьи</a></li>
-                        <li><a href="#videos" class="hover:text-brand-teal">Видео</a></li>
-                        <li><a href="3d-prints.html" class="hover:text-brand-teal">3D Печать</a></li>
-                        <li><a href="checklist.html" class="hover:text-brand-teal">Приёмка авто</a></li>
-                        <li><a href="#community" class="hover:text-brand-teal">Клуб</a></li>
                     </ul>
                 </div>
                 <div>
@@ -644,16 +678,33 @@
     <script type="module">
         import { supabase } from './js/config.js';
 
-        // ==========================================
-        // ГЛОБАЛЬНЫЙ ПОИСК
-        // ==========================================
-        let searchTimeout = null;
+        // --- 1. Управление мобильным меню (Drawer) ---
+        window.toggleMobileMenu = function() {
+            const drawer = document.getElementById('mobile-drawer');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (drawer.classList.contains('translate-x-full')) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        };
 
+        // --- 2. Скролл к поиску ---
+        window.scrollToSearch = function() {
+            document.getElementById('search-section').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => document.getElementById('global-search-input').focus(), 500);
+        };
+
+        // --- 3. Глобальный поиск ---
+        let searchTimeout = null;
         window.debounceSearch = function() {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                performGlobalSearch();
-            }, 300); // Ждем 300мс после последнего нажатия
+            searchTimeout = setTimeout(() => { performGlobalSearch(); }, 300);
         }
 
         async function performGlobalSearch() {
@@ -670,55 +721,23 @@
             dropdown.innerHTML = `<div class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2 text-brand-teal"></i> Ищем по всему сайту...</div>`;
 
             try {
-                // 1. Поиск по статьям
-                const { data: articles } = await supabase
-                    .from('articles')
-                    .select('id, title, summary')
-                    .eq('status', 'published')
-                    .or(`title.ilike.%${query}%,summary.ilike.%${query}%`)
-                    .limit(3);
+                const { data: articles } = await supabase.from('articles').select('id, title, summary').eq('status', 'published').or(`title.ilike.%${query}%,summary.ilike.%${query}%`).limit(3);
+                const { data: parts } = await supabase.from('parts').select('id, name, oem, analog').or(`name.ilike.%${query}%,oem.ilike.%${query}%,analog.ilike.%${query}%`).limit(3);
+                const { data: models } = await supabase.from('models_3d').select('id, title').eq('status', 'published').ilike('title', `%${query}%`).limit(3);
+                const { data: pages } = await supabase.from('custom_pages').select('title, slug').eq('status', 'published').ilike('title', `%${query}%`).limit(3);
 
-                // 2. Поиск по запчастям
-                const { data: parts } = await supabase
-                    .from('parts')
-                    .select('id, name, oem, analog')
-                    .or(`name.ilike.%${query}%,oem.ilike.%${query}%,analog.ilike.%${query}%`)
-                    .limit(3);
-
-                // 3. Поиск по 3D моделям
-                const { data: models } = await supabase
-                    .from('models_3d')
-                    .select('id, title')
-                    .eq('status', 'published')
-                    .ilike('title', `%${query}%`)
-                    .limit(3);
-
-                // 4. Поиск по кастомным страницам
-                const { data: pages } = await supabase
-                    .from('custom_pages')
-                    .select('title, slug')
-                    .eq('status', 'published')
-                    .ilike('title', `%${query}%`)
-                    .limit(3);
-
-                // 5. Поиск по статическим страницам
                 const staticPages = [
                     { title: 'Руководство по эксплуатации (PDF)', url: 'manual.html', icon: 'fa-book' },
                     { title: 'Приёмка автомобиля (Чек-лист)', url: 'checklist.html', icon: 'fa-clipboard-check' },
-                    { title: '3D Конфигуратор', url: 'configurator.html', icon: 'fa-cube' },
-                    { title: '3D Печать', url: '3d-prints.html', icon: 'fa-cubes' }
+                    { title: '3D Конфигуратор', url: 'configurator.html', icon: 'fa-cube' }
                 ].filter(p => p.title.toLowerCase().includes(query.toLowerCase()));
 
-                // Рендер результатов
                 let html = '';
 
                 if (parts && parts.length > 0) {
                     html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Запчасти и артикулы</div>`;
                     parts.forEach(p => {
-                        html += `<div onclick="scrollToCatalog('${p.oem || p.name}')" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
-                            <div class="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-box"></i></div>
-                            <div><div class="text-sm font-semibold text-white">${p.name}</div><div class="text-xs text-gray-400">Артикул: ${p.oem || '-'}</div></div>
-                        </div>`;
+                        html += `<div onclick="scrollToCatalog('${p.oem || p.name}')" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors"><div class="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-box"></i></div><div><div class="text-sm font-semibold text-white">${p.name}</div><div class="text-xs text-gray-400">Артикул: ${p.oem || '-'}</div></div></div>`;
                     });
                     html += `</div>`;
                 }
@@ -726,10 +745,7 @@
                 if (articles && articles.length > 0) {
                     html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Статьи и гайды</div>`;
                     articles.forEach(a => {
-                        html += `<div onclick="goToArticle('${a.id}')" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
-                            <div class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines"></i></div>
-                            <div><div class="text-sm font-semibold text-white">${a.title}</div><div class="text-xs text-gray-400 line-clamp-1">${a.summary}</div></div>
-                        </div>`;
+                        html += `<div onclick="goToArticle('${a.id}')" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors"><div class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-lines"></i></div><div><div class="text-sm font-semibold text-white">${a.title}</div><div class="text-xs text-gray-400 line-clamp-1">${a.summary}</div></div></div>`;
                     });
                     html += `</div>`;
                 }
@@ -737,10 +753,7 @@
                 if (models && models.length > 0) {
                     html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">3D Модели</div>`;
                     models.forEach(m => {
-                        html += `<a href="3d-prints.html" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
-                            <div class="w-8 h-8 rounded bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-cube"></i></div>
-                            <div class="text-sm font-semibold text-white">${m.title}</div>
-                        </a>`;
+                        html += `<a href="3d-prints.html" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors"><div class="w-8 h-8 rounded bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-cube"></i></div><div class="text-sm font-semibold text-white">${m.title}</div></a>`;
                     });
                     html += `</div>`;
                 }
@@ -748,10 +761,7 @@
                 if (pages && pages.length > 0) {
                     html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Страницы сайта</div>`;
                     pages.forEach(p => {
-                        html += `<a href="page.html?p=${p.slug}" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
-                            <div class="w-8 h-8 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-file"></i></div>
-                            <div class="text-sm font-semibold text-white">${p.title}</div>
-                        </a>`;
+                        html += `<a href="page.html?p=${p.slug}" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors"><div class="w-8 h-8 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-file"></i></div><div class="text-sm font-semibold text-white">${p.title}</div></a>`;
                     });
                     html += `</div>`;
                 }
@@ -759,10 +769,7 @@
                 if (staticPages.length > 0) {
                     html += `<div class="p-2 border-b border-brand-border/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider px-3 py-1">Разделы</div>`;
                     staticPages.forEach(p => {
-                        html += `<a href="${p.url}" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors">
-                            <div class="w-8 h-8 rounded bg-brand-teal/10 text-brand-teal flex items-center justify-center shrink-0"><i class="fa-solid ${p.icon}"></i></div>
-                            <div class="text-sm font-semibold text-white">${p.title}</div>
-                        </a>`;
+                        html += `<a href="${p.url}" class="flex items-center gap-3 p-3 hover:bg-brand-border/50 cursor-pointer rounded-lg transition-colors"><div class="w-8 h-8 rounded bg-brand-teal/10 text-brand-teal flex items-center justify-center shrink-0"><i class="fa-solid ${p.icon}"></i></div><div class="text-sm font-semibold text-white">${p.title}</div></a>`;
                     });
                     html += `</div>`;
                 }
@@ -778,22 +785,18 @@
             }
         }
 
-        // Действия при клике на результаты поиска
         window.scrollToCatalog = function(searchTerm) {
             document.getElementById('search-dropdown').classList.remove('active');
             document.getElementById('global-search-input').value = searchTerm;
             document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
-            // Опционально: можно добавить логику фильтрации таблицы по поиску
             handleGlobalSearch();
         }
 
         window.goToArticle = function(id) {
             document.getElementById('search-dropdown').classList.remove('active');
-            // Перенаправляем на страницу статей и передаем ID в хэше, чтобы открыть нужную
             window.location.href = `articles.html#article-${id}`;
         }
 
-        // Закрытие поиска при клике вне его
         document.addEventListener('click', (e) => {
             const searchContainer = document.getElementById('global-search-input');
             const dropdown = document.getElementById('search-dropdown');
@@ -802,9 +805,7 @@
             }
         });
 
-        // ==========================================
-        // ОСТАЛЬНАЯ ЛОГИКА
-        // ==========================================
+        // --- 4. Каталог ---
         let globalPartsData = [];
         async function loadPartsFromDB() {
             const tbody = document.getElementById('parts-table-body');
@@ -846,6 +847,7 @@
             renderPartsTable(globalPartsData.filter(p => (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q) || (p.analog || '').toLowerCase().includes(q)));
         };
 
+        // --- 5. Контент и статистика ---
         async function loadSiteContent() {
             const { data } = await supabase.from('site_content').select('*');
             if (!data) return;
@@ -881,11 +883,12 @@
             if (!pages || pages.length === 0) return;
             const navContainer = document.getElementById('dynamic-pages-nav'); const mobileContainer = document.getElementById('dynamic-pages-mobile');
             pages.forEach(page => {
-                const linkDesktop = document.createElement('a'); linkDesktop.href = `page.html?p=${page.slug}`; linkDesktop.className = 'hover:text-brand-teal transition-colors'; linkDesktop.textContent = page.title; navContainer.appendChild(linkDesktop);
-                const linkMobile = document.createElement('a'); linkMobile.href = `page.html?p=${page.slug}`; linkMobile.className = 'block py-2 text-gray-300 hover:text-brand-teal border-b border-gray-800'; linkMobile.textContent = page.title; mobileContainer.appendChild(linkMobile);
+                const linkDesktop = document.createElement('a'); linkDesktop.href = `page.html?p=${page.slug}`; linkDesktop.className = 'px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors'; linkDesktop.textContent = page.title; navContainer.appendChild(linkDesktop);
+                const linkMobile = document.createElement('a'); linkMobile.href = `page.html?p=${page.slug}`; linkMobile.className = 'flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white'; linkMobile.innerHTML = `<i class="fa-solid fa-file w-5 text-center text-gray-400"></i> ${page.title}`; mobileContainer.appendChild(linkMobile);
             });
         }
 
+        // --- 6. Обратная связь и модалки ---
         window.handleFeedbackSubmit = async function(e) {
             e.preventDefault(); const btn = e.target.querySelector('button[type="submit"]'); const originalText = btn.textContent; btn.textContent = 'Отправка...'; btn.disabled = true;
             const name = document.getElementById('feedback-name').value; const message = document.getElementById('feedback-message').value; const website = document.getElementById('feedback-website')?.value;
@@ -898,16 +901,13 @@
         window.toggleModal = function(id) { 
             const modal = document.getElementById(id);
             if(modal.classList.contains('hidden')) {
-                document.documentElement.style.overflow = 'hidden';
-                document.body.style.overflow = 'hidden';
+                document.documentElement.style.overflow = 'hidden'; document.body.style.overflow = 'hidden';
                 modal.classList.remove('hidden');
             } else {
-                document.documentElement.style.overflow = '';
-                document.body.style.overflow = '';
+                document.documentElement.style.overflow = ''; document.body.style.overflow = '';
                 modal.classList.add('hidden');
             }
         };
-        window.toggleMobileMenu = function() { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
         let confirmResolve = null;
         window.showConfirm = function(title, message, btnText = 'ОК', btnColor = 'bg-brand-teal', hoverColor = 'hover:bg-brand-teal/80', textColor = 'text-black') {
@@ -918,33 +918,52 @@
                 modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
             });
         };
-
         function closeConfirm(result) {
             const modal = document.getElementById('custom-confirm-modal'); const box = modal.querySelector('div');
             modal.classList.add('opacity-0'); box.classList.add('scale-95');
             setTimeout(() => { modal.classList.add('hidden'); if (confirmResolve) { confirmResolve(result); confirmResolve = null; } }, 300);
         }
-
         document.getElementById('confirm-cancel-btn')?.addEventListener('click', () => closeConfirm(false));
         document.getElementById('confirm-ok-btn')?.addEventListener('click', () => closeConfirm(true));
 
+        // --- 7. Авторизация ---
         async function updateAuthUI() {
-            const authContainer = document.getElementById('auth-container'); const mobileAuthContainer = document.getElementById('mobile-auth-container');
+            const authContainer = document.getElementById('auth-container');
+            const mobileAuthContainer = document.getElementById('mobile-auth-container');
             if (!authContainer || !mobileAuthContainer) return;
-            await new Promise(resolve => setTimeout(resolve, 300));
             const { data: { session } } = await supabase.auth.getSession();
+            
             if (session) {
-                authContainer.innerHTML = `<a href="profile.html" class="text-gray-400 text-xs hidden 2xl:block hover:text-white transition-colors">Мой профиль</a><a href="admin.html" class="text-brand-teal text-sm font-semibold hover:underline">Админка</a><button onclick="logout()" class="text-red-400 text-sm font-semibold hover:text-red-300">Выйти</button>`;
-                mobileAuthContainer.innerHTML = `<a href="profile.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Мой профиль</a><a href="admin.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Админка</a><button onclick="logout(); toggleMobileMenu()" class="w-full py-2 text-red-400 font-semibold text-left">Выйти</button><a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium mt-2"><i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram</a><button onclick="toggleModal('feedback-modal'); toggleMobileMenu()" class="w-full py-2.5 bg-brand-teal text-black font-semibold rounded-xl">Обратная связь</button>`;
+                authContainer.innerHTML = `
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-brand-card border border-brand-border hover:border-brand-teal transition-colors">
+                            <div class="w-8 h-8 rounded-full bg-brand-teal/20 text-brand-teal flex items-center justify-center font-bold"><i class="fa-solid fa-user text-sm"></i></div>
+                            <span class="text-sm font-semibold text-white hidden 2xl:block max-w-[100px] truncate">${session.user.email.split('@')[0]}</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-gray-500 group-hover:rotate-180 transition-transform"></i>
+                        </button>
+                        <div class="absolute top-full right-0 mt-2 w-48 bg-brand-card border border-brand-border rounded-xl shadow-xl dropdown-menu overflow-hidden flex flex-col p-1 z-50">
+                            <a href="profile.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-gray-300 hover:text-white transition-colors"><i class="fa-solid fa-id-card w-4 text-center mr-2 text-gray-500"></i> Профиль</a>
+                            <a href="admin.html" class="px-3 py-2 rounded-lg hover:bg-brand-border text-brand-teal font-semibold transition-colors"><i class="fa-solid fa-shield-halved w-4 text-center mr-2"></i> Админка</a>
+                            <div class="h-px bg-brand-border my-1"></div>
+                            <button onclick="logout()" class="px-3 py-2 rounded-lg hover:bg-red-500/20 text-red-400 font-semibold transition-colors text-left w-full"><i class="fa-solid fa-arrow-right-from-bracket w-4 text-center mr-2"></i> Выйти</button>
+                        </div>
+                    </div>
+                `;
+                mobileAuthContainer.innerHTML = `
+                    <a href="profile.html" class="w-full py-2.5 rounded-xl bg-brand-border text-white font-semibold text-center flex items-center justify-center gap-2"><i class="fa-solid fa-id-card"></i> Мой профиль</a>
+                    <a href="admin.html" class="w-full py-2.5 rounded-xl bg-brand-teal text-black font-bold text-center flex items-center justify-center gap-2"><i class="fa-solid fa-shield-halved"></i> Админка</a>
+                    <button onclick="logout()" class="w-full py-2.5 rounded-xl text-red-400 font-semibold text-center mt-2 border border-red-500/30"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Выйти</button>
+                `;
             } else {
-                authContainer.innerHTML = `<a href="login.html" class="text-cyan-400 text-sm font-semibold whitespace-nowrap hover:text-white transition-colors">Вход / Регистрация</a>`;
-                mobileAuthContainer.innerHTML = `<a href="login.html" onclick="toggleMobileMenu()" class="block py-2 text-brand-teal font-semibold">Вход / Регистрация</a><a href="https://t.me/bgx80" class="tg-link w-full text-center py-2.5 bg-blue-600 text-white rounded-xl font-medium"><i class="fa-brands fa-telegram mr-2"></i> Присоединиться к Telegram</a><button onclick="toggleModal('feedback-modal'); toggleMobileMenu()" class="w-full py-2.5 bg-brand-teal text-black font-semibold rounded-xl">Обратная связь</button>`;
+                authContainer.innerHTML = `<a href="login.html" class="px-5 py-2 rounded-xl bg-brand-teal text-black font-bold text-sm hover:scale-105 transition-transform">Войти</a>`;
+                mobileAuthContainer.innerHTML = `<a href="login.html" class="w-full py-3 rounded-xl bg-brand-teal text-black font-bold text-center">Вход / Регистрация</a>`;
             }
         }
 
-        supabase.auth.onAuthStateChange((event, session) => { updateAuthUI(); });
         window.logout = async function() { await supabase.auth.signOut(); window.location.reload(); }
+        supabase.auth.onAuthStateChange((event, session) => { updateAuthUI(); });
 
+        // --- Инициализация ---
         document.addEventListener('DOMContentLoaded', () => {
             loadPartsFromDB(); loadSiteContent(); loadDynamicPages(); updateAuthUI(); loadRealStats();
         });
