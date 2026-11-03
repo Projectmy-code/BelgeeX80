@@ -475,15 +475,16 @@
     <!-- ============================================== -->
     <!-- ПОЛНОЭКРАННЫЙ РЕДАКТОР -->
     <!-- ============================================== -->
-    <div id="add-article-modal" class="fixed inset-0 z-[100] hidden bg-brand-dark flex-col h-[100dvh] w-screen overflow-hidden">
-        <header class="h-16 shrink-0 bg-brand-card border-b border-brand-border flex items-center justify-between px-4 sm:px-6">
+    <div id="add-article-modal" class="fixed inset-0 z-[100] hidden bg-brand-dark h-[100dvh] w-screen overflow-hidden flex-col">
+        <!-- Шапка (всегда сверху) -->
+        <header class="h-16 shrink-0 bg-brand-card border-b border-brand-border flex items-center justify-between px-4 sm:px-6 z-20 relative">
             <div class="flex items-center gap-3">
                 <button type="button" onclick="closeEditor()" class="w-8 h-8 rounded-full bg-brand-border hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <div>
                     <div class="font-bold text-white text-sm sm:text-base">Новая статья</div>
-                    <div class="text-[10px] text-gray-500">Черновик сохраняется автоматически</div>
+                    <div class="text-[10px] text-gray-500">Черновик сохраняется</div>
                 </div>
             </div>
             
@@ -492,76 +493,81 @@
                     Отмена
                 </button>
                 <button type="submit" form="add-article-form" id="submit-article-btn" class="px-5 py-2 bg-gradient-to-r from-brand-teal to-blue-500 text-black font-bold text-sm rounded-lg shadow-lg hover:scale-105 transition-all">
-                    Отправить на модерацию
+                    Отправить
                 </button>
             </div>
         </header>
 
-        <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden overflow-y-auto">
-            
-            <div class="flex-1 flex flex-col bg-[#0c1017] lg:overflow-y-auto">
-                <div class="max-w-3xl w-full mx-auto py-8 px-4 sm:px-8">
-                    <input type="text" id="new-title" required placeholder="Заголовок статьи..." class="w-full bg-transparent text-3xl sm:text-4xl font-display font-bold text-white placeholder-gray-600 focus:outline-none mb-6">
-                    
-                    <div class="border border-brand-border rounded-2xl overflow-hidden shadow-2xl">
-                        <div id="editor-container"></div>
-                    </div>
-                </div>
-            </div>
-
-            <aside class="w-full lg:w-80 shrink-0 bg-brand-card border-t lg:border-t-0 lg:border-l border-brand-border p-6 space-y-6 lg:overflow-y-auto">
+        <!-- Скроллируемая область (включает и редактор, и настройки) -->
+        <div class="flex-1 overflow-y-auto w-full">
+            <form id="add-article-form" onsubmit="handleAddArticleSubmit(event)" class="flex flex-col lg:flex-row min-h-full">
                 
-                <div>
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Обложка</h3>
-                    <label class="block w-full aspect-video rounded-xl border-2 border-dashed border-brand-border hover:border-brand-teal bg-brand-dark flex flex-col items-center justify-center cursor-pointer transition-colors relative overflow-hidden group">
-                        <input type="file" id="new-image-file" accept="image/*" class="hidden">
-                        <div id="cover-preview-container" class="absolute inset-0 hidden">
-                            <img id="cover-preview-img" class="w-full h-full object-cover" alt="Превью">
-                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <i class="fa-solid fa-pen text-white text-xl"></i>
-                            </div>
+                <!-- Левая часть (Редактор) -->
+                <div class="flex-1 flex flex-col bg-[#0c1017]">
+                    <div class="max-w-3xl w-full mx-auto py-8 px-4 sm:px-8">
+                        <input type="text" id="new-title" required placeholder="Заголовок статьи..." class="w-full bg-transparent text-3xl sm:text-4xl font-display font-bold text-white placeholder-gray-600 focus:outline-none mb-6">
+                        
+                        <div class="border border-brand-border rounded-2xl overflow-hidden shadow-2xl bg-brand-dark">
+                            <div id="editor-container"></div>
                         </div>
-                        <div class="text-center text-gray-500 group-hover:text-brand-teal transition-colors" id="cover-placeholder">
-                            <i class="fa-regular fa-image text-2xl mb-2"></i>
-                            <div class="text-xs font-semibold">Загрузить фото</div>
-                        </div>
-                    </label>
+                    </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Категория</label>
-                        <select id="new-category" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal">
-                            <option value="Тюнинг & Защита">Тюнинг & Защита</option>
-                            <option value="Мультимедиа">Мультимедиа</option>
-                            <option value="Комфорт">Комфорт</option>
-                            <option value="Электрика">Электрика</option>
-                            <option value="Обслуживание">Обслуживание</option>
-                        </select>
-                    </div>
+                <!-- Правая часть (Настройки) -->
+                <aside class="w-full lg:w-80 shrink-0 bg-brand-card border-t lg:border-t-0 lg:border-l border-brand-border p-6 space-y-6">
                     
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Время чтения</label>
-                        <input type="text" id="new-readtime" value="5 мин чтения" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Обложка</h3>
+                        <label class="block w-full aspect-video rounded-xl border-2 border-dashed border-brand-border hover:border-brand-teal bg-brand-dark flex flex-col items-center justify-center cursor-pointer transition-colors relative overflow-hidden group">
+                            <input type="file" id="new-image-file" accept="image/*" class="hidden">
+                            <div id="cover-preview-container" class="absolute inset-0 hidden">
+                                <img id="cover-preview-img" class="w-full h-full object-cover" alt="Превью">
+                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                    <i class="fa-solid fa-pen text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="text-center text-gray-500 group-hover:text-brand-teal transition-colors" id="cover-placeholder">
+                                <i class="fa-regular fa-image text-2xl mb-2"></i>
+                                <div class="text-xs font-semibold">Загрузить фото</div>
+                            </div>
+                        </label>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Автор</label>
-                        <input type="text" id="new-author" required placeholder="Ваш никнейм" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Категория</label>
+                            <select id="new-category" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal">
+                                <option value="Тюнинг & Защита">Тюнинг & Защита</option>
+                                <option value="Мультимедиа">Мультимедиа</option>
+                                <option value="Комфорт">Комфорт</option>
+                                <option value="Электрика">Электрика</option>
+                                <option value="Обслуживание">Обслуживание</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Время чтения</label>
+                            <input type="text" id="new-readtime" value="5 мин чтения" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Автор</label>
+                            <input type="text" id="new-author" required placeholder="Ваш никнейм" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Краткое описание</label>
+                            <textarea id="new-summary" rows="4" required placeholder="О чем эта статья в 2-3 предложениях..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal resize-none"></textarea>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Краткое описание</label>
-                        <textarea id="new-summary" rows="4" required placeholder="О чем эта статья в 2-3 предложениях..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-teal resize-none"></textarea>
-                    </div>
-                </div>
+                    <button type="submit" class="w-full lg:hidden py-3 bg-brand-teal text-black font-bold rounded-xl shadow-lg mt-4">
+                        Отправить на модерацию
+                    </button>
 
-                <button type="submit" class="w-full lg:hidden py-3 bg-brand-teal text-black font-bold rounded-xl shadow-lg mt-4">
-                    Отправить на модерацию
-                </button>
-
-            </aside>
-        </form>
+                </aside>
+            </form>
+        </div>
     </div>
 
     <!-- OTHER MODALS -->
@@ -718,15 +724,17 @@
             if (website) { btn.textContent = originalText; btn.disabled = false; return; }
             const { error } = await supabase.from('feedback').insert([{ name, message }]);
             btn.textContent = originalText; btn.disabled = false;
-            if (error) { alert('Ошибка: ' + error.message); } else { alert('Спасибо! Ваше сообщение отправлено администратору.'); e.target.reset(); document.getElementById('feedback-modal').classList.add('hidden'); document.body.style.overflow = ''; }
+            if (error) { alert('Ошибка: ' + error.message); } else { alert('Спасибо! Ваше сообщение отправлено администратору.'); e.target.reset(); document.getElementById('feedback-modal').classList.add('hidden'); document.documentElement.style.overflow = ''; document.body.style.overflow = ''; }
         };
 
         window.toggleModal = function(id) { 
             const modal = document.getElementById(id);
             if(modal.classList.contains('hidden')) {
+                document.documentElement.style.overflow = 'hidden';
                 document.body.style.overflow = 'hidden';
                 modal.classList.remove('hidden');
             } else {
+                document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
                 modal.classList.add('hidden');
             }
