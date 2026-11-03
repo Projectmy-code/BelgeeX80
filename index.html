@@ -152,7 +152,7 @@
                 <!-- ГЛОБАЛЬНЫЙ ПОИСК (ПК) -->
                 <div class="hidden xl:flex items-center relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-400 z-10 pointer-events-none"></i>
-                    <input type="text" id="global-search-input" oninput="debounceSearch('global')" placeholder="Поиск по сайту..." autocomplete="off"
+                    <input type="text" id="global-search-input" oninput="debounceSearch('global'); handleGlobalSearch();" placeholder="Поиск по сайту..." autocomplete="off"
                            class="w-48 2xl:w-64 bg-brand-dark border border-brand-border rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal transition-all">
                     <div id="global-search-dropdown" class="search-dropdown absolute top-full right-0 mt-2 w-[350px] bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[60vh] overflow-y-auto custom-scrollbar"></div>
                 </div>
@@ -180,7 +180,7 @@
         <div class="p-4 border-b border-brand-border shrink-0">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"></i>
-                <input type="text" id="mobile-search-input" oninput="debounceSearch('mobile')" placeholder="Поиск по сайту..." autocomplete="off"
+                <input type="text" id="mobile-search-input" oninput="debounceSearch('mobile'); handleGlobalSearch();" placeholder="Поиск по сайту..." autocomplete="off"
                        class="w-full bg-brand-dark border border-brand-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-teal">
                 <div id="mobile-search-dropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden z-50 max-h-[40vh] overflow-y-auto custom-scrollbar"></div>
             </div>
@@ -783,25 +783,23 @@
             if (mi && md && !mi.contains(e.target) && !md.contains(e.target)) md.classList.remove('active');
         });
 
-        // --- 4. Каталог (Плитка и Таблица) ---
-        let globalPartsData = [];
+        // --- 4. КАТАЛОГ (ИСПРАВЛЕННАЯ ЛОГИКА) ---
+        let originalPartsData = [];
+        let currentPartsData = [];
         let isCatalogExpanded = false;
         let currentView = window.innerWidth < 768 ? 'grid' : 'table';
+        let activeCategory = 'all';
+        let activeSearch = '';
 
         async function loadPartsFromDB() {
             const { data, error } = await supabase.from('parts').select('*').order('name');
             if (error) return;
-            globalPartsData = data || []; 
+            originalPartsData = data || []; 
             updateViewUI();
-            renderParts();
+            updateCatalog();
         }
 
-        window.toggleCatalogView = function(view) {
-            currentView = view;
-            updateViewUI();
-            renderParts();
-        }
-
+        // Обновление визуала переключателя (Таблица/Плитка)
         function updateViewUI() {
             const btnTable = document.getElementById('btn-view-table');
             const btnGrid = document.getElementById('btn-view-grid');
@@ -823,23 +821,75 @@
             }
         }
 
+        window.toggleCatalogView = function(view) {
+            currentView = view;
+            updateViewUI();
+            renderParts();
+        }
+
+        // Основная функция фильтрации и поиска
+        function updateCatalog() {
+            currentPartsData = [...originalPartsData];
+            
+            // Фильтр по категории
+            if (activeCategory !== 'all') {
+                currentPartsData = currentPartsData.filter(p => p.cat === activeCategory || p.category === activeCategory);
+            }
+
+            // Фильтр по поиску
+            if (activeSearch) {
+                currentPartsData = currentPartsData.filter(p => 
+                    (p.name || '').toLowerCase().includes(activeSearch) ||
+                    (p.oem || '').toLowerCase().includes(activeSearch) ||
+                    (p.analog || '').toLowerCase().includes(activeSearch)
+                );
+            }
+
+            renderParts();
+        }
+
+        // Обработчик клика по категориям
+        window.filterCategory = function(cat) {
+            activeCategory = cat;
+            isCatalogExpanded = false;
+            document.querySelectorAll('.cat-tab').forEach(btn => {
+                btn.className = (btn.dataset.cat === cat) 
+                    ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md' 
+                    : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
+            });
+            updateCatalog();
+        };
+
+        // Обработчик поиска
+        window.handleGlobalSearch = function() {
+            const desktopInput = document.getElementById('global-search-input');
+            const mobileInput = document.getElementById('mobile-search-input');
+            
+            // Берем значение из того поля, где печатают
+            let val = '';
+            if (desktopInput && desktopInput.value.trim()) val = desktopInput.value.trim();
+            else if (mobileInput && mobileInput.value.trim()) val = mobileInput.value.trim();
+            
+            activeSearch = val.toLowerCase();
+            isCatalogExpanded = false;
+            updateCatalog();
+        };
+
+        // Отрисовка каталога
         function renderParts() {
             const tbody = document.getElementById('parts-table-body');
             const gridContainer = document.getElementById('parts-grid-container');
             const btn = document.getElementById('view-all-parts-btn');
             
-            if (globalPartsData.length === 0) { 
+            if (currentPartsData.length === 0) { 
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">Запчасти не найдены</td></tr>'; 
                 gridContainer.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">Запчасти не найдены</div>';
                 btn.classList.add('hidden');
                 return; 
             }
 
-            const globalSearchVal = document.getElementById('global-search-input').value.trim();
-            const mobileSearchVal = document.getElementById('mobile-search-input').value.trim();
-            const isSearching = globalSearchVal.length > 0 || mobileSearchVal.length > 0;
-
-            const displayItems = (isCatalogExpanded || isSearching) ? globalPartsData : globalPartsData.slice(0, 5);
+            // Если идет поиск — показываем все результаты, иначе ограничиваем 5
+            const displayItems = (isCatalogExpanded || activeSearch) ? currentPartsData : currentPartsData.slice(0, 5);
             
             tbody.innerHTML = displayItems.map(part => `
                 <tr class="hover:bg-brand-border/30 transition-colors">
@@ -870,17 +920,22 @@
                 </div>
             `).join('');
 
-            // ОБНОВЛЕННАЯ ЛОГИКА КНОПКИ (Показать все / Свернуть)
-            if (globalPartsData.length > 5 && !isSearching) {
+            // Умная кнопка "Показать все / Свернуть"
+            if (currentPartsData.length > 5 && !activeSearch) {
                 btn.classList.remove('hidden');
                 if (isCatalogExpanded) {
                     btn.innerHTML = `Свернуть список <i class="fa-solid fa-arrow-up ml-1"></i>`;
                 } else {
-                    btn.innerHTML = `Показать все (${globalPartsData.length}) <i class="fa-solid fa-arrow-down ml-1"></i>`;
+                    btn.innerHTML = `Показать все (${currentPartsData.length}) <i class="fa-solid fa-arrow-down ml-1"></i>`;
                 }
             } else {
                 btn.classList.add('hidden');
             }
+        }
+
+        window.toggleCatalogExpand = function() {
+            isCatalogExpanded = !isCatalogExpanded;
+            renderParts();
         }
 
         window.copyOemCode = function(code) {
@@ -891,23 +946,6 @@
                 showToast('Ошибка копирования', 'error');
             });
         }
-
-        window.toggleCatalogExpand = function() {
-            isCatalogExpanded = !isCatalogExpanded;
-            renderParts();
-        }
-
-        window.filterCategory = function(cat) {
-            isCatalogExpanded = false; 
-            document.querySelectorAll('.cat-tab').forEach(btn => {
-                btn.className = (btn.dataset.cat === cat) ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md' : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
-            });
-        };
-
-        window.handleGlobalSearch = function() {
-            isCatalogExpanded = false; 
-            const q = document.getElementById('global-search-input').value.toLowerCase() || document.getElementById('mobile-search-input').value.toLowerCase();
-        };
 
         // --- 5. PWA BANNER ---
         let deferredPrompt;
