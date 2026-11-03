@@ -59,7 +59,6 @@
 
         @keyframes slideIn { 0% { transform: translateX(50px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
-        @keyframes slideUp { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
 
         .dropdown-menu { opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .group:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
@@ -363,6 +362,7 @@
 
             <div id="parts-grid-container" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
             
+            <!-- Кнопка "Показать все / Свернуть" -->
             <div class="mt-6 text-center">
                 <button id="view-all-parts-btn" onclick="toggleCatalogExpand()" class="hidden px-8 py-3 bg-brand-card border border-brand-border hover:border-brand-teal text-white font-bold rounded-xl transition-all shadow-lg">
                     Показать все артикулы <i class="fa-solid fa-arrow-down ml-2 text-brand-teal"></i>
@@ -496,7 +496,7 @@
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
-    <!-- PWA BANNER (УМНАЯ УСТАНОВКА) -->
+    <!-- PWA BANNER -->
     <div id="pwa-banner" class="fixed bottom-0 left-0 right-0 z-[90] p-4 pb-6 sm:hidden">
         <div class="bg-brand-card/95 backdrop-blur-xl border border-brand-teal/40 rounded-2xl p-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.5)] flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-brand-teal flex items-center justify-center shrink-0 shadow-lg">
@@ -670,7 +670,6 @@
             
             container.appendChild(toast);
 
-            // Автоудаление через 3.5 секунды
             setTimeout(() => {
                 toast.classList.add('hiding');
                 setTimeout(() => toast.remove(), 300);
@@ -871,15 +870,19 @@
                 </div>
             `).join('');
 
-            if (globalPartsData.length > 5 && !isCatalogExpanded && !isSearching) {
+            // ОБНОВЛЕННАЯ ЛОГИКА КНОПКИ (Показать все / Свернуть)
+            if (globalPartsData.length > 5 && !isSearching) {
                 btn.classList.remove('hidden');
-                btn.innerHTML = `Показать все (${globalPartsData.length}) <i class="fa-solid fa-arrow-down ml-1"></i>`;
+                if (isCatalogExpanded) {
+                    btn.innerHTML = `Свернуть список <i class="fa-solid fa-arrow-up ml-1"></i>`;
+                } else {
+                    btn.innerHTML = `Показать все (${globalPartsData.length}) <i class="fa-solid fa-arrow-down ml-1"></i>`;
+                }
             } else {
                 btn.classList.add('hidden');
             }
         }
 
-        // НОВАЯ ФУНКЦИЯ ДЛЯ КОПИРОВАНИЯ С УВЕДОМЛЕНИЕМ
         window.copyOemCode = function(code) {
             if (!code || code === '-') return;
             navigator.clipboard.writeText(code).then(() => {
@@ -899,7 +902,6 @@
             document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.className = (btn.dataset.cat === cat) ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md' : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
             });
-            // Логика фильтрации (упрощенно)
         };
 
         window.handleGlobalSearch = function() {
@@ -1003,7 +1005,6 @@
         document.getElementById('confirm-cancel-btn')?.addEventListener('click', () => closeConfirm(false));
         document.getElementById('confirm-ok-btn')?.addEventListener('click', () => closeConfirm(true));
 
-        // ИСПОЛЬЗУЕМ showToast ВМЕСТО alert
         window.handleFeedbackSubmit = async function(e) {
             e.preventDefault(); 
             const btn = e.target.querySelector('button[type="submit"]'); 
