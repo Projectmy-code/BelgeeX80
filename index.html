@@ -75,7 +75,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-teal selection:text-black">
 
-    <!-- ШАПКА (ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ) -->
+    <!-- ШАПКА -->
     <header class="sticky top-0 z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
             <a href="index.html" class="flex items-center gap-3 group shrink-0">
@@ -279,56 +279,61 @@
         </div>
     </section>
 
-    <!-- SPECS -->
-    <section id="specs" class="py-16 border-b border-brand-border">
+    <!-- ============================================== -->
+    <!-- ОБНОВЛЕННЫЕ ТЕХНИЧЕСКИЕ ХАРАКТЕРИСТИКИ (КОМПАКТНЫЕ) -->
+    <!-- ============================================== -->
+    <section id="specs" class="py-12 border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-12">
-                <h2 class="text-3xl font-display font-bold text-white">Технические характеристики BELGEE X80</h2>
-                <p class="text-gray-400 mt-2 text-sm">Актуальные данные для гибридной версии PHEV (Plug-in Hybrid)</p>
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <h2 class="text-2xl font-display font-bold text-white">Технические характеристики</h2>
+                <p class="text-gray-400 mt-1 text-sm">Ключевые показатели гибридной версии PHEV</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-4 border border-blue-500/20"><i class="fa-solid fa-bolt"></i></div>
-                    <h3 class="font-display font-bold text-lg text-white">Силовая установка</h3>
-                    <p class="text-2xl font-extrabold text-brand-teal mt-1">PHEV 218 л.с.</p>
-                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
-                        <li>• ДВС: <strong>1.5 л (99 л.с.)</strong></li>
-                        <li>• Электромотор: <strong>218 л.с. / 262 Н·м</strong></li>
-                    </ul>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Мощность -->
+                <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg mb-3 border border-blue-500/20">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Мощность</div>
+                    <div class="text-xl sm:text-2xl font-display font-extrabold text-brand-teal">218 л.с.</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Гибрид PHEV</div>
                 </div>
-                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-brand-teal/10 text-brand-teal flex items-center justify-center text-xl mb-4 border border-brand-teal/20"><i class="fa-solid fa-gears"></i></div>
-                    <h3 class="font-display font-bold text-lg text-white">Трансмиссия и привод</h3>
-                    <p class="text-2xl font-extrabold text-white mt-1">Редуктор</p>
-                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
-                        <li>• Привод: <strong>Передний</strong></li>
-                        <li>• Батарея: <strong>18.4 кВт·ч (LFP)</strong></li>
-                    </ul>
+
+                <!-- Привод -->
+                <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
+                    <div class="w-10 h-10 rounded-full bg-brand-teal/10 text-brand-teal flex items-center justify-center text-lg mb-3 border border-brand-teal/20">
+                        <i class="fa-solid fa-gears"></i>
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Привод</div>
+                    <div class="text-xl sm:text-2xl font-display font-extrabold text-white">Передний</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Редуктор</div>
                 </div>
-                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl mb-4 border border-purple-500/20"><i class="fa-solid fa-ruler-combined"></i></div>
-                    <h3 class="font-display font-bold text-lg text-white">Габариты и клиренс</h3>
-                    <p class="text-2xl font-extrabold text-white mt-1">4740 × 1905 мм</p>
-                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
-                        <li>• Высота: <strong>1685 мм</strong></li>
-                        <li>• Дорожный просвет: <strong>172 мм</strong></li>
-                    </ul>
+
+                <!-- Длина -->
+                <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
+                    <div class="w-10 h-10 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg mb-3 border border-purple-500/20">
+                        <i class="fa-solid fa-ruler-combined"></i>
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Габариты</div>
+                    <div class="text-xl sm:text-2xl font-display font-extrabold text-white">4740 мм</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Длина кузова</div>
                 </div>
-                <div class="bg-brand-card p-6 rounded-2xl border border-brand-border card-glow">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4 border border-emerald-500/20"><i class="fa-solid fa-gauge-high"></i></div>
-                    <h3 class="font-display font-bold text-lg text-white">Динамика и расход</h3>
-                    <p class="text-2xl font-extrabold text-white mt-1">7.5 сек</p>
-                    <ul class="text-xs text-gray-400 mt-3 space-y-1.5 border-t border-brand-border/60 pt-3">
-                        <li>• Разгон 0–100: <strong>~7.5 сек</strong></li>
-                        <li>• Расход: <strong>от 6.4 л/100 км</strong></li>
-                    </ul>
+
+                <!-- Разгон -->
+                <div class="bg-brand-card p-4 sm:p-5 rounded-2xl border border-brand-border card-glow flex flex-col items-center text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg mb-3 border border-emerald-500/20">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Разгон</div>
+                    <div class="text-xl sm:text-2xl font-display font-extrabold text-white">7.5 сек</div>
+                    <div class="text-[11px] text-gray-400 mt-1">0–100 км/ч</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- КАТАЛОГ (С ОГРАНИЧЕНИЕМ В 5 СТРОК) -->
+    <!-- КАТАЛОГ -->
     <section id="catalog" class="py-16 bg-brand-dark border-b border-brand-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
@@ -359,7 +364,6 @@
                 </table>
             </div>
             
-            <!-- Кнопка "Показать все" -->
             <div class="mt-6 text-center">
                 <button id="view-all-parts-btn" onclick="toggleCatalogExpand()" class="hidden px-8 py-3 bg-brand-card border border-brand-border hover:border-brand-teal text-white font-bold rounded-xl transition-all shadow-lg">
                     Показать все артикулы <i class="fa-solid fa-arrow-down ml-2 text-brand-teal"></i>
@@ -800,7 +804,7 @@
 
         // --- 4. Каталог (С ограничением) ---
         let globalPartsData = [];
-        let isCatalogExpanded = false; // По умолчанию показываем 5
+        let isCatalogExpanded = false;
 
         async function loadPartsFromDB() {
             const tbody = document.getElementById('parts-table-body');
@@ -848,7 +852,7 @@
         }
 
         window.filterCategory = function(cat) {
-            isCatalogExpanded = false; // Сбрасываем при фильтрации
+            isCatalogExpanded = false; 
             document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.className = (btn.dataset.cat === cat) ? 'cat-tab px-4 py-2 rounded-xl bg-brand-teal text-black font-semibold text-xs transition-all shadow-md' : 'cat-tab px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border text-gray-300 font-medium text-xs transition-all border border-brand-border';
             });
@@ -856,7 +860,7 @@
         };
 
         window.handleGlobalSearch = function() {
-            isCatalogExpanded = false; // Сбрасываем при поиске
+            isCatalogExpanded = false; 
             const q = document.getElementById('global-search-input').value.toLowerCase();
             renderPartsTable(globalPartsData.filter(p => (p.name || '').toLowerCase().includes(q) || (p.oem || '').toLowerCase().includes(q) || (p.analog || '').toLowerCase().includes(q)));
         };
