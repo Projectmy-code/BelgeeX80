@@ -54,7 +54,11 @@ async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadArticlesFromDB();
+    // Загружаем статьи только если это ГЛАВНАЯ страница (нет кнопки load-more-btn)
+    if (document.getElementById('articles-grid') && !document.getElementById('load-more-btn')) {
+        loadArticlesFromDB();
+    }
+    
     const editorContainer = document.getElementById('editor-container');
     
     if (editorContainer) {
@@ -207,8 +211,8 @@ export function openArticleModal(article) {
 
     contentEl.innerHTML = html;
     document.getElementById('info-modal')?.classList.remove('hidden');
-    document.documentElement.style.overflow = 'hidden'; // Блокируем скролл html
-    document.body.style.overflow = 'hidden'; // Блокируем скролл body
+    document.documentElement.style.overflow = 'hidden'; 
+    document.body.style.overflow = 'hidden'; 
     applyForcedStyles(contentEl);
 }
 
